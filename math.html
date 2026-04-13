@@ -8,8 +8,9 @@
 <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="math-page">
 
+<!-- NAV -->
 <nav class="nav">
     <a href="index.html">Home</a>
     <a href="math.html">Math</a>
@@ -17,21 +18,26 @@
     <a href="about.html">About</a>
 </nav>
 
-<div class="page">
+<!-- FULL SCREEN BACKGROUND -->
+<div class="math-hero">
 
-    <h1>Math Engine</h1>
+    <div class="math-card">
 
-    <div class="card">
+        <h1>Math Engine</h1>
+        <p class="sub">Train speed and accuracy</p>
 
-        <div id="question">Loading...</div>
+        <div class="stats">
+            <div>Score: <span id="score">0</span></div>
+            <div>Streak: <span id="streak">0</span></div>
+        </div>
 
-        <input id="answer" type="number" placeholder="Answer">
+        <div id="question" class="question">Loading...</div>
 
-        <br><br>
+        <input id="answer" type="number" placeholder="Your answer" />
 
         <button id="submit">Submit</button>
 
-        <p id="result"></p>
+        <div id="result"></div>
 
     </div>
 
