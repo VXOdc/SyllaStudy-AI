@@ -1,98 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Math Engine</title>
-
 <link rel="stylesheet" href="style.css">
-
-<style>
-.container {
-    max-width: 500px;
-    margin: 120px auto;
-    text-align: center;
-}
-
-.box {
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(18px);
-    border: 1px solid rgba(255,255,255,0.1);
-    padding: 30px;
-    border-radius: 20px;
-}
-
-.stats {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 20px;
-    font-size: 14px;
-    color: #bbb;
-}
-
-.q {
-    font-size: 28px;
-    margin: 20px 0;
-}
-
-input {
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    width: 120px;
-    text-align: center;
-    font-size: 18px;
-}
-
-button {
-    margin-top: 12px;
-    padding: 10px 18px;
-    border-radius: 999px;
-    border: none;
-    background: white;
-    cursor: pointer;
-}
-
-.correct { color: lightgreen; }
-.wrong { color: red; }
-
-.topbar {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-}
-
-.topbar a {
-    text-decoration: none;
-    color: white;
-    opacity: 0.7;
-}
-</style>
 </head>
 
 <body>
 
-<div class="topbar">
-    <a href="index.html">← Back</a>
+<div class="nav">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="math.html">Math</a>
+    <a href="chat.html">Assistant</a>
 </div>
 
-<div class="container">
+<div class="page">
 
     <h1>Math Engine</h1>
 
-    <div class="box">
+    <div class="card">
 
-        <div class="stats">
-            <div>Score: <span id="score">0</span></div>
-            <div>Streak: <span id="streak">0</span></div>
-        </div>
+        <div id="question">Loading...</div>
 
-        <div id="question" class="q">Loading...</div>
+        <input id="answer" type="number">
 
-        <input id="answer" type="number" placeholder="?" />
+        <br><br>
 
-        <br>
-        <button id="submitBtn">Submit</button>
+        <button id="submit">Submit</button>
 
         <p id="result"></p>
 
@@ -100,61 +34,6 @@ button {
 
 </div>
 
-<script>
-let a, b, op;
-let score = 0;
-let streak = 0;
-
-/* safer init */
-window.addEventListener("DOMContentLoaded", () => {
-    newQ();
-
-    document.getElementById("submitBtn").addEventListener("click", check);
-
-    document.getElementById("answer").addEventListener("keydown", (e) => {
-        if (e.key === "Enter") check();
-    });
-});
-
-function newQ() {
-    a = Math.floor(Math.random() * 12);
-    b = Math.floor(Math.random() * 12);
-
-    const ops = ["+", "-", "×"];
-    op = ops[Math.floor(Math.random() * ops.length)];
-
-    document.getElementById("question").innerText = `${a} ${op} ${b}`;
-    document.getElementById("answer").value = "";
-    document.getElementById("result").innerText = "";
-}
-
-function getAnswer() {
-    if (op === "+") return a + b;
-    if (op === "-") return a - b;
-    if (op === "×") return a * b;
-}
-
-function check() {
-    const val = Number(document.getElementById("answer").value);
-    const result = document.getElementById("result");
-
-    if (val === getAnswer()) {
-        score++;
-        streak++;
-        result.innerText = "Correct";
-        result.className = "correct";
-    } else {
-        streak = 0;
-        result.innerText = "Wrong";
-        result.className = "wrong";
-    }
-
-    document.getElementById("score").innerText = score;
-    document.getElementById("streak").innerText = streak;
-
-    setTimeout(newQ, 700);
-}
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
