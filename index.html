@@ -1,67 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vxo Study OS</title>
-
 <link rel="stylesheet" href="style.css">
-<link rel="icon" href="favicon.png">
-
 </head>
 
 <body>
 
-<nav class="nav">
+<div class="nav">
     <a href="index.html">Home</a>
     <a href="about.html">About</a>
     <a href="math.html">Math</a>
     <a href="chat.html">Assistant</a>
-</nav>
+</div>
 
-<section class="hero">
+<div class="page">
+
     <h1>Vxo Study OS</h1>
-    <p>Simple system to stay organized, practice math, and study smarter.</p>
-</section>
-
-<section class="grid">
 
     <div class="card">
-        <h2>Math Engine</h2>
-        <p>Practice addition, subtraction, and multiplication.</p>
-        <a href="math.html">Open</a>
+        <h2>Welcome</h2>
+        <p>Study system for math, notes, and AI help.</p>
     </div>
 
-    <div class="card">
-        <h2>Study Assistant</h2>
-        <p>Ask questions and get instant help.</p>
-        <a href="chat.html">Open</a>
-    </div>
+</div>
 
-    <div class="card">
-        <h2>About</h2>
-        <p>Learn how this system works.</p>
-        <a href="about.html">Read</a>
-    </div>
-
-</section>
-
-<script>
-/* page fade animation */
-window.addEventListener("load", () => {
-    document.body.classList.add("loaded");
-});
-
-document.querySelectorAll("a").forEach(link => {
-    link.addEventListener("click", e => {
-        if (link.href && !link.href.includes("#")) {
-            e.preventDefault();
-            document.body.classList.remove("loaded");
-            setTimeout(() => window.location = link.href, 300);
-        }
-    });
-});
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
