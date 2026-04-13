@@ -1,45 +1,50 @@
 /* ===== BASE ===== */
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
     color: white;
 
+    /* liquid dark background */
     background:
-        linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.95)),
-        url("https://images.unsplash.com/photo-1501785888041-af3ef285b470");
+        radial-gradient(circle at top, rgba(255,255,255,0.08), transparent 40%),
+        radial-gradient(circle at bottom, rgba(255,255,255,0.05), transparent 50%),
+        linear-gradient(180deg, #000, #050505);
+
     background-size: cover;
     background-position: center;
 
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.5s ease;
 }
 
 body.loaded {
     opacity: 1;
 }
 
-/* ===== NAV ===== */
+/* ===== NAV (APPLE STYLE GLASS BAR) ===== */
 .nav {
     position: fixed;
     top: 0;
     width: 100%;
     display: flex;
     justify-content: center;
-    gap: 20px;
-    padding: 12px;
+    gap: 22px;
+    padding: 14px 10px;
+    z-index: 1000;
 
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+    /* glass effect */
+    background: rgba(20, 20, 20, 0.35);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
 
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 .nav a {
-    color: #aaa;
+    color: rgba(255,255,255,0.65);
     text-decoration: none;
     font-size: 14px;
-    transition: 0.2s;
+    transition: 0.2s ease;
 }
 
 .nav a:hover {
@@ -54,18 +59,19 @@ body.loaded {
     justify-content: center;
     align-items: center;
     text-align: center;
-
     padding: 20px;
 }
 
 .hero h1 {
     font-size: clamp(42px, 6vw, 80px);
     margin: 0;
+    letter-spacing: -1px;
 }
 
 .hero p {
-    color: #bbb;
-    max-width: 500px;
+    color: rgba(255,255,255,0.65);
+    max-width: 520px;
+    font-size: 16px;
 }
 
 /* ===== GRID ===== */
@@ -74,44 +80,45 @@ body.loaded {
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
 
-    max-width: 900px;
-    margin: -120px auto 60px auto;
+    max-width: 950px;
+    margin: -90px auto 70px auto;
     padding: 20px;
 }
 
-/* ===== GLASS CARD ===== */
+/* ===== GLASS CARDS (APPLE STYLE) ===== */
 .card {
-    background: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
     backdrop-filter: blur(18px) saturate(180%);
     -webkit-backdrop-filter: blur(18px);
 
-    border-radius: 18px;
+    border-radius: 20px;
     padding: 22px;
 
-    border: 1px solid rgba(255,255,255,0.15);
-
     transition: 0.25s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
 .card:hover {
-    transform: translateY(-6px);
-    background: rgba(255,255,255,0.12);
+    transform: translateY(-8px) scale(1.01);
+    background: rgba(255,255,255,0.1);
 }
 
 /* TEXT */
 .card h2 {
     margin: 0;
+    font-size: 18px;
 }
 
 .card p {
-    color: #bbb;
+    color: rgba(255,255,255,0.6);
     font-size: 14px;
 }
 
 /* BUTTON */
 .card a {
     display: inline-block;
-    margin-top: 12px;
+    margin-top: 14px;
     padding: 10px 16px;
 
     border-radius: 999px;
@@ -120,21 +127,26 @@ body.loaded {
     text-decoration: none;
     font-weight: 600;
     font-size: 13px;
+
+    transition: 0.2s;
+}
+
+.card a:hover {
+    transform: scale(1.05);
 }
 
 /* ===== MOBILE ===== */
 @media (max-width: 700px) {
-
     .nav {
-        gap: 10px;
+        gap: 12px;
         font-size: 12px;
     }
 
     .hero {
-        padding-top: 100px;
+        padding-top: 90px;
     }
 
     .grid {
-        margin-top: -60px;
+        margin-top: -50px;
     }
 }
