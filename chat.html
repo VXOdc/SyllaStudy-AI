@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Study Assistant</title>
+<title>Vxo Study Assistant</title>
 
 <style>
 body {
@@ -20,23 +20,36 @@ body {
 
 /* SIDEBAR */
 .sidebar {
-    width: 220px;
+    width: 240px;
     background: rgba(0,0,0,0.5);
     backdrop-filter: blur(20px);
     border-right: 1px solid rgba(255,255,255,0.1);
-    padding: 10px;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
-.sidebar h3 {
-    font-size: 14px;
-    color: #aaa;
+.newChat {
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: white;
+    color: black;
+    font-weight: 600;
+}
+
+.history {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
 }
 
 .chat-item {
     padding: 8px;
     border-radius: 8px;
     cursor: pointer;
+    color: #ccc;
 }
 
 .chat-item:hover {
@@ -50,7 +63,7 @@ body {
     flex-direction: column;
 }
 
-/* CHAT */
+/* MESSAGES */
 .messages {
     flex: 1;
     overflow-y: auto;
@@ -58,15 +71,26 @@ body {
 }
 
 .msg {
-    margin: 10px 0;
+    margin: 12px 0;
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    animation: fadeIn 0.2s ease;
 }
 
 .user {
-    text-align: right;
+    background: white;
+    color: black;
+    margin-left: auto;
 }
 
 .ai {
-    color: #ccc;
+    background: rgba(255,255,255,0.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* INPUT */
@@ -83,15 +107,23 @@ input {
     border: none;
     background: transparent;
     color: white;
+    outline: none;
 }
 
-button {
+button.send {
     margin-left: 10px;
-    padding: 10px;
+    padding: 10px 16px;
     border-radius: 999px;
     border: none;
     background: white;
     cursor: pointer;
+}
+
+/* TYPING */
+.typing {
+    color: #aaa;
+    font-size: 14px;
+    margin: 10px;
 }
 </style>
 </head>
@@ -99,41 +131,70 @@ button {
 <body>
 
 <div class="sidebar">
-    <h3>History</h3>
-    <div id="historyList"></div>
+    <button class="newChat" onclick="newChat()">+ New Chat</button>
+    <div id="historyList" class="history"></div>
 </div>
 
 <div class="main">
     <div id="messages" class="messages"></div>
 
     <div class="inputBar">
-        <input id="input" placeholder="Ask something..." />
-        <button onclick="send()">Send</button>
+        <input id="input" placeholder="Ask anything..." />
+        <button class="send" onclick="send()">Send</button>
     </div>
 </div>
 
 <script>
-let history = JSON.parse(localStorage.getItem("chat")) || [];
+let chats = JSON.parse(localStorage.getItem("chats")) || {};
+let currentChat = localStorage.getItem("currentChat") || Date.now().toString();
+
+if (!chats[currentChat]) chats[currentChat] = [];
 
 const messages = document.getElementById("messages");
 const input = document.getElementById("input");
 const historyList = document.getElementById("historyList");
 
-/* ENTER */
+/* ENTER KEY */
 input.addEventListener("keydown", e => {
     if (e.key === "Enter") send();
 });
 
-/* RENDER HISTORY */
+/* SAVE */
+function save() {
+    localStorage.setItem("chats", JSON.stringify(chats));
+    localStorage.setItem("currentChat", currentChat);
+}
+
+/* NEW CHAT */
+function newChat() {
+    currentChat = Date.now().toString();
+    chats[currentChat] = [];
+    save();
+    loadChat();
+}
+
+/* LOAD CHAT */
+function loadChat() {
+    messages.innerHTML = "";
+    chats[currentChat].forEach(msg => {
+        addMessage(msg.content, msg.role === "user" ? "user" : "ai");
+    });
+    renderHistory();
+}
+
+/* HISTORY SIDEBAR */
 function renderHistory() {
     historyList.innerHTML = "";
-    history.slice(-10).forEach(msg => {
-        if (msg.role === "user") {
-            let div = document.createElement("div");
-            div.className = "chat-item";
-            div.innerText = msg.content.slice(0, 30);
-            historyList.appendChild(div);
-        }
+    Object.keys(chats).slice(-10).forEach(id => {
+        let div = document.createElement("div");
+        div.className = "chat-item";
+        div.innerText = chats[id][0]?.content?.slice(0, 20) || "New Chat";
+        div.onclick = () => {
+            currentChat = id;
+            save();
+            loadChat();
+        };
+        historyList.appendChild(div);
     });
 }
 
@@ -146,36 +207,41 @@ function addMessage(text, type) {
     messages.scrollTop = messages.scrollHeight;
 }
 
-/* LOAD OLD CHAT */
-history.forEach(msg => {
-    addMessage(msg.content, msg.role === "user" ? "user" : "ai");
-});
-
-renderHistory();
-
 /* SEND */
 async function send() {
     const text = input.value.trim();
     if (!text) return;
 
     addMessage(text, "user");
-    history.push({ role: "user", content: text });
+    chats[currentChat].push({ role: "user", content: text });
     input.value = "";
+
+    const typing = document.createElement("div");
+    typing.className = "typing";
+    typing.innerText = "Thinking...";
+    messages.appendChild(typing);
 
     const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, history })
+        body: JSON.stringify({
+            message: text,
+            history: chats[currentChat]
+        })
     });
 
     const data = await res.json();
+    messages.removeChild(typing);
 
     addMessage(data.reply, "ai");
-    history.push({ role: "assistant", content: data.reply });
+    chats[currentChat].push({ role: "assistant", content: data.reply });
 
-    localStorage.setItem("chat", JSON.stringify(history));
+    save();
     renderHistory();
 }
+
+/* INIT */
+loadChat();
 </script>
 
 </body>
