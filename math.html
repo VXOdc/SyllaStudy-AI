@@ -1,81 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Math Engine</title>
-
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<nav class="nav">
+<div class="nav">
     <a href="index.html">Home</a>
     <a href="math.html">Math</a>
     <a href="chat.html">Assistant</a>
     <a href="about.html">About</a>
-</nav>
+</div>
 
-<div class="math-page">
+<div class="fullscreen">
+    <div class="card">
 
-    <div class="math-card">
+        <h2>Math Engine</h2>
 
-        <h1>Math Engine</h1>
-
-        <div class="question" id="question">Loading...</div>
-
-        <input id="answer" type="number" placeholder="?">
-
+        <div id="q">Loading...</div>
         <br>
+
+        <input id="a" type="number">
+        <br><br>
 
         <button onclick="check()">Submit</button>
 
-        <div id="result"></div>
+        <p id="r"></p>
 
     </div>
-
 </div>
 
 <script>
-let a, b, op;
+let x, y;
 
 function newQ() {
-    a = Math.floor(Math.random()*12);
-    b = Math.floor(Math.random()*12);
-
-    const ops = ["+", "-", "×"];
-    op = ops[Math.floor(Math.random()*3)];
-
-    document.getElementById("question").innerText = `${a} ${op} ${b}`;
-    document.getElementById("answer").value = "";
-    document.getElementById("result").innerText = "";
-}
-
-function getAnswer() {
-    if (op === "+") return a + b;
-    if (op === "-") return a - b;
-    return a * b;
+    x = Math.floor(Math.random() * 10);
+    y = Math.floor(Math.random() * 10);
+    document.getElementById("q").innerText = `${x} + ${y} = ?`;
+    document.getElementById("a").value = "";
+    document.getElementById("r").innerText = "";
 }
 
 function check() {
-    const val = Number(document.getElementById("answer").value);
-    const res = document.getElementById("result");
+    let val = Number(document.getElementById("a").value);
+    let r = document.getElementById("r");
 
-    if (val === getAnswer()) {
-        res.innerText = "Correct";
-        res.style.color = "lightgreen";
+    if (val === x + y) {
+        r.innerText = "Correct";
+        r.style.color = "lightgreen";
     } else {
-        res.innerText = "Wrong";
-        res.style.color = "red";
+        r.innerText = "Wrong";
+        r.style.color = "red";
     }
 
     setTimeout(newQ, 700);
 }
-
-document.getElementById("answer").addEventListener("keydown", e => {
-    if (e.key === "Enter") check();
-});
 
 newQ();
 </script>
