@@ -1,45 +1,46 @@
 let a, b, op;
 
 window.addEventListener("DOMContentLoaded", () => {
-    if (document.getElementById("question")) {
-        newQ();
 
-        document.getElementById("submit").addEventListener("click", check);
+    if (!document.getElementById("q")) return;
 
-        document.getElementById("answer").addEventListener("keydown", e => {
-            if (e.key === "Enter") check();
-        });
-    }
+    newQ();
+
+    document.getElementById("btn").addEventListener("click", check);
+
+    document.getElementById("a").addEventListener("keydown", e => {
+        if (e.key === "Enter") check();
+    });
 });
 
 function newQ() {
-    a = Math.floor(Math.random() * 10);
-    b = Math.floor(Math.random() * 10);
+    a = Math.floor(Math.random() * 12);
+    b = Math.floor(Math.random() * 12);
 
     const ops = ["+", "-", "×"];
     op = ops[Math.floor(Math.random() * 3)];
 
-    document.getElementById("question").innerText = `${a} ${op} ${b}`;
-    document.getElementById("answer").value = "";
-    document.getElementById("result").innerText = "";
+    document.getElementById("q").innerText = `${a} ${op} ${b}`;
+    document.getElementById("a").value = "";
+    document.getElementById("r").innerText = "";
 }
 
-function getAnswer() {
+function answer() {
     if (op === "+") return a + b;
     if (op === "-") return a - b;
     if (op === "×") return a * b;
 }
 
 function check() {
-    const val = Number(document.getElementById("answer").value);
-    const result = document.getElementById("result");
+    const val = Number(document.getElementById("a").value);
+    const r = document.getElementById("r");
 
-    if (val === getAnswer()) {
-        result.innerText = "Correct";
-        result.style.color = "lightgreen";
+    if (val === answer()) {
+        r.innerText = "Correct";
+        r.style.color = "lightgreen";
     } else {
-        result.innerText = "Wrong";
-        result.style.color = "red";
+        r.innerText = "Wrong";
+        r.style.color = "red";
     }
 
     setTimeout(newQ, 700);
