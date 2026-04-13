@@ -1,101 +1,119 @@
-/* ===== BASE RESET ===== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    background:
+        linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)),
+        url("https://images.unsplash.com/photo-1501785888041-af3ef285b470");
+    background-size: cover;
     color: white;
-    background: black;
-    overflow-x: hidden;
-}
-
-/* ===== GLASS NAV ===== */
-.nav {
-    position: fixed;
-    top: 0;
-    width: 100%;
     display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 12px;
-
-    background: rgba(0,0,0,0.4);
-    backdrop-filter: blur(18px);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    z-index: 1000;
-}
-
-.nav a {
-    color: #aaa;
-    text-decoration: none;
-    font-size: 14px;
-}
-
-.nav a:hover {
-    color: white;
-}
-
-/* ===== HERO BACKGROUND (HOME) ===== */
-.hero {
     height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 240px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255,255,255,0.1);
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.9)),
-    url("https://images.unsplash.com/photo-1500375592092-40eb2168fd21");
-    background-size: cover;
-    background-position: center;
 }
 
-/* ===== GRID ===== */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 20px;
-    max-width: 900px;
-    margin: -80px auto 60px;
-    padding: 20px;
-}
-
-/* ===== GLASS CARD ===== */
-.card {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(18px);
-    border-radius: 18px;
-    padding: 20px;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-}
-
-/* ===== MATH / CHAT FULL SCREEN ===== */
-.fullscreen {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* ===== INPUT ===== */
-input {
-    padding: 12px;
+.newChat {
+    margin: 10px;
+    padding: 10px;
     border-radius: 10px;
     border: none;
+    cursor: pointer;
+    background: white;
+    color: black;
+    font-weight: 600;
+}
+
+.history {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.chat-item {
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #ccc;
+}
+
+.chat-item:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* MESSAGES */
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.msg {
+    margin: 12px 0;
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    animation: fadeIn 0.2s ease;
+}
+
+.user {
+    background: white;
+    color: black;
+    margin-left: auto;
+}
+
+.ai {
+    background: rgba(255,255,255,0.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* INPUT */
+.inputBar {
+    display: flex;
+    padding: 12px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px);
+}
+
+input {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    color: white;
     outline: none;
 }
 
-/* ===== BUTTON ===== */
-button {
+button.send {
+    margin-left: 10px;
     padding: 10px 16px;
     border-radius: 999px;
     border: none;
     background: white;
     cursor: pointer;
+}
+
+/* TYPING */
+.typing {
+    color: #aaa;
+    font-size: 14px;
+    margin: 10px;
 }
