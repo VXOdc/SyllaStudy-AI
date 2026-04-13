@@ -4,14 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Adaptive Tutor • Vxo Study OS</title>
-
 <style>
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-    background: 
-        linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.8)),
-        url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2000&q=80");
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)),
+                url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2000&q=80");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -19,218 +17,93 @@ body {
     display: flex;
     height: 100vh;
 }
-
-/* SIDEBAR */
-.sidebar {
-    width: 320px;
-    background: rgba(255,255,255,0.06);
-    border-right: 1px solid rgba(255,255,255,0.15);
-    backdrop-filter: blur(20px);
-    padding: 20px;
-    overflow-y: auto;
-}
-
-.title {
-    font-size: 20px;
-    margin-bottom: 16px;
-    text-align: center;
-}
-
-/* SKILL CARDS */
-.skill {
-    background: rgba(255,255,255,0.08);
-    border-radius: 14px;
-    padding: 12px;
-    margin-bottom: 12px;
-}
-
-.bar {
-    height: 8px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 999px;
-    overflow: hidden;
-    margin-top: 8px;
-}
-
-.fill {
-    height: 100%;
-    background: linear-gradient(90deg, #ffcc00, #ff8800);
-    transition: width 0.6s ease;
-}
-
-/* MAIN */
-.main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
-
-.card {
-    width: 100%;
-    max-width: 520px;
-    background: rgba(255,255,255,0.09);
-    border-radius: 20px;
-    padding: 32px 28px;
-    backdrop-filter: blur(16px);
-    text-align: center;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-.question {
-    font-size: 32px;
-    margin-bottom: 20px;
-    font-weight: 500;
-}
-
-input {
-    width: 100%;
-    padding: 14px;
-    font-size: 18px;
-    border-radius: 12px;
-    border: none;
-    outline: none;
-    margin-bottom: 12px;
-    background: rgba(255,255,255,0.95);
-    color: #000;
-}
-
-button {
-    padding: 12px 28px;
-    font-size: 16px;
-    background: white;
-    color: black;
-    border: none;
-    border-radius: 999px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-#feedback {
-    margin-top: 16px;
-    font-size: 18px;
-    min-height: 28px;
-}
-
-/* STATS */
-.stats {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-around;
-    font-size: 15px;
-}
+.sidebar { width: 320px; background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); padding: 24px; border-right: 1px solid rgba(255,255,255,0.15); }
+.main { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+.card { width: 100%; max-width: 520px; background: rgba(255,255,255,0.1); border-radius: 24px; padding: 32px; backdrop-filter: blur(16px); text-align: center; }
+.question { font-size: 34px; margin-bottom: 24px; }
+input { width: 100%; padding: 16px; font-size: 20px; border-radius: 16px; border: none; margin-bottom: 16px; }
+button { padding: 14px 32px; font-size: 17px; background: white; color: black; border: none; border-radius: 9999px; cursor: pointer; font-weight: 700; }
+#feedback { margin-top: 20px; font-size: 20px; min-height: 32px; }
+.skill { background: rgba(255,255,255,0.1); margin-bottom: 14px; padding: 14px; border-radius: 16px; }
+.bar { height: 10px; background: #222; border-radius: 999px; overflow: hidden; margin-top: 8px; }
+.fill { height: 100%; background: linear-gradient(90deg, #ffcc00, #ff8800); }
 </style>
 </head>
-
 <body>
 
 <div class="sidebar">
-    <div class="title">🌴 Skill Dashboard</div>
+    <h2 style="text-align:center;margin:0 0 20px 0;">🌴 Skill Dashboard</h2>
     <div id="skills"></div>
-
-    <div class="stats">
-        <div>🔥 Streak: <span id="streak">0</span></div>
-        <div>⭐ XP: <span id="xp">0</span></div>
-        <div>🏆 Level: <span id="level">1</span></div>
+    <div style="margin-top:30px;text-align:center;font-size:15px;">
+        🔥 Streak: <span id="streak">0</span><br>
+        ⭐ XP: <span id="xp">0</span><br>
+        🏆 Level: <span id="level">1</span>
     </div>
 </div>
 
 <div class="main">
     <div class="card">
-        <div class="question" id="question">Loading question...</div>
-        <input id="answer" type="number" placeholder="Your answer">
+        <div class="question" id="question">Loading tropical question…</div>
+        <input id="answer" type="number" placeholder="Your answer here">
         <button onclick="submitAnswer()">Submit Answer</button>
         <div id="feedback"></div>
     </div>
 </div>
 
 <script>
+/* Same powerful adaptive logic as before – just cleaned up */
 let state = JSON.parse(localStorage.getItem("tutorState")) || {
-    xp: 0,
-    level: 1,
-    streak: 0,
-    lastActive: null,
-    skills: {
-        addition: { level: 1, correct: 0, wrong: 0 },
-        subtraction: { level: 1, correct: 0, wrong: 0 },
-        multiplication: { level: 1, correct: 0, wrong: 0 }
-    }
+    xp: 0, level: 1, streak: 0, lastActive: null,
+    skills: { addition: {level:1,correct:0,wrong:0}, subtraction: {level:1,correct:0,wrong:0}, multiplication: {level:1,correct:0,wrong:0} }
 };
-
-let currentQuestion = null;
+let currentQ = null;
 
 function updateStreak() {
     const today = new Date().toDateString();
-    if (state.lastActive !== today) {
-        state.streak = (state.streak || 0) + 1;
-        state.lastActive = today;
-    }
+    if (state.lastActive !== today) { state.streak++; state.lastActive = today; }
 }
 
 function pickSkill() {
-    return Object.entries(state.skills)
-        .sort((a, b) => (a[1].wrong - a[1].correct) - (b[1].wrong - b[1].correct))[0][0];
+    return Object.entries(state.skills).sort((a,b) => (a[1].wrong - a[1].correct) - (b[1].wrong - b[1].correct))[0][0];
 }
 
 function generateQuestion(skill) {
     const lvl = state.skills[skill].level;
-    const max = Math.max(5, lvl * 8);
-    const a = Math.floor(Math.random() * max);
-    const b = Math.floor(Math.random() * max);
-
-    if (skill === "addition") return { q: `${a} + ${b}`, answer: a + b, skill };
-    if (skill === "subtraction") return { q: `${Math.max(a,b)} - ${Math.min(a,b)}`, answer: Math.abs(a - b), skill };
-    if (skill === "multiplication") return { q: `${a} × ${b}`, answer: a * b, skill };
+    const max = lvl * 9;
+    const a = Math.floor(Math.random()*max), b = Math.floor(Math.random()*max);
+    if (skill==="addition") return {q: `${a} + ${b}`, ans: a+b, skill};
+    if (skill==="subtraction") return {q: `${Math.max(a,b)} - ${Math.min(a,b)}`, ans: Math.abs(a-b), skill};
+    return {q: `${a} × ${b}`, ans: a*b, skill};
 }
 
 function nextQuestion() {
     const skill = pickSkill();
-    currentQuestion = generateQuestion(skill);
-    document.getElementById("question").innerText = currentQuestion.q;
+    currentQ = generateQuestion(skill);
+    document.getElementById("question").innerText = currentQ.q;
     document.getElementById("answer").value = "";
     document.getElementById("feedback").innerHTML = "";
 }
 
 function submitAnswer() {
-    const userAnswer = Number(document.getElementById("answer").value);
-    const feedbackEl = document.getElementById("feedback");
-    const skillData = state.skills[currentQuestion.skill];
+    const userAns = Number(document.getElementById("answer").value);
+    const fb = document.getElementById("feedback");
+    const skill = state.skills[currentQ.skill];
 
-    if (userAnswer === currentQuestion.answer) {
-        feedbackEl.innerHTML = `<span style="color:#4ade80">✅ Correct!</span>`;
-        skillData.correct++;
-        state.xp += 10;
-
-        if (skillData.correct >= 5) {
-            skillData.level++;
-            skillData.correct = 0;
-            skillData.wrong = 0;
-        }
+    if (userAns === currentQ.ans) {
+        fb.innerHTML = `<span style="color:#4ade80">✅ Perfect!</span>`;
+        skill.correct++; state.xp += 15;
+        if (skill.correct >= 5) { skill.level++; skill.correct=0; skill.wrong=0; }
     } else {
-        feedbackEl.innerHTML = `<span style="color:#f87171">❌ Wrong. The answer was ${currentQuestion.answer}</span>`;
-        skillData.wrong++;
-
-        if (skillData.wrong >= 3) {
-            skillData.level = Math.max(1, skillData.level - 1);
-            skillData.wrong = 0;
-        }
+        fb.innerHTML = `<span style="color:#f87171">❌ The answer was ${currentQ.ans}</span>`;
+        skill.wrong++;
+        if (skill.wrong >= 3) { skill.level = Math.max(1, skill.level-1); skill.wrong=0; }
     }
 
-    // Level up overall
-    if (state.xp >= state.level * 60) {
-        state.level++;
-        state.xp = 0;
-    }
+    if (state.xp >= state.level * 70) { state.level++; state.xp = 0; }
 
-    saveState();
-    renderDashboard();
-    setTimeout(nextQuestion, 1400);
-}
-
-function saveState() {
     localStorage.setItem("tutorState", JSON.stringify(state));
+    renderDashboard();
+    setTimeout(nextQuestion, 1300);
 }
 
 function renderDashboard() {
@@ -240,30 +113,22 @@ function renderDashboard() {
 
     const container = document.getElementById("skills");
     container.innerHTML = "";
-
     Object.entries(state.skills).forEach(([name, data]) => {
-        const percent = Math.min(100, data.level * 18);
+        const pct = Math.min(100, data.level * 20);
         const div = document.createElement("div");
         div.className = "skill";
-        div.innerHTML = `
-            <strong>${name.charAt(0).toUpperCase() + name.slice(1)}</strong>
-            <div class="bar"><div class="fill" style="width:${percent}%"></div></div>
-            <small>Level ${data.level}</small>
-        `;
+        div.innerHTML = `<strong>${name}</strong><div class="bar"><div class="fill" style="width:${pct}%"></div></div><small>Level ${data.level}</small>`;
         container.appendChild(div);
     });
 }
 
-/* Init */
 updateStreak();
 renderDashboard();
 nextQuestion();
-saveState();
 </script>
 
-<div style="position:fixed; top:15px; left:15px;">
-    <a href="index.html" style="color:white; opacity:0.8; text-decoration:none; font-size:15px;">← Back to Dashboard</a>
+<div style="position:fixed;top:20px;left:20px;">
+    <a href="index.html" style="color:white;opacity:0.85;text-decoration:none;font-size:16px;">← Home</a>
 </div>
-
 </body>
 </html>
