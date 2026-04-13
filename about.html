@@ -1,27 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>About</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About • Vxo Study OS</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255,255,255,0.13);
+            --glass-border: rgba(255,255,255,0.26);
+            --glass-blur: 32px;
+        }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.85)),
+                        url("https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            padding: 20px 0;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+            z-index: 1000;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 15.5px;
+            font-weight: 500;
+            padding: 8px 20px;
+            border-radius: 9999px;
+            transition: 0.3s;
+        }
+        nav a:hover {
+            background: rgba(255,255,255,0.18);
+        }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 48px 44px;
+            max-width: 720px;
+            text-align: center;
+            box-shadow: 0 15px 55px rgba(0,0,0,0.4);
+        }
+        h1 {
+            font-size: 46px;
+            margin: 0 0 20px 0;
+            font-weight: 600;
+        }
+        p {
+            font-size: 17.5px;
+            line-height: 1.75;
+            color: #ddd;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="nav">
+<nav>
     <a href="index.html">Home</a>
-    <a href="math.html">Math</a>
-    <a href="chat.html">Assistant</a>
+    <a href="math-game.html">Math Game</a>
+    <a href="chat.html">Study AI</a>
     <a href="about.html">About</a>
-</div>
+</nav>
 
-<div class="fullscreen">
-    <div class="card">
-        <h2>About Vxo Study OS</h2>
-        <p>
-        This is a personal student system built with HTML, CSS, and JavaScript.
-        It includes a math practice tool and a study assistant.
-        </p>
-    </div>
+<div class="glass-card">
+    <h1>About Vxo Study OS</h1>
+    <p>
+        Vxo Study OS is a study environment built with pure HTML, CSS, and JavaScript.<br><br>
+        It combines an adaptive Math Game with progression system and a powered by Mistral AI.<br><br>
+       .
+    </p>
 </div>
 
 </body>
