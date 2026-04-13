@@ -1,65 +1,251 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Math Engine</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vxo Study OS - Math</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    background:
+        linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)),
+        url("https://images.unsplash.com/photo-1501785888041-af3ef285b470");
+    background-size: cover;
+    color: white;
+    display: flex;
+    height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 240px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.newChat {
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: white;
+    color: black;
+    font-weight: 600;
+}
+
+.history {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.chat-item {
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #ccc;
+}
+
+.chat-item:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* MESSAGES */
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.msg {
+    margin: 12px 0;
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    animation: fadeIn 0.2s ease;
+}
+
+.user {
+    background: white;
+    color: black;
+    margin-left: auto;
+}
+
+.ai {
+    background: rgba(255,255,255,0.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* INPUT */
+.inputBar {
+    display: flex;
+    padding: 12px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px);
+}
+
+input {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    color: white;
+    outline: none;
+}
+
+button.send {
+    margin-left: 10px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: none;
+    background: white;
+    cursor: pointer;
+}
+
+/* TYPING */
+.typing {
+    color: #aaa;
+    font-size: 14px;
+    margin: 10px;
+}
+</style>
 </head>
 
 <body>
 
-<div class="nav">
-    <a href="index.html">Home</a>
-    <a href="math.html">Math</a>
-    <a href="chat.html">Assistant</a>
-    <a href="about.html">About</a>
+<div class="sidebar">
+    <button class="newChat" onclick="newChat()">+ New Chat</button>
+    <div id="historyList" class="history"></div>
 </div>
 
-<div class="fullscreen">
-    <div class="card">
+<div class="main">
+    <div id="messages" class="messages"></div>
 
-        <h2>Math Engine</h2>
-
-        <div id="q">Loading...</div>
-        <br>
-
-        <input id="a" type="number">
-        <br><br>
-
-        <button onclick="check()">Submit</button>
-
-        <p id="r"></p>
-
+    <div class="inputBar">
+        <input id="input" placeholder="Ask anything..." />
+        <button class="send" onclick="send()">Send</button>
     </div>
 </div>
 
 <script>
-let x, y;
+let chats = JSON.parse(localStorage.getItem("chats")) || {};
+let currentChat = localStorage.getItem("currentChat") || Date.now().toString();
 
-function newQ() {
-    x = Math.floor(Math.random() * 10);
-    y = Math.floor(Math.random() * 10);
-    document.getElementById("q").innerText = `${x} + ${y} = ?`;
-    document.getElementById("a").value = "";
-    document.getElementById("r").innerText = "";
+if (!chats[currentChat]) chats[currentChat] = [];
+
+const messages = document.getElementById("messages");
+const input = document.getElementById("input");
+const historyList = document.getElementById("historyList");
+
+/* ENTER KEY */
+input.addEventListener("keydown", e => {
+    if (e.key === "Enter") send();
+});
+
+/* SAVE */
+function save() {
+    localStorage.setItem("chats", JSON.stringify(chats));
+    localStorage.setItem("currentChat", currentChat);
 }
 
-function check() {
-    let val = Number(document.getElementById("a").value);
-    let r = document.getElementById("r");
-
-    if (val === x + y) {
-        r.innerText = "Correct";
-        r.style.color = "lightgreen";
-    } else {
-        r.innerText = "Wrong";
-        r.style.color = "red";
-    }
-
-    setTimeout(newQ, 700);
+/* NEW CHAT */
+function newChat() {
+    currentChat = Date.now().toString();
+    chats[currentChat] = [];
+    save();
+    loadChat();
 }
 
-newQ();
+/* LOAD CHAT */
+function loadChat() {
+    messages.innerHTML = "";
+    chats[currentChat].forEach(msg => {
+        addMessage(msg.content, msg.role === "user" ? "user" : "ai");
+    });
+    renderHistory();
+}
+
+/* HISTORY SIDEBAR */
+function renderHistory() {
+    historyList.innerHTML = "";
+    Object.keys(chats).slice(-10).forEach(id => {
+        let div = document.createElement("div");
+        div.className = "chat-item";
+        div.innerText = chats[id][0]?.content?.slice(0, 20) || "New Chat";
+        div.onclick = () => {
+            currentChat = id;
+            save();
+            loadChat();
+        };
+        historyList.appendChild(div);
+    });
+}
+
+/* ADD MESSAGE */
+function addMessage(text, type) {
+    const div = document.createElement("div");
+    div.className = "msg " + type;
+    div.innerText = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+}
+
+/* SEND */
+async function send() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, "user");
+    chats[currentChat].push({ role: "user", content: text });
+    input.value = "";
+
+    const typing = document.createElement("div");
+    typing.className = "typing";
+    typing.innerText = "Thinking...";
+    messages.appendChild(typing);
+
+    const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            message: text,
+            history: chats[currentChat]
+        })
+    });
+
+    const data = await res.json();
+    messages.removeChild(typing);
+
+    addMessage(data.reply, "ai");
+    chats[currentChat].push({ role: "assistant", content: data.reply });
+
+    save();
+    renderHistory();
+}
+
+/* INIT */
+loadChat();
 </script>
 
+<div style="position:fixed;top:15px;left:15px;">
+<a href="index.html" style="color:white;opacity:0.7;text-decoration:none;">← Back</a>
+</div>
 </body>
 </html>
