@@ -92,7 +92,7 @@ button {
         <input id="answer" type="number" placeholder="?" />
 
         <br>
-        <button onclick="check()">Submit</button>
+        <button id="submitBtn">Submit</button>
 
         <p id="result"></p>
 
@@ -105,12 +105,23 @@ let a, b, op;
 let score = 0;
 let streak = 0;
 
+/* safer init */
+window.addEventListener("DOMContentLoaded", () => {
+    newQ();
+
+    document.getElementById("submitBtn").addEventListener("click", check);
+
+    document.getElementById("answer").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") check();
+    });
+});
+
 function newQ() {
-    a = Math.floor(Math.random()*12);
-    b = Math.floor(Math.random()*12);
+    a = Math.floor(Math.random() * 12);
+    b = Math.floor(Math.random() * 12);
 
     const ops = ["+", "-", "×"];
-    op = ops[Math.floor(Math.random()*3)];
+    op = ops[Math.floor(Math.random() * ops.length)];
 
     document.getElementById("question").innerText = `${a} ${op} ${b}`;
     document.getElementById("answer").value = "";
@@ -141,14 +152,8 @@ function check() {
     document.getElementById("score").innerText = score;
     document.getElementById("streak").innerText = streak;
 
-    setTimeout(newQ, 800);
+    setTimeout(newQ, 700);
 }
-
-document.getElementById("answer").addEventListener("keydown", e => {
-    if (e.key === "Enter") check();
-});
-
-newQ();
 </script>
 
 </body>
