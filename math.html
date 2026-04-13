@@ -1,185 +1,118 @@
-<script>
-let chats = JSON.parse(localStorage.getItem("chats")) || {};
-let currentChat = localStorage.getItem("currentChat");
-
-if (!currentChat || !chats[currentChat]) {
-    currentChat = Date.now().toString();
-    chats[currentChat] = [];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Math Engine</title>
+<style>
+body {
+    margin:0;
+    font-family: Arial;
+    background:#000;
+    color:white;
+    display:flex;
+    height:100vh;
 }
 
+.sidebar {
+    width:240px;
+    background:#111;
+    padding:10px;
+}
+
+.main {
+    flex:1;
+    display:flex;
+    flex-direction:column;
+}
+
+.messages {
+    flex:1;
+    padding:20px;
+    overflow:auto;
+}
+
+.msg {
+    margin:10px 0;
+}
+
+.user { color:#fff; }
+.ai { color:#aaa; }
+
+.input {
+    display:flex;
+    padding:10px;
+    background:#111;
+}
+
+input {
+    flex:1;
+    padding:10px;
+}
+
+button {
+    margin-left:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+<h3>Math OS</h3>
+</div>
+
+<div class="main">
+<div id="messages" class="messages"></div>
+
+<div class="input">
+<input id="input" placeholder="Type equation like 2+2*5">
+<button onclick="send()">Send</button>
+</div>
+</div>
+
+<script>
 const messages = document.getElementById("messages");
 const input = document.getElementById("input");
-const historyList = document.getElementById("historyList");
 
-input.addEventListener("keydown", e => {
-    if (e.key === "Enter") send();
-});
-
-function save() {
-    localStorage.setItem("chats", JSON.stringify(chats));
-    localStorage.setItem("currentChat", currentChat);
+function add(text, cls){
+    const div = document.createElement("div");
+    div.className = "msg " + cls;
+    div.innerText = text;
+    messages.appendChild(div);
 }
 
-/* -----------------------------
-   MATH ENGINE CORE (LOCAL)
-------------------------------*/
-
-// detects simple math expressions
-function isMathExpression(text) {
+function isMath(text){
     return /^[0-9+\-*/().\s]+$/.test(text);
 }
 
-// safe eval (still controlled because regex filters input)
-function solveMath(expr) {
+function solve(expr){
     try {
-        return Function(`"use strict"; return (${expr})`)();
+        return Function("return ("+expr+")")();
     } catch {
         return null;
     }
 }
 
-function handleMath(text) {
-    const result = solveMath(text);
-    if (result === null || result === undefined || Number.isNaN(result)) {
-        return {
-            handled: false
-        };
-    }
-
-    return {
-        handled: true,
-        answer: result
-    };
-}
-
-/* ----------------------------- */
-
-function newChat() {
-    currentChat = Date.now().toString();
-    chats[currentChat] = [];
-    save();
-    loadChat();
-}
-
-function loadChat() {
-    messages.innerHTML = "";
-
-    const chat = chats[currentChat] || [];
-    chat.forEach(msg => {
-        addMessage(msg.content, msg.role === "user" ? "user" : "ai");
-    });
-
-    renderHistory();
-}
-
-function renderHistory() {
-    historyList.innerHTML = "";
-
-    const sorted = Object.entries(chats)
-        .sort((a, b) => Number(b[0]) - Number(a[0]));
-
-    for (let [id, msgs] of sorted.slice(0, 10)) {
-        let div = document.createElement("div");
-        div.className = "chat-item";
-
-        const preview = msgs.find(m => m.role === "user")?.content || "New Chat";
-        div.innerText = preview.slice(0, 25);
-
-        div.onclick = () => {
-            currentChat = id;
-            save();
-            loadChat();
-        };
-
-        historyList.appendChild(div);
-    }
-}
-
-function addMessage(text, type) {
-    const div = document.createElement("div");
-    div.className = "msg " + type;
-    div.innerText = text;
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
-}
-
-/* -----------------------------
-   SEND LOGIC (SMART ROUTING)
-------------------------------*/
-
-async function send() {
+function send(){
     const text = input.value.trim();
-    if (!text) return;
+    if(!text) return;
 
-    addMessage(text, "user");
+    add(text,"user");
 
-    if (!chats[currentChat]) chats[currentChat] = [];
-    chats[currentChat].push({ role: "user", content: text });
+    if(isMath(text)){
+        const result = solve(text);
+        if(result !== null){
+            add("Answer: " + result, "ai");
+        } else {
+            add("Invalid math", "ai");
+        }
+    } else {
+        add("Not a math expression", "ai");
+    }
 
     input.value = "";
-
-    // 🔥 STEP 1: try math engine first
-    if (isMathExpression(text)) {
-        const math = handleMath(text);
-
-        if (math.handled) {
-            const reply = `Answer: ${math.answer}`;
-
-            addMessage(reply, "ai");
-
-            chats[currentChat].push({
-                role: "assistant",
-                content: reply
-            });
-
-            save();
-            renderHistory();
-            return;
-        }
-    }
-
-    // fallback AI
-    const typing = document.createElement("div");
-    typing.className = "typing";
-    typing.innerText = "Thinking...";
-    messages.appendChild(typing);
-
-    try {
-        const res = await fetch("/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                message: text,
-                history: chats[currentChat]
-            })
-        });
-
-        if (!res.ok) throw new Error("API error");
-
-        const data = await res.json();
-
-        if (typing.parentNode) {
-            messages.removeChild(typing);
-        }
-
-        addMessage(data.reply, "ai");
-
-        chats[currentChat].push({
-            role: "assistant",
-            content: data.reply
-        });
-
-    } catch (err) {
-        if (typing.parentNode) {
-            messages.removeChild(typing);
-        }
-        addMessage("Error: AI unavailable", "ai");
-    }
-
-    save();
-    renderHistory();
 }
-
-/* INIT */
-loadChat();
 </script>
+
+</body>
+</html>
