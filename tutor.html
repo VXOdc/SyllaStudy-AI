@@ -3,99 +3,123 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Adaptive Tutor OS</title>
+<title>Adaptive Tutor • Vxo Study OS</title>
 
 <style>
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-    background: radial-gradient(circle at top, #111, #000);
+    background: 
+        linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.8)),
+        url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2000&q=80");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     color: white;
     display: flex;
     height: 100vh;
 }
 
-/* SIDEBAR DASHBOARD */
+/* SIDEBAR */
 .sidebar {
-    width: 300px;
-    background: rgba(255,255,255,0.04);
-    border-right: 1px solid rgba(255,255,255,0.1);
+    width: 320px;
+    background: rgba(255,255,255,0.06);
+    border-right: 1px solid rgba(255,255,255,0.15);
     backdrop-filter: blur(20px);
-    padding: 15px;
+    padding: 20px;
+    overflow-y: auto;
 }
 
 .title {
-    font-size: 18px;
-    margin-bottom: 10px;
+    font-size: 20px;
+    margin-bottom: 16px;
+    text-align: center;
 }
 
 /* SKILL CARDS */
 .skill {
+    background: rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 12px;
     margin-bottom: 12px;
-    padding: 10px;
-    border-radius: 12px;
-    background: rgba(255,255,255,0.05);
 }
 
 .bar {
-    height: 6px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 10px;
+    height: 8px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 999px;
     overflow: hidden;
-    margin-top: 6px;
+    margin-top: 8px;
 }
 
 .fill {
     height: 100%;
-    width: 0%;
-    background: white;
+    background: linear-gradient(90deg, #ffcc00, #ff8800);
+    transition: width 0.6s ease;
 }
 
-/* MAIN AREA */
+/* MAIN */
 .main {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 20px;
 }
 
 .card {
-    width: 60%;
-    max-width: 500px;
-    padding: 20px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 16px;
+    width: 100%;
+    max-width: 520px;
+    background: rgba(255,255,255,0.09);
+    border-radius: 20px;
+    padding: 32px 28px;
+    backdrop-filter: blur(16px);
     text-align: center;
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 .question {
-    font-size: 26px;
-    margin-bottom: 15px;
+    font-size: 32px;
+    margin-bottom: 20px;
+    font-weight: 500;
 }
 
 input {
     width: 100%;
-    padding: 12px;
-    border-radius: 10px;
+    padding: 14px;
+    font-size: 18px;
+    border-radius: 12px;
     border: none;
     outline: none;
-    margin-top: 10px;
+    margin-bottom: 12px;
+    background: rgba(255,255,255,0.95);
+    color: #000;
 }
 
 button {
-    margin-top: 10px;
-    padding: 10px 16px;
-    border-radius: 999px;
+    padding: 12px 28px;
+    font-size: 16px;
+    background: white;
+    color: black;
     border: none;
+    border-radius: 999px;
     cursor: pointer;
+    font-weight: 600;
+}
+
+#feedback {
+    margin-top: 16px;
+    font-size: 18px;
+    min-height: 28px;
 }
 
 /* STATS */
 .stats {
     margin-top: 20px;
-    font-size: 13px;
-    color: #aaa;
+    display: flex;
+    justify-content: space-around;
+    font-size: 15px;
 }
 </style>
 </head>
@@ -103,7 +127,7 @@ button {
 <body>
 
 <div class="sidebar">
-    <div class="title">📊 Skill Dashboard</div>
+    <div class="title">🌴 Skill Dashboard</div>
     <div id="skills"></div>
 
     <div class="stats">
@@ -115,21 +139,15 @@ button {
 
 <div class="main">
     <div class="card">
-        <div class="question" id="question">Loading...</div>
-
-        <input id="answer" placeholder="Type answer...">
-        <button onclick="submitAnswer()">Submit</button>
-
+        <div class="question" id="question">Loading question...</div>
+        <input id="answer" type="number" placeholder="Your answer">
+        <button onclick="submitAnswer()">Submit Answer</button>
         <div id="feedback"></div>
     </div>
 </div>
 
 <script>
-/* -----------------------------
-   STATE SYSTEM
-------------------------------*/
-
-let state = JSON.parse(localStorage.getItem("tutor")) || {
+let state = JSON.parse(localStorage.getItem("tutorState")) || {
     xp: 0,
     level: 1,
     streak: 0,
@@ -141,106 +159,81 @@ let state = JSON.parse(localStorage.getItem("tutor")) || {
     }
 };
 
-let current = null;
-
-/* -----------------------------
-   STREAK SYSTEM
-------------------------------*/
+let currentQuestion = null;
 
 function updateStreak() {
     const today = new Date().toDateString();
-
     if (state.lastActive !== today) {
         state.streak = (state.streak || 0) + 1;
         state.lastActive = today;
     }
 }
 
-/* -----------------------------
-   SKILL LOGIC
-------------------------------*/
-
 function pickSkill() {
-    const entries = Object.entries(state.skills);
-
-    entries.sort((a,b)=>
-        (a[1].wrong - a[1].correct) - (b[1].wrong - b[1].correct)
-    );
-
-    return entries[0][0];
+    return Object.entries(state.skills)
+        .sort((a, b) => (a[1].wrong - a[1].correct) - (b[1].wrong - b[1].correct))[0][0];
 }
 
 function generateQuestion(skill) {
-    const level = state.skills[skill].level;
-    const max = level * 10;
-
+    const lvl = state.skills[skill].level;
+    const max = Math.max(5, lvl * 8);
     const a = Math.floor(Math.random() * max);
     const b = Math.floor(Math.random() * max);
 
-    if (skill === "addition") return { q: `${a} + ${b}`, a: a + b, skill };
-    if (skill === "subtraction") return { q: `${a} - ${b}`, a: a - b, skill };
-    if (skill === "multiplication") return { q: `${a} * ${b}`, a: a * b, skill };
+    if (skill === "addition") return { q: `${a} + ${b}`, answer: a + b, skill };
+    if (skill === "subtraction") return { q: `${Math.max(a,b)} - ${Math.min(a,b)}`, answer: Math.abs(a - b), skill };
+    if (skill === "multiplication") return { q: `${a} × ${b}`, answer: a * b, skill };
 }
 
-/* -----------------------------
-   GAME LOOP
-------------------------------*/
-
-function next() {
+function nextQuestion() {
     const skill = pickSkill();
-    current = generateQuestion(skill);
-
-    document.getElementById("question").innerText = current.q;
+    currentQuestion = generateQuestion(skill);
+    document.getElementById("question").innerText = currentQuestion.q;
     document.getElementById("answer").value = "";
-    document.getElementById("feedback").innerText = "";
+    document.getElementById("feedback").innerHTML = "";
 }
-
-/* -----------------------------
-   ANSWER CHECKING
-------------------------------*/
 
 function submitAnswer() {
-    const val = Number(document.getElementById("answer").value);
-    const fb = document.getElementById("feedback");
+    const userAnswer = Number(document.getElementById("answer").value);
+    const feedbackEl = document.getElementById("feedback");
+    const skillData = state.skills[currentQuestion.skill];
 
-    const skill = state.skills[current.skill];
-
-    if (val === current.a) {
-        fb.innerText = "Correct!";
-        skill.correct++;
+    if (userAnswer === currentQuestion.answer) {
+        feedbackEl.innerHTML = `<span style="color:#4ade80">✅ Correct!</span>`;
+        skillData.correct++;
         state.xp += 10;
 
-        if (skill.correct >= 5) {
-            skill.level++;
-            skill.correct = 0;
-            skill.wrong = 0;
+        if (skillData.correct >= 5) {
+            skillData.level++;
+            skillData.correct = 0;
+            skillData.wrong = 0;
         }
-
     } else {
-        fb.innerText = `Wrong. Answer: ${current.a}`;
-        skill.wrong++;
+        feedbackEl.innerHTML = `<span style="color:#f87171">❌ Wrong. The answer was ${currentQuestion.answer}</span>`;
+        skillData.wrong++;
 
-        if (skill.wrong >= 3) {
-            skill.level = Math.max(1, skill.level - 1);
-            skill.wrong = 0;
+        if (skillData.wrong >= 3) {
+            skillData.level = Math.max(1, skillData.level - 1);
+            skillData.wrong = 0;
         }
     }
 
-    if (state.xp >= state.level * 50) {
+    // Level up overall
+    if (state.xp >= state.level * 60) {
         state.level++;
         state.xp = 0;
     }
 
-    save();
-    render();
-    next();
+    saveState();
+    renderDashboard();
+    setTimeout(nextQuestion, 1400);
 }
 
-/* -----------------------------
-   UI RENDER
-------------------------------*/
+function saveState() {
+    localStorage.setItem("tutorState", JSON.stringify(state));
+}
 
-function render() {
+function renderDashboard() {
     document.getElementById("xp").innerText = state.xp;
     document.getElementById("level").innerText = state.level;
     document.getElementById("streak").innerText = state.streak;
@@ -248,36 +241,29 @@ function render() {
     const container = document.getElementById("skills");
     container.innerHTML = "";
 
-    for (let [name, s] of Object.entries(state.skills)) {
-        const percent = Math.min(100, s.level * 20);
-
+    Object.entries(state.skills).forEach(([name, data]) => {
+        const percent = Math.min(100, data.level * 18);
         const div = document.createElement("div");
         div.className = "skill";
         div.innerHTML = `
-            <div>${name}</div>
+            <strong>${name.charAt(0).toUpperCase() + name.slice(1)}</strong>
             <div class="bar"><div class="fill" style="width:${percent}%"></div></div>
+            <small>Level ${data.level}</small>
         `;
         container.appendChild(div);
-    }
+    });
 }
 
-/* -----------------------------
-   SAVE
-------------------------------*/
-
-function save() {
-    localStorage.setItem("tutor", JSON.stringify(state));
-}
-
-/* -----------------------------
-   INIT
-------------------------------*/
-
+/* Init */
 updateStreak();
-render();
-next();
-save();
+renderDashboard();
+nextQuestion();
+saveState();
 </script>
+
+<div style="position:fixed; top:15px; left:15px;">
+    <a href="index.html" style="color:white; opacity:0.8; text-decoration:none; font-size:15px;">← Back to Dashboard</a>
+</div>
 
 </body>
 </html>
