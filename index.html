@@ -17,21 +17,38 @@
     <a href="about.html">About</a>
 </nav>
 
-<div class="page">
-
+<section class="hero">
     <h1>Vxo Study OS</h1>
+    <p>Simple system for studying, practice, and productivity.</p>
+</section>
+
+<section class="grid">
 
     <div class="card">
-        A simple student system for math, studying, and productivity.
+        <h2>Math Engine</h2>
+        <p>Practice arithmetic with instant feedback.</p>
+        <a href="math.html">Open</a>
     </div>
 
     <div class="card">
-        Click Math or Assistant to start using apps.
+        <h2>Study Assistant</h2>
+        <p>Ask questions and get help instantly.</p>
+        <a href="chat.html">Open</a>
     </div>
 
-</div>
+    <div class="card">
+        <h2>About</h2>
+        <p>What this project is and how it was built.</p>
+        <a href="about.html">Read</a>
+    </div>
 
-<script src="script.js" defer></script>
+</section>
+
+<script>
+window.addEventListener("load", () => {
+    document.body.classList.add("loaded");
+});
+</script>
 
 </body>
 </html>
