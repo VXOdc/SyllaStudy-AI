@@ -1,118 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Math Game • Vxo Study OS</title>
-<style>
-body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)),
-                url("https://images6.alphacoders.com/526/526622.jpg");
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    color: white;
-    display: flex;
-    height: 100vh;
-}
-
-/* Sidebar - Apple glass style */
-.sidebar {
-    width: 320px;
-    background: rgba(255,255,255,0.09);
-    backdrop-filter: blur(24px);
-    border-right: 1px solid rgba(255,255,255,0.15);
-    padding: 24px;
-}
-
-/* Main game area - perfectly centered */
-.main {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.card {
-    width: 100%;
-    max-width: 560px;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 28px;
-    padding: 40px 32px;
-    backdrop-filter: blur(20px);
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-.question {
-    font-size: 36px;
-    margin-bottom: 28px;
-    font-weight: 500;
-}
-
-input {
-    width: 100%;
-    padding: 18px;
-    font-size: 22px;
-    border: none;
-    border-radius: 18px;
-    background: rgba(255,255,255,0.95);
-    color: #000;
-    margin-bottom: 20px;
-    outline: none;
-}
-
-button {
-    padding: 16px 36px;
-    font-size: 17px;
-    background: white;
-    color: black;
-    border: none;
-    border-radius: 9999px;
-    cursor: pointer;
-    font-weight: 700;
-}
-
-/* Feedback */
-#feedback {
-    margin-top: 24px;
-    font-size: 21px;
-    min-height: 32px;
-}
-
-/* Skill cards */
-.skill {
-    background: rgba(255,255,255,0.1);
-    margin-bottom: 14px;
-    padding: 14px;
-    border-radius: 16px;
-}
-
-.bar {
-    height: 10px;
-    background: #222;
-    border-radius: 999px;
-    overflow: hidden;
-    margin-top: 8px;
-}
-
-.fill {
-    height: 100%;
-    background: linear-gradient(90deg, #ffcc00, #ff8800);
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Game • Vxo Study OS</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255,255,255,0.11);
+            --glass-border: rgba(255,255,255,0.25);
+            --glass-blur: 32px;
+        }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.82)),
+                        url("https://images6.alphacoders.com/526/526622.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 320px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border-right: 1px solid var(--glass-border);
+            padding: 28px;
+        }
+        .main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            width: 100%;
+            max-width: 580px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 48px 40px;
+            text-align: center;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+        }
+        .question {
+            font-size: 38px;
+            margin-bottom: 32px;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 20px;
+            font-size: 24px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.95);
+            color: #000;
+            margin-bottom: 24px;
+            outline: none;
+        }
+        button {
+            padding: 18px 42px;
+            font-size: 17px;
+            background: rgba(255,255,255,0.95);
+            color: #000;
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+        button:hover {
+            background: white;
+            transform: scale(1.05);
+        }
+        #feedback {
+            margin-top: 28px;
+            font-size: 22px;
+            min-height: 34px;
+        }
+        .skill {
+            background: rgba(255,255,255,0.12);
+            margin-bottom: 16px;
+            padding: 16px;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+        .bar {
+            height: 9px;
+            background: #222;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffcc00, #ff8800);
+        }
+    </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2 style="text-align:center; margin:0 0 24px 0; font-size:22px;">Skill Dashboard</h2>
+    <h2 style="text-align:center; margin:0 0 28px 0; font-size:23px;">Skill Dashboard</h2>
     <div id="skills"></div>
     
-    <div style="margin-top:40px; text-align:center; font-size:15px; line-height:1.6;">
+    <div style="margin-top:50px; text-align:center; font-size:15.5px; line-height:1.7;">
         🔥 Streak: <span id="streak">0</span><br>
         ⭐ XP: <span id="xp">0</span><br>
         🏆 Level: <span id="level">1</span>
@@ -129,107 +125,107 @@ button {
 </div>
 
 <script>
-let state = JSON.parse(localStorage.getItem("tutorState")) || {
-    xp: 0, level: 1, streak: 0, lastActive: null,
-    skills: {
-        addition: {level:1, correct:0, wrong:0},
-        subtraction: {level:1, correct:0, wrong:0},
-        multiplication: {level:1, correct:0, wrong:0}
-    }
-};
-let currentQ = null;
-
-function updateStreak() {
-    const today = new Date().toDateString();
-    if (state.lastActive !== today) {
-        state.streak++;
-        state.lastActive = today;
-    }
-}
-
-function pickSkill() {
-    return Object.entries(state.skills)
-        .sort((a,b) => (a[1].wrong - a[1].correct) - (b[1].wrong - b[1].correct))[0][0];
-}
-
-function generateQuestion(skill) {
-    const lvl = state.skills[skill].level;
-    const max = lvl * 9;
-    const a = Math.floor(Math.random() * max);
-    const b = Math.floor(Math.random() * max);
-    
-    if (skill === "addition") return {q: `${a} + ${b}`, ans: a + b, skill};
-    if (skill === "subtraction") return {q: `${Math.max(a,b)} - ${Math.min(a,b)}`, ans: Math.abs(a - b), skill};
-    return {q: `${a} × ${b}`, ans: a * b, skill};
-}
-
-function nextQuestion() {
-    currentQ = generateQuestion(pickSkill());
-    document.getElementById("question").innerText = currentQ.q;
-    document.getElementById("answer").value = "";
-    document.getElementById("feedback").innerHTML = "";
-}
-
-function submitAnswer() {
-    const userAns = Number(document.getElementById("answer").value);
-    const fb = document.getElementById("feedback");
-    const skill = state.skills[currentQ.skill];
-
-    if (userAns === currentQ.ans) {
-        fb.innerHTML = `<span style="color:#4ade80">✅ Perfect!</span>`;
-        skill.correct++;
-        state.xp += 15;
-        if (skill.correct >= 5) {
-            skill.level++;
-            skill.correct = 0;
-            skill.wrong = 0;
+    let state = JSON.parse(localStorage.getItem("tutorState")) || {
+        xp: 0, level: 1, streak: 0, lastActive: null,
+        skills: {
+            addition: {level:1, correct:0, wrong:0},
+            subtraction: {level:1, correct:0, wrong:0},
+            multiplication: {level:1, correct:0, wrong:0}
         }
-    } else {
-        fb.innerHTML = `<span style="color:#f87171">❌ The answer was ${currentQ.ans}</span>`;
-        skill.wrong++;
-        if (skill.wrong >= 3) {
-            skill.level = Math.max(1, skill.level - 1);
-            skill.wrong = 0;
+    };
+    let currentQ = null;
+
+    function updateStreak() {
+        const today = new Date().toDateString();
+        if (state.lastActive !== today) {
+            state.streak++;
+            state.lastActive = today;
         }
     }
 
-    if (state.xp >= state.level * 70) {
-        state.level++;
-        state.xp = 0;
+    function pickSkill() {
+        return Object.entries(state.skills)
+            .sort((a,b) => (a[1].wrong - a[1].correct) - (b[1].wrong - b[1].correct))[0][0];
     }
 
-    localStorage.setItem("tutorState", JSON.stringify(state));
+    function generateQuestion(skill) {
+        const lvl = state.skills[skill].level;
+        const max = lvl * 9;
+        const a = Math.floor(Math.random() * max);
+        const b = Math.floor(Math.random() * max);
+        
+        if (skill === "addition") return {q: `${a} + ${b}`, ans: a + b, skill};
+        if (skill === "subtraction") return {q: `${Math.max(a,b)} - ${Math.min(a,b)}`, ans: Math.abs(a - b), skill};
+        return {q: `${a} × ${b}`, ans: a * b, skill};
+    }
+
+    function nextQuestion() {
+        currentQ = generateQuestion(pickSkill());
+        document.getElementById("question").innerText = currentQ.q;
+        document.getElementById("answer").value = "";
+        document.getElementById("feedback").innerHTML = "";
+    }
+
+    function submitAnswer() {
+        const userAns = Number(document.getElementById("answer").value);
+        const fb = document.getElementById("feedback");
+        const skill = state.skills[currentQ.skill];
+
+        if (userAns === currentQ.ans) {
+            fb.innerHTML = `<span style="color:#4ade80">✅ Perfect!</span>`;
+            skill.correct++;
+            state.xp += 15;
+            if (skill.correct >= 5) {
+                skill.level++;
+                skill.correct = 0;
+                skill.wrong = 0;
+            }
+        } else {
+            fb.innerHTML = `<span style="color:#f87171">❌ The answer was ${currentQ.ans}</span>`;
+            skill.wrong++;
+            if (skill.wrong >= 3) {
+                skill.level = Math.max(1, skill.level - 1);
+                skill.wrong = 0;
+            }
+        }
+
+        if (state.xp >= state.level * 70) {
+            state.level++;
+            state.xp = 0;
+        }
+
+        localStorage.setItem("tutorState", JSON.stringify(state));
+        renderDashboard();
+        setTimeout(nextQuestion, 1400);
+    }
+
+    function renderDashboard() {
+        document.getElementById("xp").innerText = state.xp;
+        document.getElementById("level").innerText = state.level;
+        document.getElementById("streak").innerText = state.streak;
+
+        const container = document.getElementById("skills");
+        container.innerHTML = "";
+        Object.entries(state.skills).forEach(([name, data]) => {
+            const pct = Math.min(100, data.level * 22);
+            const div = document.createElement("div");
+            div.className = "skill";
+            div.innerHTML = `
+                <strong>${name.charAt(0).toUpperCase() + name.slice(1)}</strong>
+                <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
+                <small>Level ${data.level}</small>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    updateStreak();
     renderDashboard();
-    setTimeout(nextQuestion, 1300);
-}
-
-function renderDashboard() {
-    document.getElementById("xp").innerText = state.xp;
-    document.getElementById("level").innerText = state.level;
-    document.getElementById("streak").innerText = state.streak;
-
-    const container = document.getElementById("skills");
-    container.innerHTML = "";
-    Object.entries(state.skills).forEach(([name, data]) => {
-        const pct = Math.min(100, data.level * 20);
-        const div = document.createElement("div");
-        div.className = "skill";
-        div.innerHTML = `
-            <strong>${name.charAt(0).toUpperCase() + name.slice(1)}</strong>
-            <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
-            <small>Level ${data.level}</small>
-        `;
-        container.appendChild(div);
-    });
-}
-
-updateStreak();
-renderDashboard();
-nextQuestion();
+    nextQuestion();
 </script>
 
-<div style="position:fixed; top:20px; left:20px;">
-    <a href="index.html" style="color:white; opacity:0.85; text-decoration:none; font-size:16px;">← Home</a>
+<div style="position:fixed; top:24px; left:24px;">
+    <a href="index.html" style="color:white; opacity:0.9; text-decoration:none; font-size:16px;">← Home</a>
 </div>
 </body>
 </html>
