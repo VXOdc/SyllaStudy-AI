@@ -1,47 +1,48 @@
 let a, b, op;
 
-window.addEventListener("DOMContentLoaded", () => {
+// wait until page is fully ready
+document.addEventListener("DOMContentLoaded", () => {
 
-    if (!document.getElementById("q")) return;
+    if (document.getElementById("question")) {
+        newQuestion();
 
-    newQ();
+        document.getElementById("submit").addEventListener("click", check);
 
-    document.getElementById("btn").addEventListener("click", check);
-
-    document.getElementById("a").addEventListener("keydown", e => {
-        if (e.key === "Enter") check();
-    });
+        document.getElementById("answer").addEventListener("keydown", e => {
+            if (e.key === "Enter") check();
+        });
+    }
 });
 
-function newQ() {
+function newQuestion() {
     a = Math.floor(Math.random() * 12);
     b = Math.floor(Math.random() * 12);
 
     const ops = ["+", "-", "×"];
-    op = ops[Math.floor(Math.random() * 3)];
+    op = ops[Math.floor(Math.random() * ops.length)];
 
-    document.getElementById("q").innerText = `${a} ${op} ${b}`;
-    document.getElementById("a").value = "";
-    document.getElementById("r").innerText = "";
+    document.getElementById("question").innerText = `${a} ${op} ${b}`;
+    document.getElementById("answer").value = "";
+    document.getElementById("result").innerText = "";
 }
 
-function answer() {
+function solve() {
     if (op === "+") return a + b;
     if (op === "-") return a - b;
     if (op === "×") return a * b;
 }
 
 function check() {
-    const val = Number(document.getElementById("a").value);
-    const r = document.getElementById("r");
+    const val = Number(document.getElementById("answer").value);
+    const result = document.getElementById("result");
 
-    if (val === answer()) {
-        r.innerText = "Correct";
-        r.style.color = "lightgreen";
+    if (val === solve()) {
+        result.innerText = "Correct";
+        result.style.color = "lightgreen";
     } else {
-        r.innerText = "Wrong";
-        r.style.color = "red";
+        result.innerText = "Wrong";
+        result.style.color = "red";
     }
 
-    setTimeout(newQ, 700);
+    setTimeout(newQuestion, 700);
 }
