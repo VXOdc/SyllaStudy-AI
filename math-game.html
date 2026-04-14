@@ -6,7 +6,7 @@
 <title>Math Game • Vxo Study OS</title>
 <style>
     :root {
-        /* Liquid Glass Theme - Apple-inspired */
+       
         --glass-bg: rgba(255, 255, 255, 0.11);
         --glass-border: rgba(255, 255, 255, 0.28);
         --glass-blur: 32px;
@@ -24,7 +24,7 @@
         padding: 0;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         background: linear-gradient(rgba(0, 0, 0, 0.48), rgba(0, 0, 0, 0.82)),
-                    url("https://images.unsplash.com/photo-1506953823976-52e1aa0bb3a7?auto=format&fit=crop&w=2000&q=80");
+                    url("https://images6.alphacoders.com/526/526622.jpg");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -35,7 +35,7 @@
         position: relative;
     }
 
-    /* SIDEBAR - Premium Liquid Glass */
+   
     .sidebar {
         width: 340px;
         background: var(--glass-bg);
@@ -56,7 +56,7 @@
         letter-spacing: -0.5px;
     }
 
-    /* Skill Cards */
+
     .skill-card {
         background: rgba(255,255,255,0.09);
         border: 1px solid rgba(255,255,255,0.18);
@@ -103,7 +103,7 @@
         display: block;
     }
 
-    /* Stats Section */
+   
     .stats {
         margin-top: auto;
         padding-top: 32px;
@@ -120,7 +120,7 @@
         gap: 10px;
     }
 
-    /* Reset Button */
+    
     .reset-btn {
         margin-top: 24px;
         padding: 12px 20px;
@@ -140,7 +140,7 @@
         transform: scale(1.03);
     }
 
-    /* MAIN GAME AREA */
+
     .main {
         flex: 1;
         display: flex;
@@ -150,14 +150,14 @@
         position: relative;
     }
 
-    /* Liquid Glass Card - the star of the show */
+ 
     .game-card {
         width: 100%;
         max-width: 620px;
         background: var(--glass-bg);
         backdrop-filter: blur(var(--glass-blur));
         border: 1px solid var(--glass-border);
-        border-radius: 48px 32px 52px 28px; /* asymmetric liquid shape */
+        border-radius: 48px 32px 52px 28px; 
         padding: 64px 56px;
         text-align: center;
         box-shadow: var(--shadow);
@@ -185,7 +185,7 @@
         letter-spacing: -1px;
     }
 
-    /* Answer Input */
+
     input {
         width: 100%;
         padding: 24px 28px;
@@ -205,7 +205,7 @@
         box-shadow: 0 12px 35px rgba(0,0,0,0.3);
     }
 
-    /* Submit Button */
+
     .submit-btn {
         margin-top: 32px;
         padding: 18px 52px;
@@ -225,7 +225,6 @@
         box-shadow: 0 15px 40px rgba(0,0,0,0.35);
     }
 
-    /* Feedback */
     #feedback {
         margin-top: 32px;
         font-size: 24px;
@@ -233,7 +232,7 @@
         min-height: 40px;
     }
 
-    /* Modal */
+
     .modal {
         position: fixed;
         inset: 0;
@@ -301,11 +300,11 @@
 </head>
 <body>
 
-<!-- SIDEBAR -->
+
 <div class="sidebar">
     <h2>Skill Dashboard</h2>
 
-    <!-- Addition -->
+
     <div class="skill-card" id="addition-card">
         <div class="skill-name">
             <span>Addition</span>
@@ -316,7 +315,7 @@
         <div class="level-label" id="addition-level">Level 1</div>
     </div>
 
-    <!-- Subtraction -->
+  
     <div class="skill-card" id="subtraction-card">
         <div class="skill-name">
             <span>Subtraction</span>
@@ -327,7 +326,7 @@
         <div class="level-label" id="subtraction-level">Level 1</div>
     </div>
 
-    <!-- Multiplication -->
+
     <div class="skill-card" id="multiplication-card">
         <div class="skill-name">
             <span>Multiplication</span>
@@ -338,7 +337,7 @@
         <div class="level-label" id="multiplication-level">Level 1</div>
     </div>
 
-    <!-- Stats -->
+  
     <div class="stats">
         <div class="stat-item">🔥 Streak: <span id="streak">0</span></div>
         <div class="stat-item">⭐ XP: <span id="xp">0</span></div>
@@ -350,7 +349,7 @@
     </button>
 </div>
 
-<!-- MAIN GAME AREA -->
+
 <div class="main">
     <div class="game-card">
         <div class="question" id="question">Loading question…</div>
@@ -370,7 +369,7 @@
     </div>
 </div>
 
-<!-- RESET MODAL -->
+
 <div id="resetModal" class="modal">
     <div class="modal-content">
         <h3>Reset All Progress?</h3>
@@ -383,7 +382,7 @@
 </div>
 
 <script>
-/* ==================== STATE & CORE LOGIC ==================== */
+
 let state = JSON.parse(localStorage.getItem("tutorState")) || {
     xp: 0,
     level: 1,
@@ -398,7 +397,7 @@ let state = JSON.parse(localStorage.getItem("tutorState")) || {
 
 let currentQuestion = null;
 
-/* Update streak on first load */
+
 function updateStreak() {
     const today = new Date().toDateString();
     if (state.lastActive !== today) {
@@ -407,13 +406,13 @@ function updateStreak() {
     }
 }
 
-/* Choose the weakest skill */
+
 function pickSkill() {
     return Object.entries(state.skills)
         .sort((a, b) => (a[1].wrong - a[1].correct) - (b[1].wrong - b[1].correct))[0][0];
 }
 
-/* Generate a question based on skill level */
+
 function generateQuestion(skill) {
     const lvl = state.skills[skill].level;
     const max = Math.max(5, lvl * 9);
@@ -425,7 +424,7 @@ function generateQuestion(skill) {
     return { q: `${a} × ${b}`, ans: a * b, skill };
 }
 
-/* Load next question */
+
 function nextQuestion() {
     currentQuestion = generateQuestion(pickSkill());
     document.getElementById("question").innerText = currentQuestion.q;
@@ -433,7 +432,7 @@ function nextQuestion() {
     document.getElementById("feedback").innerHTML = "";
 }
 
-/* Submit answer (called by button AND Enter key) */
+
 function submitAnswer() {
     const userAnswer = Number(document.getElementById("answer").value.trim());
     if (isNaN(userAnswer)) return;
@@ -460,7 +459,7 @@ function submitAnswer() {
         }
     }
 
-    /* Overall level up */
+
     if (state.xp >= state.level * 70) {
         state.level++;
         state.xp = 0;
@@ -471,30 +470,29 @@ function submitAnswer() {
     setTimeout(nextQuestion, 1650);
 }
 
-/* Render the entire sidebar */
 function renderDashboard() {
-    /* Stats */
+
     document.getElementById("xp").innerText = state.xp;
     document.getElementById("level").innerText = state.level;
     document.getElementById("streak").innerText = state.streak;
 
-    /* Addition */
+
     const addPct = Math.min(100, state.skills.addition.level * 22);
     document.getElementById("addition-bar").style.width = addPct + "%";
     document.getElementById("addition-level").innerText = `Level ${state.skills.addition.level}`;
 
-    /* Subtraction */
+ 
     const subPct = Math.min(100, state.skills.subtraction.level * 22);
     document.getElementById("subtraction-bar").style.width = subPct + "%";
     document.getElementById("subtraction-level").innerText = `Level ${state.skills.subtraction.level}`;
 
-    /* Multiplication */
+
     const mulPct = Math.min(100, state.skills.multiplication.level * 22);
     document.getElementById("multiplication-bar").style.width = mulPct + "%";
     document.getElementById("multiplication-level").innerText = `Level ${state.skills.multiplication.level}`;
 }
 
-/* Reset Modal */
+
 function showResetModal() {
     document.getElementById("resetModal").classList.add("show");
 }
@@ -510,13 +508,13 @@ function resetProgress() {
     }
 }
 
-/* Initialize everything */
+
 function init() {
     updateStreak();
     renderDashboard();
     nextQuestion();
 
-    /* Enter key support on input */
+
     const answerInput = document.getElementById("answer");
     answerInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter") submitAnswer();
