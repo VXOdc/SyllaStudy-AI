@@ -117,6 +117,7 @@
     .new-chat-btn {
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 12px;
         padding: 12px 16px;
         margin: 0 20px 20px 20px;
@@ -129,6 +130,12 @@
         cursor: pointer;
         transition: all 0.3s var(--transition-spring);
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .new-chat-btn svg {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
     }
 
     .new-chat-btn:hover {
