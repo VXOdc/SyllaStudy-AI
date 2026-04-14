@@ -22,7 +22,7 @@
 
     body {
         font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-        background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.85)),
+        background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)),
                     url("https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80");
         background-size: cover;
         background-position: center;
@@ -45,7 +45,6 @@
         z-index: 100;
         flex-shrink: 0;
     }
-
     .sidebar.collapsed { width: var(--sidebar-collapsed-width); }
 
     .new-chat-btn {
@@ -65,7 +64,6 @@
     }
 
     .history { flex: 1; overflow-y: auto; padding: 0 12px; }
-    
     .chat-item {
         position: relative;
         padding: 12px;
@@ -80,118 +78,77 @@
     }
     .chat-item:hover, .chat-item.active { background: var(--glass-hover); color: #fff; }
     .chat-item .title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
-    
-    .chat-actions-trigger {
-        opacity: 0;
-        background: none;
-        border: none;
-        color: white;
-        cursor: pointer;
-        padding: 4px;
-        border-radius: 6px;
-    }
+    .chat-actions-trigger { opacity: 0; background: none; border: none; color: white; cursor: pointer; padding: 4px; }
     .chat-item:hover .chat-actions-trigger { opacity: 1; }
-    .chat-actions-trigger:hover { background: var(--glass-active); }
 
     /* CONTEXT MENU */
     .context-menu {
         position: fixed;
-        background: rgba(30, 30, 30, 0.9);
+        background: rgba(30, 30, 30, 0.95);
         backdrop-filter: blur(20px);
         border: 1px solid var(--glass-border);
         border-radius: 12px;
         padding: 6px;
         display: none;
         z-index: 1000;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        min-width: 140px;
     }
     .context-menu button {
-        display: block;
-        width: 100%;
-        text-align: left;
-        padding: 8px 12px;
-        background: none;
-        border: none;
-        color: white;
-        font-size: 13px;
-        cursor: pointer;
-        border-radius: 6px;
+        display: block; width: 100%; text-align: left; padding: 10px;
+        background: none; border: none; color: white; cursor: pointer; border-radius: 6px;
     }
     .context-menu button:hover { background: var(--glass-hover); }
-    .context-menu .delete { color: #ff4d4d; }
 
-    /* NOTIFICATIONS */
-    #notification-container {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 2000;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+    /* HERO SECTION (The part you wanted fixed) */
+    .hero {
+        position: absolute;
+        top: 45%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        width: 100%;
+        max-width: 600px;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        z-index: 5;
     }
-    .toast {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
-        border: 1px solid var(--glass-border);
-        color: white;
-        padding: 12px 20px;
-        border-radius: 12px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        animation: slideIn 0.3s ease-out;
-    }
-    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .hero.hidden { opacity: 0; pointer-events: none; transform: translate(-50%, -60%); }
+    .hero h1 { font-size: 48px; font-weight: 800; margin-bottom: 10px; letter-spacing: -1px; }
+    .hero p { font-size: 18px; color: var(--text-secondary); }
 
     /* MAIN CONTENT */
     .main { flex: 1; display: flex; flex-direction: column; position: relative; }
-    .messages-wrapper { flex: 1; overflow-y: auto; padding: 80px 20px; display: flex; justify-content: center; scroll-behavior: smooth;}
-    .messages { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 24px; }
+    .messages-wrapper { flex: 1; overflow-y: auto; padding: 100px 20px 40px; display: flex; justify-content: center; scroll-behavior: smooth;}
+    .messages { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 24px; z-index: 10; }
     .msg-row { display: flex; width: 100%; }
     .msg-row.user { justify-content: flex-end; }
     .msg-row.ai { justify-content: flex-start; }
-    .msg { max-width: 75%; padding: 16px 20px; border-radius: 20px; line-height: 1.5; font-size: 15px;}
-    .msg.user { background: #fff; color: #000; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(255,255,255,0.1); }
+    .msg { max-width: 75%; padding: 16px 20px; border-radius: 20px; line-height: 1.6; font-size: 15px; }
+    .msg.user { background: #fff; color: #000; border-bottom-right-radius: 4px; }
     .msg.ai { background: var(--glass-bg); border: 1px solid var(--glass-border); border-bottom-left-radius: 4px; backdrop-filter: blur(10px); }
 
     /* INPUT AREA */
-    .input-wrapper { padding: 0 20px 40px; display: flex; justify-content: center; }
+    .input-wrapper { padding: 0 20px 40px; display: flex; justify-content: center; z-index: 20; }
     .input-box {
-        width: 100%;
-        max-width: 800px;
-        background: rgba(0, 0, 0, 0.4);
+        width: 100%; max-width: 800px;
+        background: rgba(0, 0, 0, 0.5);
         backdrop-filter: blur(40px);
         border: 1px solid var(--glass-border);
-        border-radius: 24px;
-        padding: 14px;
-        transition: 0.3s;
+        border-radius: 24px; padding: 14px;
     }
-    .input-box:focus-within { border-color: rgba(255,255,255,0.4); background: rgba(0,0,0,0.5); }
     .input-row { display: flex; align-items: flex-end; gap: 12px; }
     textarea {
-        flex: 1;
-        background: transparent;
-        border: none;
-        color: white;
-        font-size: 16px;
-        outline: none;
-        resize: none;
-        padding: 4px 8px;
-        max-height: 200px;
+        flex: 1; background: transparent; border: none; color: white;
+        font-size: 16px; outline: none; resize: none; padding: 4px 8px; max-height: 200px;
     }
     .send-btn {
-        width: 40px; height: 40px;
-        border-radius: 50%;
-        background: #fff;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
+        width: 40px; height: 40px; border-radius: 50%; background: #fff;
+        border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
-    .send-btn:disabled { opacity: 0.3; }
 
-    .pin-icon { font-size: 10px; margin-right: 6px; transform: rotate(45deg); display: inline-block; }
+    /* TOASTS */
+    #notification-container { position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+    .toast { background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); padding: 12px 20px; border-radius: 12px; border: 1px solid var(--glass-border); animation: slideIn 0.3s; }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 </style>
 </head>
 <body>
@@ -201,7 +158,7 @@
 <div id="contextMenu" class="context-menu">
     <button onclick="handleRename()">Rename</button>
     <button onclick="handlePin()">Toggle Pin</button>
-    <button class="delete" onclick="handleDelete()">Delete</button>
+    <button style="color: #ff4d4d;" onclick="handleDelete()">Delete</button>
 </div>
 
 <nav class="sidebar" id="sidebar">
@@ -209,13 +166,18 @@
         <button onclick="toggleSidebar()" style="background:none; border:none; color:white; cursor:pointer;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
         </button>
-        <span style="font-weight: 600; font-size: 14px; letter-spacing: 1px;">HISTORY</span>
+        <span style="font-weight: 700; font-size: 12px; letter-spacing: 2px; opacity: 0.5;">VXO HISTORY</span>
     </div>
     <button class="new-chat-btn" onclick="newChat()">+ New Chat</button>
     <div id="historyList" class="history"></div>
 </nav>
 
 <main class="main">
+    <div id="hero" class="hero">
+        <h1>Vxo Study OS</h1>
+        <p>How can I help you with your studies today?</p>
+    </div>
+
     <div class="messages-wrapper" id="messagesWrapper">
         <div id="messages" class="messages"></div>
     </div>
@@ -223,7 +185,7 @@
     <div class="input-wrapper">
         <div class="input-box">
             <div class="input-row">
-                <textarea id="input" placeholder="Ask Vxo anything..." rows="1" oninput="autoGrow(this)" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); send();}"></textarea>
+                <textarea id="input" placeholder="Message Vxo..." rows="1" oninput="autoGrow(this)" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); send();}"></textarea>
                 <button class="send-btn" id="sendBtn" onclick="send()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                 </button>
@@ -233,21 +195,17 @@
 </main>
 
 <script>
-// --- State Management ---
-let chats = JSON.parse(localStorage.getItem("vxoChats")) || {};
+let chats = JSON.parse(localStorage.getItem("vxoChats")) || { "default": [] };
 let pinnedChats = JSON.parse(localStorage.getItem("vxoPinned")) || [];
 let customNames = JSON.parse(localStorage.getItem("vxoNames")) || {};
 let currentChat = localStorage.getItem("vxoCurrentChat") || "default";
 let menuTargetId = null;
 
-// Initialize if empty
-if (Object.keys(chats).length === 0) chats["default"] = [];
-
 const messagesEl = document.getElementById("messages");
+const heroEl = document.getElementById("hero");
 const input = document.getElementById("input");
 const menu = document.getElementById("contextMenu");
 
-// --- UI Helpers ---
 function notify(text) {
     const container = document.getElementById("notification-container");
     const toast = document.createElement("div");
@@ -264,16 +222,6 @@ function autoGrow(el) {
 
 function toggleSidebar() { document.getElementById("sidebar").classList.toggle("collapsed"); }
 
-// --- Chat Actions ---
-function newChat() {
-    currentChat = "chat_" + Date.now();
-    chats[currentChat] = [];
-    save();
-    renderMessages();
-    renderHistory();
-    notify("New chat created");
-}
-
 function save() {
     localStorage.setItem("vxoChats", JSON.stringify(chats));
     localStorage.setItem("vxoCurrentChat", currentChat);
@@ -284,103 +232,40 @@ function save() {
 function renderMessages() {
     messagesEl.innerHTML = "";
     const msgs = chats[currentChat] || [];
-    if(msgs.length === 0) {
-        appendMessageHTML("Hello! I'm your Vxo Study Assistant. What are we working on?", "ai");
+    
+    // Check if we should show hero or messages
+    if (msgs.length === 0) {
+        heroEl.classList.remove("hidden");
+    } else {
+        heroEl.classList.add("hidden");
+        msgs.forEach(m => appendMessageHTML(m.content, m.role));
     }
-    msgs.forEach(m => appendMessageHTML(m.content, m.role));
 }
 
 function appendMessageHTML(text, role) {
     const row = document.createElement("div");
     row.className = `msg-row ${role}`;
-    row.innerHTML = `<div class="msg ${role}">${text.replace(/\n/g, '<br>')}</div>`;
+    // Basic Markdown Support (Bold/Italic)
+    let formattedText = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
+        
+    row.innerHTML = `<div class="msg ${role}">${formattedText}</div>`;
     messagesEl.appendChild(row);
+    heroEl.classList.add("hidden"); // Ensure hero hides when first msg added
     const wrap = document.getElementById("messagesWrapper");
     wrap.scrollTop = wrap.scrollHeight;
 }
 
-// --- Sidebar & Context Menu Logic ---
-function showMenu(e, id) {
-    e.preventDefault();
-    e.stopPropagation();
-    menuTargetId = id;
-    menu.style.display = "block";
-    menu.style.left = e.pageX + "px";
-    menu.style.top = e.pageY + "px";
-}
-
-document.addEventListener('click', () => menu.style.display = "none");
-
-function handleRename() {
-    const newName = prompt("Enter new chat name:");
-    if (newName) {
-        customNames[menuTargetId] = newName;
-        save();
-        renderHistory();
-        notify("Chat renamed");
-    }
-}
-
-function handlePin() {
-    const index = pinnedChats.indexOf(menuTargetId);
-    if (index > -1) pinnedChats.splice(index, 1);
-    else pinnedChats.push(menuTargetId);
-    save();
-    renderHistory();
-    notify(index > -1 ? "Unpinned" : "Pinned to top");
-}
-
-function handleDelete() {
-    if (Object.keys(chats).length <= 1) return notify("Can't delete last chat");
-    if (confirm("Delete this conversation?")) {
-        delete chats[menuTargetId];
-        pinnedChats = pinnedChats.filter(id => id !== menuTargetId);
-        if (currentChat === menuTargetId) currentChat = Object.keys(chats)[0];
-        save();
-        renderHistory();
-        renderMessages();
-        notify("Chat deleted");
-    }
-}
-
-function renderHistory() {
-    const hist = document.getElementById("historyList");
-    hist.innerHTML = "";
-    
-    // Sort: Pinned first, then by timestamp
-    const sortedIds = Object.keys(chats).sort((a, b) => {
-        const aPinned = pinnedChats.includes(a);
-        const bPinned = pinnedChats.includes(b);
-        if (aPinned && !bPinned) return -1;
-        if (!aPinned && bPinned) return 1;
-        return b - a;
-    });
-
-    sortedIds.forEach(id => {
-        const item = document.createElement("div");
-        item.className = `chat-item ${id === currentChat ? 'active' : ''}`;
-        
-        const isPinned = pinnedChats.includes(id);
-        const name = customNames[id] || chats[id][0]?.content.substring(0, 25) || "Empty Chat";
-        
-        item.innerHTML = `
-            <div class="title" onclick="switchChat('${id}')">
-                ${isPinned ? '<span class="pin-icon">📌</span>' : ''} ${name}
-            </div>
-            <button class="chat-actions-trigger" onclick="showMenu(event, '${id}')">⋮</button>
-        `;
-        hist.appendChild(item);
-    });
-}
-
-function switchChat(id) {
-    currentChat = id;
+function newChat() {
+    currentChat = "chat_" + Date.now();
+    chats[currentChat] = [];
     save();
     renderMessages();
     renderHistory();
+    notify("New Chat Started");
 }
 
-// --- The Core API Logic ---
 async function send() {
     const text = input.value.trim();
     if (!text) return;
@@ -392,7 +277,7 @@ async function send() {
     
     const typingRow = document.createElement("div");
     typingRow.className = "msg-row ai";
-    typingRow.innerHTML = `<div class="msg ai typing-indicator"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+    typingRow.innerHTML = `<div class="msg ai">...</div>`;
     messagesEl.appendChild(typingRow);
     
     try {
@@ -411,18 +296,63 @@ async function send() {
         if (data.reply) {
             appendMessageHTML(data.reply, "ai");
             chats[currentChat].push({ role: "ai", content: data.reply });
-        } else {
-            notify("API Error: Check your key");
         }
     } catch (e) {
         typingRow.remove();
-        notify("Connection lost. Try again.");
+        notify("Connection Error");
     }
     save();
     renderHistory();
 }
 
-// Initial Load
+// Sidebar Management
+function renderHistory() {
+    const hist = document.getElementById("historyList");
+    hist.innerHTML = "";
+    const ids = Object.keys(chats).sort((a,b) => b.localeCompare(a));
+    
+    ids.forEach(id => {
+        const item = document.createElement("div");
+        item.className = `chat-item ${id === currentChat ? 'active' : ''}`;
+        const name = customNames[id] || chats[id][0]?.content.substring(0, 20) || "Empty Chat";
+        item.innerHTML = `
+            <div class="title" onclick="switchChat('${id}')">${name}</div>
+            <button class="chat-actions-trigger" onclick="showMenu(event, '${id}')">⋮</button>
+        `;
+        hist.appendChild(item);
+    });
+}
+
+function switchChat(id) {
+    currentChat = id;
+    save();
+    renderMessages();
+    renderHistory();
+}
+
+function showMenu(e, id) {
+    e.preventDefault(); e.stopPropagation();
+    menuTargetId = id;
+    menu.style.display = "block";
+    menu.style.left = e.pageX + "px";
+    menu.style.top = e.pageY + "px";
+}
+
+document.addEventListener('click', () => menu.style.display = "none");
+
+function handleRename() {
+    const n = prompt("New name:");
+    if(n) { customNames[menuTargetId] = n; save(); renderHistory(); }
+}
+
+function handleDelete() {
+    if(confirm("Delete?")) {
+        delete chats[menuTargetId];
+        if(currentChat === menuTargetId) currentChat = "default";
+        save(); renderHistory(); renderMessages();
+    }
+}
+
 renderHistory();
 renderMessages();
 </script>
