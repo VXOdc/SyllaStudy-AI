@@ -5,265 +5,400 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Math Game • Vxo Study OS</title>
 <style>
-:root {
-    --glass: rgba(255,255,255,0.11);
-    --border: rgba(255,255,255,0.22);
-}
+    :root {
+        /* Liquid Glass Theme - Apple-inspired */
+        --glass-bg: rgba(255, 255, 255, 0.11);
+        --glass-border: rgba(255, 255, 255, 0.28);
+        --glass-blur: 32px;
+        --accent: #ffd60a;
+        --text: #ffffff;
+        --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    }
 
-body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: linear-gradient(rgba(0,0,0,0.52), rgba(0,0,0,0.85)),
-                url("https://images6.alphacoders.com/526/526622.jpg");
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    color: white;
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
-}
+    * {
+        box-sizing: border-box;
+    }
 
-/* Sidebar */
-.sidebar {
-    width: 340px;
-    background: var(--glass);
-    backdrop-filter: blur(32px);
-    border-right: 1px solid var(--border);
-    padding: 32px 28px;
-    display: flex;
-    flex-direction: column;
-}
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: linear-gradient(rgba(0, 0, 0, 0.48), rgba(0, 0, 0, 0.82)),
+                    url("https://images.unsplash.com/photo-1506953823976-52e1aa0bb3a7?auto=format&fit=crop&w=2000&q=80");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: var(--text);
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+    }
 
-h2 {
-    text-align: center;
-    margin: 0 0 32px 0;
-    font-size: 24px;
-    font-weight: 600;
-}
+    /* SIDEBAR - Premium Liquid Glass */
+    .sidebar {
+        width: 340px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(var(--glass-blur));
+        border-right: 1px solid var(--glass-border);
+        padding: 32px 24px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: var(--shadow);
+        z-index: 10;
+    }
 
-/* Skills */
-.skill {
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.18);
-    margin-bottom: 16px;
-    padding: 18px;
-    border-radius: 20px;
-}
+    .sidebar h2 {
+        text-align: center;
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0 0 32px 0;
+        letter-spacing: -0.5px;
+    }
 
-.bar {
-    height: 10px;
-    background: #1c1c1e;
-    border-radius: 999px;
-    overflow: hidden;
-    margin-top: 10px;
-}
+    /* Skill Cards */
+    .skill-card {
+        background: rgba(255,255,255,0.09);
+        border: 1px solid rgba(255,255,255,0.18);
+        border-radius: 20px;
+        padding: 18px 20px;
+        margin-bottom: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
 
-.fill {
-    height: 100%;
-    background: linear-gradient(90deg, #ffd60a, #ff9f0a);
-    transition: width 0.6s ease;
-}
+    .skill-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+    }
 
-/* Stats */
-.stats {
-    margin-top: auto;
-    text-align: center;
-    font-size: 15px;
-    line-height: 1.8;
-}
+    .skill-name {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-/* Main Game Area */
-.main {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px;
-}
+    .bar-container {
+        height: 10px;
+        background: #1c1c1e;
+        border-radius: 9999px;
+        overflow: hidden;
+        position: relative;
+    }
 
-.card {
-    width: 100%;
-    max-width: 560px;
-    background: var(--glass);
-    backdrop-filter: blur(32px);
-    border: 1px solid var(--border);
-    border-radius: 32px;
-    padding: 52px 48px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
-}
+    .bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ffd60a, #ff9f0a);
+        transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border-radius: 9999px;
+    }
 
-.question {
-    font-size: 42px;
-    font-weight: 500;
-    margin-bottom: 36px;
-    min-height: 54px;
-}
+    .level-label {
+        font-size: 13px;
+        opacity: 0.75;
+        margin-top: 6px;
+        display: block;
+    }
 
-input {
-    width: 100%;
-    padding: 20px 24px;
-    font-size: 26px;
-    border: none;
-    border-radius: 20px;
-    background: rgba(255,255,255,0.95);
-    color: #000;
-    margin-bottom: 24px;
-    outline: none;
-    text-align: center;
-}
+    /* Stats Section */
+    .stats {
+        margin-top: auto;
+        padding-top: 32px;
+        border-top: 1px solid rgba(255,255,255,0.15);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        font-size: 15px;
+    }
 
-button.submit {
-    padding: 16px 48px;
-    font-size: 17px;
-    font-weight: 600;
-    background: white;
-    color: black;
-    border: none;
-    border-radius: 9999px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-button.submit:hover {
-    transform: scale(1.04);
-    background: #f0f0f0;
-}
+    /* Reset Button */
+    .reset-btn {
+        margin-top: 24px;
+        padding: 12px 20px;
+        background: rgba(255,59,48,0.12);
+        color: #ff3b30;
+        border: 1px solid rgba(255,59,48,0.3);
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
 
-/* Feedback */
-#feedback {
-    margin-top: 28px;
-    font-size: 23px;
-    min-height: 38px;
-    font-weight: 500;
-}
+    .reset-btn:hover {
+        background: rgba(255,59,48,0.2);
+        transform: scale(1.03);
+    }
 
-/* Reset Button */
-.reset-btn {
-    margin-top: 20px;
-    padding: 10px 16px;
-    background: rgba(255,255,255,0.1);
-    color: #ff3b30;
-    border: 1px solid rgba(255,59,48,0.3);
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-}
+    /* MAIN GAME AREA */
+    .main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        position: relative;
+    }
 
-/* Confirmation Modal */
-.modal {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.7);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
+    /* Liquid Glass Card - the star of the show */
+    .game-card {
+        width: 100%;
+        max-width: 620px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(var(--glass-blur));
+        border: 1px solid var(--glass-border);
+        border-radius: 48px 32px 52px 28px; /* asymmetric liquid shape */
+        padding: 64px 56px;
+        text-align: center;
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+    }
 
-.modal.show {
-    display: flex;
-    opacity: 1;
-}
+    .game-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 60%;
+        height: 60%;
+        background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 70%);
+        pointer-events: none;
+        opacity: 0.6;
+    }
 
-.modal-content {
-    background: rgba(255,255,255,0.95);
-    color: #000;
-    border-radius: 24px;
-    padding: 32px 40px;
-    width: 100%;
-    max-width: 380px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-}
+    .question {
+        font-size: 48px;
+        font-weight: 500;
+        margin-bottom: 48px;
+        min-height: 68px;
+        letter-spacing: -1px;
+    }
 
-.modal-content h3 {
-    margin: 0 0 16px 0;
-    font-size: 22px;
-}
+    /* Answer Input */
+    input {
+        width: 100%;
+        padding: 24px 28px;
+        font-size: 28px;
+        text-align: center;
+        border: none;
+        border-radius: 24px;
+        background: rgba(255,255,255,0.95);
+        color: #111;
+        outline: none;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
 
-.modal-content p {
-    color: #555;
-    margin-bottom: 32px;
-}
+    input:focus {
+        transform: scale(1.02);
+        box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+    }
 
-.modal-buttons {
-    display: flex;
-    gap: 12px;
-}
+    /* Submit Button */
+    .submit-btn {
+        margin-top: 32px;
+        padding: 18px 52px;
+        font-size: 17px;
+        font-weight: 700;
+        background: rgba(255,255,255,0.95);
+        color: #111;
+        border: none;
+        border-radius: 9999px;
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-.modal-buttons button {
-    flex: 1;
-    padding: 14px;
-    border: none;
-    border-radius: 14px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-}
+    .submit-btn:hover {
+        transform: translateY(-3px) scale(1.04);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+    }
 
-.cancel {
-    background: #e5e5e7;
-    color: #000;
-}
+    /* Feedback */
+    #feedback {
+        margin-top: 32px;
+        font-size: 24px;
+        font-weight: 600;
+        min-height: 40px;
+    }
 
-.reset-confirm {
-    background: #ff3b30;
-    color: white;
-}
+    /* Modal */
+    .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.75);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modal.show {
+        display: flex;
+        opacity: 1;
+    }
+
+    .modal-content {
+        background: rgba(255,255,255,0.97);
+        color: #111;
+        border-radius: 28px;
+        padding: 40px;
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+        box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    }
+
+    .modal-content h3 {
+        font-size: 24px;
+        margin-bottom: 12px;
+    }
+
+    .modal-content p {
+        color: #555;
+        margin-bottom: 32px;
+        line-height: 1.5;
+    }
+
+    .modal-buttons {
+        display: flex;
+        gap: 16px;
+    }
+
+    .modal-buttons button {
+        flex: 1;
+        padding: 16px;
+        border: none;
+        border-radius: 16px;
+        font-size: 17px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .cancel-btn {
+        background: #f0f0f0;
+        color: #111;
+    }
+
+    .reset-confirm-btn {
+        background: #ff3b30;
+        color: white;
+    }
 </style>
 </head>
 <body>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
     <h2>Skill Dashboard</h2>
-    <div id="skills"></div>
-    
-    <div class="stats">
-        🔥 Streak: <span id="streak">0</span><br>
-        ⭐ XP: <span id="xp">0</span><br>
-        🏆 Level: <span id="level">1</span>
+
+    <!-- Addition -->
+    <div class="skill-card" id="addition-card">
+        <div class="skill-name">
+            <span>Addition</span>
+        </div>
+        <div class="bar-container">
+            <div class="bar-fill" id="addition-bar" style="width: 0%"></div>
+        </div>
+        <div class="level-label" id="addition-level">Level 1</div>
     </div>
 
-    <button class="reset-btn" onclick="showResetModal()">Reset All Progress</button>
+    <!-- Subtraction -->
+    <div class="skill-card" id="subtraction-card">
+        <div class="skill-name">
+            <span>Subtraction</span>
+        </div>
+        <div class="bar-container">
+            <div class="bar-fill" id="subtraction-bar" style="width: 0%"></div>
+        </div>
+        <div class="level-label" id="subtraction-level">Level 1</div>
+    </div>
+
+    <!-- Multiplication -->
+    <div class="skill-card" id="multiplication-card">
+        <div class="skill-name">
+            <span>Multiplication</span>
+        </div>
+        <div class="bar-container">
+            <div class="bar-fill" id="multiplication-bar" style="width: 0%"></div>
+        </div>
+        <div class="level-label" id="multiplication-level">Level 1</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+        <div class="stat-item">🔥 Streak: <span id="streak">0</span></div>
+        <div class="stat-item">⭐ XP: <span id="xp">0</span></div>
+        <div class="stat-item">🏆 Level: <span id="level">1</span></div>
+    </div>
+
+    <button class="reset-btn" onclick="showResetModal()">
+        Reset All Progress
+    </button>
 </div>
 
+<!-- MAIN GAME AREA -->
 <div class="main">
-    <div class="card">
+    <div class="game-card">
         <div class="question" id="question">Loading question…</div>
-        <input id="answer" type="number" placeholder="Type your answer" autocomplete="off">
-        <button class="submit" onclick="submitAnswer()">Submit Answer</button>
+        
+        <input 
+            id="answer" 
+            type="number" 
+            placeholder="Type your answer"
+            autocomplete="off"
+            onkeydown="if(event.key === 'Enter') submitAnswer()">
+        
+        <button class="submit-btn" onclick="submitAnswer()">
+            Submit Answer
+        </button>
+
         <div id="feedback"></div>
     </div>
 </div>
 
-<!-- Reset Confirmation Modal -->
+<!-- RESET MODAL -->
 <div id="resetModal" class="modal">
     <div class="modal-content">
-        <h3>Reset Progress?</h3>
-        <p>This will delete all your streaks, XP, and skill levels.<br>Are you sure?</p>
+        <h3>Reset All Progress?</h3>
+        <p>This action cannot be undone.<br>All streaks, XP, and skill levels will be permanently deleted.</p>
         <div class="modal-buttons">
-            <button class="cancel" onclick="hideResetModal()">Cancel</button>
-            <button class="reset-confirm" onclick="resetProgress()">Reset Everything</button>
+            <button class="cancel-btn" onclick="hideResetModal()">Cancel</button>
+            <button class="reset-confirm-btn" onclick="resetProgress()">Reset Everything</button>
         </div>
     </div>
 </div>
 
 <script>
+/* ==================== STATE & CORE LOGIC ==================== */
 let state = JSON.parse(localStorage.getItem("tutorState")) || {
-    xp: 0, level: 1, streak: 0, lastActive: null,
+    xp: 0,
+    level: 1,
+    streak: 0,
+    lastActive: null,
     skills: {
-        addition: {level:1, correct:0, wrong:0},
-        subtraction: {level:1, correct:0, wrong:0},
-        multiplication: {level:1, correct:0, wrong:0}
+        addition:     { level: 1, correct: 0, wrong: 0 },
+        subtraction:  { level: 1, correct: 0, wrong: 0 },
+        multiplication: { level: 1, correct: 0, wrong: 0 }
     }
 };
-let currentQ = null;
 
+let currentQuestion = null;
+
+/* Update streak on first load */
 function updateStreak() {
     const today = new Date().toDateString();
     if (state.lastActive !== today) {
@@ -272,54 +407,60 @@ function updateStreak() {
     }
 }
 
+/* Choose the weakest skill */
 function pickSkill() {
     return Object.entries(state.skills)
-        .sort((a,b) => (a[1].wrong - a[1].correct) - (b[1].wrong - b[1].correct))[0][0];
+        .sort((a, b) => (a[1].wrong - a[1].correct) - (b[1].wrong - b[1].correct))[0][0];
 }
 
+/* Generate a question based on skill level */
 function generateQuestion(skill) {
     const lvl = state.skills[skill].level;
-    const max = lvl * 9;
+    const max = Math.max(5, lvl * 9);
     const a = Math.floor(Math.random() * max);
     const b = Math.floor(Math.random() * max);
-    
-    if (skill === "addition") return {q: `${a} + ${b}`, ans: a + b, skill};
-    if (skill === "subtraction") return {q: `${Math.max(a,b)} - ${Math.min(a,b)}`, ans: Math.abs(a - b), skill};
-    return {q: `${a} × ${b}`, ans: a * b, skill};
+
+    if (skill === "addition") return { q: `${a} + ${b}`, ans: a + b, skill };
+    if (skill === "subtraction") return { q: `${Math.max(a,b)} - ${Math.min(a,b)}`, ans: Math.abs(a - b), skill };
+    return { q: `${a} × ${b}`, ans: a * b, skill };
 }
 
+/* Load next question */
 function nextQuestion() {
-    currentQ = generateQuestion(pickSkill());
-    document.getElementById("question").innerText = currentQ.q;
+    currentQuestion = generateQuestion(pickSkill());
+    document.getElementById("question").innerText = currentQuestion.q;
     document.getElementById("answer").value = "";
     document.getElementById("feedback").innerHTML = "";
 }
 
+/* Submit answer (called by button AND Enter key) */
 function submitAnswer() {
-    const userAns = Number(document.getElementById("answer").value.trim());
-    if (isNaN(userAns)) return;
+    const userAnswer = Number(document.getElementById("answer").value.trim());
+    if (isNaN(userAnswer)) return;
 
-    const fb = document.getElementById("feedback");
-    const skill = state.skills[currentQ.skill];
+    const feedbackEl = document.getElementById("feedback");
+    const skillData = state.skills[currentQuestion.skill];
 
-    if (userAns === currentQ.ans) {
-        fb.innerHTML = `<span style="color:#30d158">✅ Perfect!</span>`;
-        skill.correct++;
+    if (userAnswer === currentQuestion.ans) {
+        feedbackEl.innerHTML = `<span style="color:#30d158">✅ Perfect!</span>`;
+        skillData.correct++;
         state.xp += 15;
-        if (skill.correct >= 5) {
-            skill.level++;
-            skill.correct = 0;
-            skill.wrong = 0;
+
+        if (skillData.correct >= 5) {
+            skillData.level++;
+            skillData.correct = 0;
+            skillData.wrong = 0;
         }
     } else {
-        fb.innerHTML = `<span style="color:#ff3b30">❌ The answer was ${currentQ.ans}</span>`;
-        skill.wrong++;
-        if (skill.wrong >= 3) {
-            skill.level = Math.max(1, skill.level - 1);
-            skill.wrong = 0;
+        feedbackEl.innerHTML = `<span style="color:#ff3b30">❌ The answer was ${currentQuestion.ans}</span>`;
+        skillData.wrong++;
+        if (skillData.wrong >= 3) {
+            skillData.level = Math.max(1, skillData.level - 1);
+            skillData.wrong = 0;
         }
     }
 
+    /* Overall level up */
     if (state.xp >= state.level * 70) {
         state.level++;
         state.xp = 0;
@@ -327,35 +468,33 @@ function submitAnswer() {
 
     localStorage.setItem("tutorState", JSON.stringify(state));
     renderDashboard();
-    setTimeout(nextQuestion, 1600);
+    setTimeout(nextQuestion, 1650);
 }
 
-// Enter key support
-document.getElementById("answer").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") submitAnswer();
-});
-
+/* Render the entire sidebar */
 function renderDashboard() {
+    /* Stats */
     document.getElementById("xp").innerText = state.xp;
     document.getElementById("level").innerText = state.level;
     document.getElementById("streak").innerText = state.streak;
 
-    const container = document.getElementById("skills");
-    container.innerHTML = "";
-    Object.entries(state.skills).forEach(([name, data]) => {
-        const pct = Math.min(100, data.level * 22);
-        const div = document.createElement("div");
-        div.className = "skill";
-        div.innerHTML = `
-            <strong>${name.charAt(0).toUpperCase() + name.slice(1)}</strong>
-            <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
-            <small style="opacity:0.8">Level ${data.level}</small>
-        `;
-        container.appendChild(div);
-    });
+    /* Addition */
+    const addPct = Math.min(100, state.skills.addition.level * 22);
+    document.getElementById("addition-bar").style.width = addPct + "%";
+    document.getElementById("addition-level").innerText = `Level ${state.skills.addition.level}`;
+
+    /* Subtraction */
+    const subPct = Math.min(100, state.skills.subtraction.level * 22);
+    document.getElementById("subtraction-bar").style.width = subPct + "%";
+    document.getElementById("subtraction-level").innerText = `Level ${state.skills.subtraction.level}`;
+
+    /* Multiplication */
+    const mulPct = Math.min(100, state.skills.multiplication.level * 22);
+    document.getElementById("multiplication-bar").style.width = mulPct + "%";
+    document.getElementById("multiplication-level").innerText = `Level ${state.skills.multiplication.level}`;
 }
 
-/* Reset Progress */
+/* Reset Modal */
 function showResetModal() {
     document.getElementById("resetModal").classList.add("show");
 }
@@ -365,19 +504,33 @@ function hideResetModal() {
 }
 
 function resetProgress() {
-    if (confirm("Final confirmation: Reset ALL math game progress?")) {
+    if (confirm("Final confirmation — reset ALL progress forever?")) {
         localStorage.removeItem("tutorState");
         location.reload();
     }
 }
 
-updateStreak();
-renderDashboard();
-nextQuestion();
+/* Initialize everything */
+function init() {
+    updateStreak();
+    renderDashboard();
+    nextQuestion();
+
+    /* Enter key support on input */
+    const answerInput = document.getElementById("answer");
+    answerInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") submitAnswer();
+    });
+}
+
+init();
 </script>
 
-<div style="position:fixed; top:28px; left:28px;">
-    <a href="index.html" style="color:white; opacity:0.9; text-decoration:none; font-size:16px;">← Home</a>
+<div style="position:fixed; top:28px; left:28px; z-index: 100;">
+    <a href="index.html" style="color:white; opacity:0.9; text-decoration:none; font-size:16px; display:flex; align-items:center; gap:6px;">
+        ← Home
+    </a>
 </div>
+
 </body>
 </html>
