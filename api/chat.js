@@ -1,31 +1,13 @@
 export default async function handler(req, res) {
-    if (req.method !== "POST") {
-        return res.status(405).json({ error: "Only POST allowed" });
-    }
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    const { message, history } = req.body;
+  if (req.method === "OPTIONS") return res.status(200).end();
 
-    const messages = [
-        { role: "system", content: "You are a helpful study assistant." },
-        ...(history || []),
-        { role: "user", content: message }
-    ];
+  const { message } = req.body;
 
-    const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-            "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            model: "mistral-small-latest",
-            messages: messages
-        })
-    });
-
-    const data = await response.json();
-
-    res.json({
-        reply: data.choices?.[0]?.message?.content || "Error"
-    });
+  return res.status(200).json({
+    reply: "Your API is working! Message received: " + message
+  });
 }
