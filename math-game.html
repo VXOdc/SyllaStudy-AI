@@ -6,7 +6,6 @@
 <title>Math Game • Vxo Study OS</title>
 <style>
     :root {
-       
         --glass-bg: rgba(255, 255, 255, 0.11);
         --glass-border: rgba(255, 255, 255, 0.28);
         --glass-blur: 32px;
@@ -35,7 +34,6 @@
         position: relative;
     }
 
-   
     .sidebar {
         width: 340px;
         background: var(--glass-bg);
@@ -48,6 +46,29 @@
         z-index: 10;
     }
 
+    .home-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text);
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 10px 16px;
+        border-radius: 999px;
+        width: fit-content;
+        margin-bottom: 24px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .home-btn:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+    }
+
     .sidebar h2 {
         text-align: center;
         font-size: 24px;
@@ -55,7 +76,6 @@
         margin: 0 0 32px 0;
         letter-spacing: -0.5px;
     }
-
 
     .skill-card {
         background: rgba(255,255,255,0.09);
@@ -103,7 +123,6 @@
         display: block;
     }
 
-   
     .stats {
         margin-top: auto;
         padding-top: 32px;
@@ -120,7 +139,6 @@
         gap: 10px;
     }
 
-    
     .reset-btn {
         margin-top: 24px;
         padding: 12px 20px;
@@ -140,7 +158,6 @@
         transform: scale(1.03);
     }
 
-
     .main {
         flex: 1;
         display: flex;
@@ -150,7 +167,6 @@
         position: relative;
     }
 
- 
     .game-card {
         width: 100%;
         max-width: 620px;
@@ -185,7 +201,6 @@
         letter-spacing: -1px;
     }
 
-
     input {
         width: 100%;
         padding: 24px 28px;
@@ -204,7 +219,6 @@
         transform: scale(1.02);
         box-shadow: 0 12px 35px rgba(0,0,0,0.3);
     }
-
 
     .submit-btn {
         margin-top: 32px;
@@ -231,7 +245,6 @@
         font-weight: 600;
         min-height: 40px;
     }
-
 
     .modal {
         position: fixed;
@@ -300,10 +313,9 @@
 </head>
 <body>
 
-
 <div class="sidebar">
+    <a href="index.html" class="home-btn">← Home</a>
     <h2>Skill Dashboard</h2>
-
 
     <div class="skill-card" id="addition-card">
         <div class="skill-name">
@@ -315,7 +327,6 @@
         <div class="level-label" id="addition-level">Level 1</div>
     </div>
 
-  
     <div class="skill-card" id="subtraction-card">
         <div class="skill-name">
             <span>Subtraction</span>
@@ -325,7 +336,6 @@
         </div>
         <div class="level-label" id="subtraction-level">Level 1</div>
     </div>
-
 
     <div class="skill-card" id="multiplication-card">
         <div class="skill-name">
@@ -337,7 +347,6 @@
         <div class="level-label" id="multiplication-level">Level 1</div>
     </div>
 
-  
     <div class="stats">
         <div class="stat-item">🔥 Streak: <span id="streak">0</span></div>
         <div class="stat-item">⭐ XP: <span id="xp">0</span></div>
@@ -348,7 +357,6 @@
         Reset All Progress
     </button>
 </div>
-
 
 <div class="main">
     <div class="game-card">
@@ -369,7 +377,6 @@
     </div>
 </div>
 
-
 <div id="resetModal" class="modal">
     <div class="modal-content">
         <h3>Reset All Progress?</h3>
@@ -382,7 +389,6 @@
 </div>
 
 <script>
-
 let state = JSON.parse(localStorage.getItem("tutorState")) || {
     xp: 0,
     level: 1,
@@ -397,7 +403,6 @@ let state = JSON.parse(localStorage.getItem("tutorState")) || {
 
 let currentQuestion = null;
 
-
 function updateStreak() {
     const today = new Date().toDateString();
     if (state.lastActive !== today) {
@@ -406,12 +411,10 @@ function updateStreak() {
     }
 }
 
-
 function pickSkill() {
     return Object.entries(state.skills)
         .sort((a, b) => (a[1].wrong - a[1].correct) - (b[1].wrong - b[1].correct))[0][0];
 }
-
 
 function generateQuestion(skill) {
     const lvl = state.skills[skill].level;
@@ -424,18 +427,17 @@ function generateQuestion(skill) {
     return { q: `${a} × ${b}`, ans: a * b, skill };
 }
 
-
 function nextQuestion() {
     currentQuestion = generateQuestion(pickSkill());
     document.getElementById("question").innerText = currentQuestion.q;
     document.getElementById("answer").value = "";
     document.getElementById("feedback").innerHTML = "";
+    document.getElementById("answer").focus();
 }
-
 
 function submitAnswer() {
     const userAnswer = Number(document.getElementById("answer").value.trim());
-    if (isNaN(userAnswer)) return;
+    if (isNaN(userAnswer) || document.getElementById("answer").value.trim() === "") return;
 
     const feedbackEl = document.getElementById("feedback");
     const skillData = state.skills[currentQuestion.skill];
@@ -459,7 +461,6 @@ function submitAnswer() {
         }
     }
 
-
     if (state.xp >= state.level * 70) {
         state.level++;
         state.xp = 0;
@@ -471,27 +472,22 @@ function submitAnswer() {
 }
 
 function renderDashboard() {
-
     document.getElementById("xp").innerText = state.xp;
     document.getElementById("level").innerText = state.level;
     document.getElementById("streak").innerText = state.streak;
-
 
     const addPct = Math.min(100, state.skills.addition.level * 22);
     document.getElementById("addition-bar").style.width = addPct + "%";
     document.getElementById("addition-level").innerText = `Level ${state.skills.addition.level}`;
 
- 
     const subPct = Math.min(100, state.skills.subtraction.level * 22);
     document.getElementById("subtraction-bar").style.width = subPct + "%";
     document.getElementById("subtraction-level").innerText = `Level ${state.skills.subtraction.level}`;
-
 
     const mulPct = Math.min(100, state.skills.multiplication.level * 22);
     document.getElementById("multiplication-bar").style.width = mulPct + "%";
     document.getElementById("multiplication-level").innerText = `Level ${state.skills.multiplication.level}`;
 }
-
 
 function showResetModal() {
     document.getElementById("resetModal").classList.add("show");
@@ -508,12 +504,10 @@ function resetProgress() {
     }
 }
 
-
 function init() {
     updateStreak();
     renderDashboard();
     nextQuestion();
-
 
     const answerInput = document.getElementById("answer");
     answerInput.addEventListener("keypress", (e) => {
@@ -523,12 +517,6 @@ function init() {
 
 init();
 </script>
-
-<div style="position:fixed; top:28px; left:28px; z-index: 100;">
-    <a href="index.html" style="color:white; opacity:0.9; text-decoration:none; font-size:16px; display:flex; align-items:center; gap:6px;">
-        ← Home
-    </a>
-</div>
 
 </body>
 </html>
