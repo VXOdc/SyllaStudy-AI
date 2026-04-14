@@ -1,133 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study Assistant • Vxo Study OS</title>
-    <style>
-        :root {
-            --glass-bg: rgba(255,255,255,0.11);
-            --glass-border: rgba(255,255,255,0.28);
-            --glass-blur: 32px;
-        }
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.92)),
-                        url("https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: white;
-            display: flex;
-            height: 100vh;
-        }
-        .sidebar {
-            width: 290px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            border-right: 1px solid var(--glass-border);
-            display: flex;
-            flex-direction: column;
-            padding: 24px;
-        }
-        .back-btn {
-            padding: 10px 14px;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(20px);
-            color: white;
-            border-radius: 12px;
-            text-decoration: none;
-            font-size: 15px;
-            margin-bottom: 16px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .newChat {
-            margin-bottom: 20px;
-            padding: 14px;
-            border-radius: 14px;
-            border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.95);
-            color: black;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 15px;
-        }
-        .history {
-            flex: 1;
-            overflow-y: auto;
-        }
-        .chat-item {
-            padding: 14px 16px;
-            border-radius: 14px;
-            cursor: pointer;
-            margin-bottom: 8px;
-            font-size: 14.5px;
-            background: rgba(255,255,255,0.09);
-            border: 1px solid rgba(255,255,255,0.15);
-            transition: 0.2s;
-        }
-        .chat-item:hover {
-            background: rgba(255,255,255,0.20);
-        }
-        .main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .messages {
-            flex: 1;
-            padding: 28px;
-            overflow-y: auto;
-        }
-        .msg {
-            margin: 14px 0;
-            max-width: 74%;
-            padding: 16px 20px;
-            border-radius: 22px;
-            line-height: 1.5;
-        }
-        .user {
-            background: rgba(255,255,255,0.94);
-            color: #000;
-            margin-left: auto;
-        }
-        .ai {
-            background: rgba(255,255,255,0.16);
-            border: 1px solid rgba(255,255,255,0.25);
-        }
-        .inputBar {
-            padding: 18px;
-            background: rgba(0,0,0,0.68);
-            backdrop-filter: blur(28px);
-            display: flex;
-            align-items: center;
-        }
-        input {
-            flex: 1;
-            padding: 16px 22px;
-            border: none;
-            background: rgba(255,255,255,0.18);
-            border: 1px solid rgba(255,255,255,0.22);
-            color: white;
-            border-radius: 9999px;
-            font-size: 16.5px;
-            outline: none;
-        }
-        button.send {
-            margin-left: 14px;
-            padding: 16px 28px;
-            border-radius: 9999px;
-            border: none;
-            background: white;
-            color: black;
-            cursor: pointer;
-            font-weight: 700;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Assistant • Vxo Study OS</title>
+<style>
+:root {
+    --glass: rgba(255,255,255,0.12);
+    --border: rgba(255,255,255,0.25);
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(rgba(0,0,0,0.48), rgba(0,0,0,0.82)),
+                url("https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: white;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 300px;
+    background: var(--glass);
+    backdrop-filter: blur(32px);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.back-btn {
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.18);
+    color: white;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 15px;
+    margin-bottom: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.newChat {
+    padding: 14px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.95);
+    color: black;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 15px;
+    margin-bottom: 20px;
+    border: none;
+}
+
+/* History */
+.history {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.chat-item {
+    padding: 14px 16px;
+    border-radius: 14px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    font-size: 14.5px;
+    background: rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.chat-item:hover {
+    background: rgba(255,255,255,0.20);
+}
+
+.chat-item.active {
+    background: rgba(255,255,255,0.22);
+    border-color: rgba(255,255,255,0.4);
+}
+
+.menu-btn {
+    opacity: 0.6;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.menu-btn:hover { opacity: 1; }
+
+/* Context Menu */
+.context-menu {
+    position: absolute;
+    background: rgba(30,30,30,0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 12px;
+    padding: 8px 0;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 2000;
+    min-width: 160px;
+    display: none;
+}
+
+.context-menu div {
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.context-menu div:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+.context-menu .delete {
+    color: #ff3b30;
+}
+
+/* Main Area */
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.messages {
+    flex: 1;
+    padding: 28px;
+    overflow-y: auto;
+}
+
+.msg {
+    margin: 14px 0;
+    max-width: 74%;
+    padding: 16px 20px;
+    border-radius: 22px;
+    line-height: 1.5;
+}
+
+.user {
+    background: rgba(255,255,255,0.94);
+    color: #000;
+    margin-left: auto;
+}
+
+.ai {
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.25);
+}
+
+/* Liquid Input Bar */
+.inputBar {
+    padding: 18px 24px;
+    background: rgba(0,0,0,0.68);
+    backdrop-filter: blur(28px);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+input {
+    flex: 1;
+    padding: 16px 24px;
+    border: none;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: white;
+    border-radius: 9999px;
+    font-size: 16.5px;
+    outline: none;
+}
+
+.inputBar button {
+    padding: 12px 18px;
+    border-radius: 9999px;
+    border: none;
+    background: rgba(255,255,255,0.9);
+    color: black;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.inputBar button:hover {
+    background: white;
+}
+</style>
 </head>
 <body>
 
@@ -141,124 +206,166 @@
     <div id="messages" class="messages"></div>
     <div class="inputBar">
         <input id="input" placeholder="Ask anything about your studies..." autocomplete="off">
-        <button class="send" onclick="send()">Send</button>
+        <button onclick="send()">Send</button>
     </div>
 </div>
 
+<!-- Context Menu -->
+<div id="contextMenu" class="context-menu">
+    <div onclick="renameChat()">Rename</div>
+    <div onclick="archiveChat()">Archive</div>
+    <div onclick="pinChat()">Pin</div>
+    <div class="delete" onclick="deleteChat()">Delete</div>
+</div>
+
 <script>
-    let chats = JSON.parse(localStorage.getItem("chats")) || {};
-    let currentChat = localStorage.getItem("currentChat");
+let chats = JSON.parse(localStorage.getItem("chats")) || {};
+let currentChat = localStorage.getItem("currentChat") || Date.now().toString();
+if (!chats[currentChat]) chats[currentChat] = [];
 
-    if (!currentChat || !chats[currentChat]) {
-        currentChat = Date.now().toString();
-        chats[currentChat] = [];
-    }
+const messagesEl = document.getElementById("messages");
+const input = document.getElementById("input");
+const historyList = document.getElementById("historyList");
+let contextMenu = document.getElementById("contextMenu");
+let currentContextId = null;
 
-    const messagesEl = document.getElementById("messages");
-    const input = document.getElementById("input");
-    const historyList = document.getElementById("historyList");
+function save() {
+    localStorage.setItem("chats", JSON.stringify(chats));
+    localStorage.setItem("currentChat", currentChat);
+}
 
-    function save() {
-        localStorage.setItem("chats", JSON.stringify(chats));
-        localStorage.setItem("currentChat", currentChat);
-    }
+function newChat() {
+    currentChat = Date.now().toString();
+    chats[currentChat] = [];
+    save();
+    loadChat();
+}
 
-    function newChat() {
-        currentChat = Date.now().toString();
-        chats[currentChat] = [];
-        save();
-        loadChat();
-    }
+function loadChat() {
+    messagesEl.innerHTML = "";
+    (chats[currentChat] || []).forEach(msg => {
+        addMessage(msg.content, msg.role === "user" ? "user" : "ai");
+    });
+    renderHistory();
+}
 
-    function loadChat() {
-        messagesEl.innerHTML = "";
-        (chats[currentChat] || []).forEach(msg => {
-            addMessage(msg.content, msg.role === "user" ? "user" : "ai");
-        });
-        renderHistory();
-    }
+function renderHistory() {
+    historyList.innerHTML = "";
+    const sorted = Object.entries(chats).sort((a,b) => Number(b[0]) - Number(a[0]));
 
-    function renderHistory() {
-        historyList.innerHTML = "";
-        const sorted = Object.entries(chats).sort((a,b) => Number(b[0]) - Number(a[0]));
+    sorted.slice(0, 20).forEach(([id, msgs]) => {
+        const div = document.createElement("div");
+        div.className = `chat-item ${id === currentChat ? 'active' : ''}`;
+        const preview = msgs.find(m => m.role === "user")?.content || "New Chat";
+        div.innerHTML = `
+            <span>${preview.slice(0, 38)}${preview.length > 38 ? '...' : ''}</span>
+            <span class="menu-btn" onclick="showContextMenu(event, '${id}')">⋯</span>
+        `;
 
-        sorted.slice(0, 15).forEach(([id, msgs]) => {
-            const div = document.createElement("div");
-            div.className = "chat-item";
-            const preview = msgs.find(m => m.role === "user")?.content || "New Chat";
-            div.innerText = preview.slice(0, 35) + (preview.length > 35 ? "..." : "");
-
-            div.addEventListener("contextmenu", e => {
-                e.preventDefault();
-                if (confirm("Delete this chat?")) {
-                    delete chats[id];
-                    if (currentChat === id) {
-                        currentChat = Object.keys(chats)[0] || Date.now().toString();
-                        if (!chats[currentChat]) chats[currentChat] = [];
-                    }
-                    save();
-                    loadChat();
-                }
-            });
-
-            div.onclick = () => {
+        div.onclick = (e) => {
+            if (!e.target.classList.contains('menu-btn')) {
                 currentChat = id;
                 save();
                 loadChat();
-            };
+            }
+        };
 
-            historyList.appendChild(div);
-        });
-    }
-
-    function addMessage(text, type) {
-        const div = document.createElement("div");
-        div.className = `msg ${type}`;
-        div.innerText = text;
-        messagesEl.appendChild(div);
-        messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
-
-    async function send() {
-        const text = input.value.trim();
-        if (!text) return;
-
-        addMessage(text, "user");
-        chats[currentChat].push({ role: "user", content: text });
-        input.value = "";
-
-        const typing = document.createElement("div");
-        typing.className = "msg ai";
-        typing.innerText = "Thinking...";
-        messagesEl.appendChild(typing);
-
-        try {
-            const res = await fetch("/api/chat", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: text, history: chats[currentChat] })
-            });
-
-            if (!res.ok) throw new Error();
-
-            const data = await res.json();
-            messagesEl.removeChild(typing);
-            addMessage(data.reply || "Sorry, I couldn't process that.", "ai");
-            chats[currentChat].push({ role: "assistant", content: data.reply });
-        } catch (e) {
-            if (typing.parentNode) messagesEl.removeChild(typing);
-            addMessage("Error: AI service unavailable right now.", "ai");
-        }
-
-        save();
-        renderHistory();
-    }
-
-    input.addEventListener("keydown", e => {
-        if (e.key === "Enter") send();
+        historyList.appendChild(div);
     });
+}
 
-    loadChat();
+function showContextMenu(e, id) {
+    e.stopImmediatePropagation();
+    currentContextId = id;
+
+    contextMenu.style.display = 'block';
+    contextMenu.style.left = `${e.pageX + 10}px`;
+    contextMenu.style.top = `${e.pageY + 10}px`;
+}
+
+function hideContextMenu() {
+    contextMenu.style.display = 'none';
+}
+
+document.addEventListener('click', hideContextMenu);
+
+function deleteChat() {
+    if (confirm("Delete this chat?")) {
+        delete chats[currentContextId];
+        if (currentChat === currentContextId) {
+            currentChat = Object.keys(chats)[0] || Date.now().toString();
+            if (!chats[currentChat]) chats[currentChat] = [];
+        }
+        save();
+        loadChat();
+    }
+    hideContextMenu();
+}
+
+function renameChat() {
+    const newName = prompt("Rename chat:", "New Chat Name");
+    if (newName && newName.trim()) {
+        // For simplicity we store name in first user message if exists
+        if (chats[currentContextId] && chats[currentContextId].length > 0) {
+            chats[currentContextId][0].content = newName.trim();
+        }
+        save();
+        loadChat();
+    }
+    hideContextMenu();
+}
+
+function archiveChat() { alert("Archive feature coming soon"); hideContextMenu(); }
+function pinChat() { alert("Pin feature coming soon"); hideContextMenu(); }
+
+function addMessage(text, type) {
+    const div = document.createElement("div");
+    div.className = `msg ${type}`;
+    div.innerText = text;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+async function send() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, "user");
+    chats[currentChat].push({ role: "user", content: text });
+    input.value = "";
+
+    const typing = document.createElement("div");
+    typing.className = "msg ai";
+    typing.innerText = "Thinking...";
+    messagesEl.appendChild(typing);
+
+    try {
+        const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: text, history: chats[currentChat] })
+        });
+
+        if (!res.ok) throw new Error();
+
+        const data = await res.json();
+        messagesEl.removeChild(typing);
+        addMessage(data.reply || "Sorry, I couldn't process that.", "ai");
+        chats[currentChat].push({ role: "assistant", content: data.reply });
+    } catch (e) {
+        if (typing.parentNode) messagesEl.removeChild(typing);
+        addMessage("Error: AI service unavailable right now.", "ai");
+    }
+
+    save();
+    renderHistory();
+}
+
+input.addEventListener("keydown", e => {
+    if (e.key === "Enter") send();
+});
+
+loadChat();
 </script>
 </body>
 </html>
