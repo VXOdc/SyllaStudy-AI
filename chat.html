@@ -953,5 +953,243 @@ async function send() {
 // Initialize
 loadChat();
 </script>
+    <script>
+/* ==========================================================================
+    STATE MANAGEMENT & INITIALIZATION
+   ========================================================================== */
+let chats = JSON.parse(localStorage.getItem("vxoChats")) || {};
+let currentChat = localStorage.getItem("vxoCurrentChat") || Date.now().toString();
+
+if (!chats[currentChat]) {
+    chats[currentChat] = [];
+}
+
+const messagesEl = document.getElementById("messages");
+const wrapperEl = document.getElementById("messagesWrapper");
+const input = document.getElementById("input");
+const sendBtn = document.getElementById("sendBtn");
+const historyList = document.getElementById("historyList");
+const contextMenu = document.getElementById("contextMenu");
+
+let currentContextId = null;
+let currentAttachments = [];
+
+function save() {
+    localStorage.setItem("vxoChats", JSON.stringify(chats));
+    localStorage.setItem("vxoCurrentChat", currentChat);
+}
+
+/* ==========================================================================
+    UI INTERACTIONS
+   ========================================================================== */
+function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("collapsed");
+}
+
+function autoResize(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = (textarea.scrollHeight) + 'px';
+    sendBtn.disabled = textarea.value.trim() === '' && currentAttachments.length === 0;
+}
+
+function handleEnter(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (!sendBtn.disabled) send();
+    }
+}
+
+function showContextMenu(e, id) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    currentContextId = id;
+    contextMenu.classList.add('show');
+    let x = e.pageX + 10;
+    let y = e.pageY + 10;
+    const rect = contextMenu.getBoundingClientRect();
+    if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 10;
+    if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 10;
+    contextMenu.style.left = `${x}px`;
+    contextMenu.style.top = `${y}px`;
+}
+
+function hideContextMenu() {
+    contextMenu.classList.remove('show');
+}
+document.addEventListener('click', hideContextMenu);
+
+/* ==========================================================================
+    CHAT RENDERING
+   ========================================================================== */
+function newChat() {
+    currentChat = Date.now().toString();
+    chats[currentChat] = [];
+    save();
+    loadChat();
+}
+
+function loadChat() {
+    messagesEl.innerHTML = "";
+    const msgs = chats[currentChat] || [];
+    if (msgs.length === 0) {
+        messagesEl.innerHTML = `
+            <div class="empty-state">
+                <h1>What do you want to learn?</h1>
+                <p style="color: var(--text-secondary); font-size: 18px;">Type a prompt below to get started.</p>
+            </div>`;
+    } else {
+        msgs.forEach(msg => appendMessageHTML(msg.content, msg.role));
+    }
+    renderHistory();
+    scrollToBottom();
+}
+
+function renderHistory() {
+    historyList.innerHTML = "";
+    const sorted = Object.entries(chats).sort((a,b) => Number(b[0]) - Number(a[0]));
+    sorted.slice(0, 20).forEach(([id, msgs]) => {
+        if (msgs.length === 0 && id !== currentChat) return; 
+        const div = document.createElement("div");
+        div.className = `chat-item ${id === currentChat ? 'active' : ''}`;
+        let preview = "New Chat";
+        if (msgs.length > 0) {
+            const firstUserMsg = msgs.find(m => m.role === "user");
+            if (firstUserMsg) preview = firstUserMsg.content.replace(/\[📎 Attached:.*?\]/g, '').trim();
+        }
+        div.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <div class="chat-item-text">${preview}</div>
+            <div class="menu-btn" onclick="showContextMenu(event, '${id}')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            </div>`;
+        div.onclick = (e) => {
+            if (!e.target.closest('.menu-btn')) {
+                currentChat = id;
+                save();
+                loadChat();
+            }
+        };
+        historyList.appendChild(div);
+    });
+}
+
+function appendMessageHTML(text, role) {
+    const emptyState = messagesEl.querySelector('.empty-state');
+    if (emptyState) emptyState.remove();
+    const row = document.createElement("div");
+    row.className = `msg-row ${role}`;
+    const bubble = document.createElement("div");
+    bubble.className = `msg ${role}`;
+    let formattedText = text.replace(/\[📎 Attached: (.*?)\]/g, '<br><br><span style="font-size:12px; opacity:0.7; background:rgba(150,150,150,0.2); padding: 4px 8px; border-radius:8px;">📎 $1</span>');
+    formattedText = formattedText.replace(/\n/g, '<br>');
+    bubble.innerHTML = formattedText;
+    row.appendChild(bubble);
+    messagesEl.appendChild(row);
+}
+
+function scrollToBottom() {
+    wrapperEl.scrollTop = wrapperEl.scrollHeight;
+}
+
+/* ==========================================================================
+    CORE API LOGIC (MISTRAL CONNECTION)
+   ========================================================================== */
+async function send() {
+    const text = input.value.trim();
+    let messageText = text;
+
+    if (currentAttachments.length > 0) {
+        const names = currentAttachments.map(f => f.name).join(", ");
+        messageText += `\n\n[📎 Attached: ${names}]`;
+    }
+
+    if (!messageText) return;
+
+    // Add User Message
+    appendMessageHTML(messageText, "user");
+    chats[currentChat].push({ role: "user", content: messageText });
+    save();
+    renderHistory();
+    scrollToBottom();
+
+    // Reset Input
+    input.value = "";
+    input.style.height = 'auto';
+    currentAttachments = [];
+    renderAttachments();
+    sendBtn.disabled = true;
+
+    // Typing Indicator
+    const typingRow = document.createElement("div");
+    typingRow.className = "msg-row ai typing-row";
+    typingRow.innerHTML = `<div class="msg ai typing-indicator"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+    messagesEl.appendChild(typingRow);
+    scrollToBottom();
+
+    try {
+        // CALLING YOUR VERCEL API
+        const response = await fetch("https://vxo-dc-github-e3bqc1p11-vxodcs-projects.vercel.app/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                message: text, 
+                history: chats[currentChat].slice(0, -1) // Send history minus the current message
+            })
+        });
+
+        if (!response.ok) throw new Error("API Error");
+
+        const data = await response.json();
+        const reply = data.reply || "I couldn't get a response.";
+
+        typingRow.remove();
+        appendMessageHTML(reply, "ai");
+        chats[currentChat].push({ role: "ai", content: reply });
+        
+    } catch (e) {
+        typingRow.remove();
+        appendMessageHTML("Error: Failed to connect to Vxo AI. Check your Vercel logs.", "ai");
+        console.error("Fetch error:", e);
+    }
+
+    save();
+    scrollToBottom();
+}
+
+/* ==========================================================================
+    UTILITIES (FILES & MANAGEMENT)
+   ========================================================================== */
+function triggerFileUpload() { document.getElementById("fileInput").click(); }
+function handleFiles(files) {
+    Array.from(files).forEach(file => currentAttachments.push(file));
+    renderAttachments();
+    sendBtn.disabled = false;
+}
+function renderAttachments() {
+    const bar = document.getElementById("attachmentBar");
+    bar.innerHTML = "";
+    bar.style.display = currentAttachments.length === 0 ? "none" : "flex";
+    currentAttachments.forEach((file, index) => {
+        const div = document.createElement("div");
+        div.className = "attachment-preview";
+        div.innerHTML = `📎 ${file.name.substring(0,10)}... <button onclick="removeAttachment(${index})">×</button>`;
+        bar.appendChild(div);
+    });
+}
+function removeAttachment(index) {
+    currentAttachments.splice(index, 1);
+    renderAttachments();
+}
+function deleteChat() {
+    if (confirm("Delete this chat?")) {
+        delete chats[currentContextId];
+        currentChat = Object.keys(chats)[0] || Date.now().toString();
+        if (!chats[currentChat]) chats[currentChat] = [];
+        save(); loadChat();
+    }
+}
+
+loadChat();
+</script>
 </body>
 </html>
