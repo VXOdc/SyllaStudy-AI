@@ -1,1 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes • SyllaStudy-ai</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-active: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.22);
+            --glass-blur: 40px;
+            --accent-glow: rgba(255, 255, 255, 0.35);
+            --text-main: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.6);
+            --transition-spring: cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.45)), 
+                        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Navigation */
+        nav {
+            height: 80px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 60px;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            opacity: 0.9;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 40px;
+            font-size: 15px;
+            font-weight: 500;
+            opacity: 0.7;
+            transition: 0.4s var(--transition-spring);
+        }
+
+        .nav-links a:hover, .nav-links a.active { 
+            opacity: 1; 
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* App Layout */
+        .app-container {
+            display: flex;
+            flex: 1;
+            padding: 30px;
+            gap: 30px;
+            overflow: hidden;
+        }
+
+        /* Glass Sidebar */
+        .sidebar {
+            width: 320px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 40px 15px 50px 20px; /* Organic Liquid Shape */
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+
+        .new-note-btn {
+            background: rgba(255,255,255,0.9);
+            color: #000;
+            border: none;
+            padding: 16px;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-spring);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .new-note-btn:hover { 
+            background: #fff;
+            transform: scale(1.03); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
+        }
+
+        .note-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .note-list::-webkit-scrollbar { width: 0px; }
+
+        .note-item {
+            padding: 16px 20px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .note-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .note-item.active {
+            background: var(--glass-active);
+            border-color: var(--glass-border);
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.05);
+        }
+
+        .note-title-preview {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .note-date {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        /* Editor Area */
+        .editor-container {
+            flex: 1;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 20px 45px 15px 55px; /* Organic Liquid Shape */
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Floating Toolbar */
+        .toolbar {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            padding: 8px 16px;
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .tool-btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 16px;
+            font-weight: 600;
+            opacity: 0.6;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .tool-btn:hover {
+            opacity: 1;
+        }
+
+        .editor-content {
+            flex: 1;
+            padding: 60px 80px;
+            overflow-y: auto;
+            outline: none;
+        }
+
+        .editor-content::-webkit-scrollbar { width: 6px; }
+        .editor-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+        .document-title {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 42px;
+            font-weight: 700;
+            width: 100%;
+            margin-bottom: 30px;
+            letter-spacing: -1px;
+        }
+
+        .document-title::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+
+        .rich-text {
+            font-size: 17px;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.9);
+            outline: none;
+            min-height: 50vh;
+        }
+
+        .rich-text p {
+            margin-bottom: 24px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">SyllaStudy-ai</div>
+        <div class="nav-links">
+            <a href="index.html">Dashboard</a>
+            <a href="chat.html">Study AI</a>
+            <a href="notes.html" class="active">Notes</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="focus.html">Focus</a>
+        </div>
+    </nav>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <button class="new-note-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                New Document
+            </button>
+            
+            <div class="note-list">
+                <div class="note-item active">
+                    <div class="note-title-preview">2026 Hardware Specs</div>
+                    <div class="note-date">Just now</div>
+                </div>
+                <div class="note-item">
+                    <div class="note-title-preview">Biology Chapter 4 Summary</div>
+                    <div class="note-date">Yesterday</div>
+                </div>
+                <div class="note-item">
+                    <div class="note-title-preview">Project Brainstorming</div>
+                    <div class="note-date">Last Week</div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="editor-container">
+            <div class="toolbar">
+                <button class="tool-btn" style="font-family: serif;">B</button>
+                <button class="tool-btn" style="font-style: italic; font-family: serif;">I</button>
+                <button class="tool-btn" style="text-decoration: underline;">U</button>
+                <div style="width: 1px; background: var(--glass-border); margin: 0 5px;"></div>
+                <button class="tool-btn">H1</button>
+                <button class="tool-btn">H2</button>
+            </div>
+
+            <div class="editor-content">
+                <input type="text" class="document-title" value="The 2026 Advanced Note Taker" placeholder="Untitled Document">
+                
+                <div class="rich-text" contenteditable="true">
+                    <p>In the rapidly evolving landscape of productivity tools for 2026, the advanced note taker emerges as a pinnacle of hardware-software synergy, designed exclusively for users seeking cutting-edge functionality without any reliance on artificial intelligence. At its core, this device features a revolutionary ultra-thin, foldable e-ink display with full-color rendering and adaptive refresh rates up to 120Hz, allowing seamless transitions between writing, sketching, and reading modes on a flexible, durable polymer substrate that weighs under 200 grams.</p>
+                    
+                    <p>The accompanying precision stylus incorporates piezoelectric sensors for variable pressure sensitivity, tilt detection, and haptic feedback loops that simulate the tactile resistance of traditional paper, while the chassis integrates solar-assisted charging panels and a modular battery system capable of lasting up to four weeks on a single charge. Ergonomically optimized with customizable grips and edge-to-edge touch zones, the hardware prioritizes longevity through self-healing screen coatings and IP68 water resistance, making it an indispensable companion for professionals, students, and creatives who demand reliability in any environment.</p>
+
+                    <p>Functionality extends far beyond basic jotting, encompassing an infinite canvas architecture powered by vector-based rendering engines that support unlimited layering, real-time geometric snapping, and dynamic zooming without performance degradation. Users can embed high-resolution multimedia directly—such as 8K photo scans via the integrated hyperspectral camera or lossless audio recordings captured through multi-array microphones with adaptive noise gating—while advanced tagging systems employ hierarchical metadata structures and Boolean search algorithms for instantaneous retrieval across terabytes of synchronized data.</p>
+                    
+                    <p>Integration with existing ecosystems stands as a cornerstone, enabling effortless connectivity to smartphones, laptops, and desktops through ultra-wideband protocols and encrypted near-field communication chips that facilitate one-tap device pairing and bidirectional data streaming at gigabit speeds. Security and sustainability define the final layer of this 2026 vision, with end-to-end quantum-resistant encryption safeguarding all local and transmitted data through hardware root-of-trust modules.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
