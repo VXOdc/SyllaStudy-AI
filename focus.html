@@ -4,14 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Focus • SyllaStudy AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Canela+Deck:wght@300;400&family=Neue+Montreal:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.22);
-            --glass-blur: 40px;
-            --accent-glow: rgba(255, 255, 255, 0.4);
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-bg-hover: rgba(255, 255, 255, 0.13);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-blur: 32px;
             --text-main: #ffffff;
-            --text-dim: rgba(255, 255, 255, 0.6);
+            --text-dim: rgba(255, 255, 255, 0.5);
+            --text-mid: rgba(255, 255, 255, 0.75);
+            --accent: #ffffff;
+            --ring-color: rgba(255,255,255,0.9);
+            --ring-bg: rgba(255,255,255,0.08);
+            --danger: rgba(255, 100, 80, 0.8);
         }
 
         * {
@@ -22,9 +29,10 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), 
-                        url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80');
+            font-family: "DM Mono", "SF Mono", monospace;
+            background:
+                linear-gradient(160deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.72) 100%),
+                url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -35,188 +43,453 @@
             flex-direction: column;
         }
 
-        /* Navigation */
+        /* ── Navigation ── */
         nav {
-            height: 80px;
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.05);
+            height: 72px;
+            backdrop-filter: blur(24px) saturate(1.4);
+            background: rgba(255,255,255,0.04);
             border-bottom: 1px solid var(--glass-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 60px;
-            z-index: 100;
+            padding: 0 56px;
+            flex-shrink: 0;
+            z-index: 200;
         }
 
         .logo {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            font-size: 17px;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            color: white;
         }
 
         .nav-links a {
             color: white;
             text-decoration: none;
-            margin-left: 40px;
-            font-size: 15px;
-            font-weight: 500;
-            opacity: 0.7;
-            transition: 0.3s;
+            margin-left: 36px;
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: 0.04em;
+            opacity: 0.5;
+            transition: opacity 0.25s;
         }
 
-        .nav-links a:hover, .nav-links a.active { 
-            opacity: 1; 
-            text-shadow: 0 0 15px var(--accent-glow);
-        }
+        .nav-links a:hover { opacity: 0.85; }
+        .nav-links a.active { opacity: 1; }
 
-        /* Focus Layout */
+        /* ── Main Layout ── */
         main {
             flex: 1;
             display: grid;
-            grid-template-columns: 1fr 380px;
-            padding: 40px 60px;
-            gap: 40px;
+            grid-template-columns: 1fr 360px;
+            padding: 32px 56px;
+            gap: 28px;
             overflow: hidden;
+            min-height: 0;
         }
 
-        /* Left Side: The Timer (The "Restriction" Element) */
+        /* ── Timer Section ── */
         .timer-section {
             background: var(--glass-bg);
             backdrop-filter: blur(var(--glass-blur));
             border: 1px solid var(--glass-border);
-            border-radius: 40px;
+            border-radius: 32px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            overflow: hidden;
+            transition: border-color 0.5s;
+        }
+
+        .timer-section.running {
+            border-color: rgba(255,255,255,0.35);
+            box-shadow: inset 0 0 80px rgba(255,255,255,0.03);
+        }
+
+        .timer-section.paused {
+            border-color: rgba(255,200,80,0.35);
+        }
+
+        .timer-section.finished {
+            border-color: rgba(80,220,120,0.45);
+        }
+
+        /* Ambient glow that pulses when running */
+        .timer-section::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.6s;
+        }
+
+        .timer-section.running::before {
+            opacity: 1;
+            animation: ambientPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes ambientPulse {
+            0%, 100% { transform: scale(0.9); opacity: 0.4; }
+            50% { transform: scale(1.1); opacity: 0.9; }
+        }
+
+        /* SVG Ring */
+        .ring-wrapper {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin-bottom: 32px;
+        }
+
+        .ring-svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .ring-track {
+            fill: none;
+            stroke: var(--ring-bg);
+            stroke-width: 5;
+        }
+
+        .ring-progress {
+            fill: none;
+            stroke: white;
+            stroke-width: 5;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s linear, stroke 0.4s;
+        }
+
+        .ring-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
         }
 
         .timer-display {
-            font-size: 160px;
-            font-weight: 800;
-            letter-spacing: -5px;
-            margin-bottom: 20px;
+            font-size: 72px;
+            font-weight: 300;
+            letter-spacing: -2px;
+            line-height: 1;
             font-variant-numeric: tabular-nums;
+            transition: color 0.4s;
         }
 
-        .timer-label {
-            font-size: 18px;
+        .timer-session-label {
+            font-size: 11px;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
-            letter-spacing: 4px;
             color: var(--text-dim);
-            margin-bottom: 40px;
+            margin-top: 8px;
+            transition: color 0.4s;
         }
 
+        /* Status badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 24px;
+            padding: 6px 16px;
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            transition: all 0.4s;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-dim);
+            transition: background 0.4s;
+        }
+
+        .status-badge.running { border-color: rgba(80,220,120,0.4); color: rgba(80,220,120,0.9); }
+        .status-badge.running .status-dot { background: rgba(80,220,120,0.9); animation: blink 1.5s infinite; }
+        .status-badge.paused { border-color: rgba(255,200,80,0.4); color: rgba(255,200,80,0.9); }
+        .status-badge.paused .status-dot { background: rgba(255,200,80,0.9); }
+        .status-badge.finished { border-color: rgba(80,200,255,0.4); color: rgba(80,200,255,0.9); }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Controls */
         .timer-controls {
             display: flex;
-            gap: 20px;
+            gap: 14px;
+            margin-top: 8px;
         }
 
-        .btn-focus {
+        .btn-start {
             background: white;
             color: black;
             border: none;
-            padding: 18px 50px;
+            padding: 16px 48px;
             border-radius: 100px;
-            font-weight: 700;
-            font-size: 18px;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 15px;
+            letter-spacing: 0.04em;
             cursor: pointer;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
+            min-width: 180px;
         }
 
-        .btn-focus:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(255,255,255,0.2);
+        .btn-start:hover {
+            transform: scale(1.04);
+            box-shadow: 0 8px 30px rgba(255,255,255,0.25);
         }
 
-        .btn-secondary {
+        .btn-start:active { transform: scale(0.98); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-mid);
+            border: 1px solid var(--glass-border);
+            padding: 16px 24px;
+            border-radius: 100px;
+            font-family: inherit;
+            font-size: 14px;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .btn-ghost:hover {
             background: rgba(255,255,255,0.1);
             color: white;
-            border: 1px solid var(--glass-border);
-            padding: 18px 30px;
-            border-radius: 100px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
         }
 
-        .btn-secondary:hover {
-            background: rgba(255,255,255,0.2);
+        /* Session counter */
+        .session-count {
+            position: absolute;
+            bottom: 28px;
+            left: 0; right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 0.08em;
         }
 
-        /* Right Side: Habits & Guidance (The "Support" Element) */
+        .session-dots {
+            display: inline-flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .session-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            transition: background 0.4s;
+        }
+
+        .session-dot.done { background: white; }
+
+        /* ── Sidebar ── */
         .sidebar-section {
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 20px;
+            overflow-y: auto;
+            scrollbar-width: none;
+            min-height: 0;
         }
+
+        .sidebar-section::-webkit-scrollbar { display: none; }
 
         .glass-panel {
             background: var(--glass-bg);
             backdrop-filter: blur(var(--glass-blur));
             border: 1px solid var(--glass-border);
-            border-radius: 30px;
-            padding: 30px;
+            border-radius: 24px;
+            padding: 24px;
+            flex-shrink: 0;
         }
 
         .panel-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 16px;
         }
 
-        /* Focus Mode Cards */
+        /* Mode Cards */
         .mode-card {
-            background: rgba(255,255,255,0.05);
-            padding: 15px;
-            border-radius: 20px;
-            margin-bottom: 12px;
+            background: rgba(255,255,255,0.04);
+            padding: 14px 16px;
+            border-radius: 16px;
+            margin-bottom: 8px;
             border: 1px solid transparent;
             cursor: pointer;
-            transition: 0.3s;
+            transition: background 0.25s, border-color 0.25s, transform 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 14px;
         }
 
+        .mode-card:last-child { margin-bottom: 0; }
+
         .mode-card:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: var(--glass-border);
+            background: var(--glass-bg-hover);
+            transform: translateX(3px);
         }
 
         .mode-card.active {
-            background: rgba(255,255,255,0.15);
-            border-color: white;
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(255,255,255,0.3);
         }
 
+        .mode-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .mode-card.active .mode-icon {
+            background: rgba(255,255,255,0.18);
+        }
+
+        .mode-info { flex: 1; }
+
         .mode-name {
-            font-weight: 600;
-            font-size: 15px;
-            margin-bottom: 4px;
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 3px;
         }
 
         .mode-desc {
+            font-size: 11px;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+
+        .mode-duration {
             font-size: 12px;
+            color: var(--text-mid);
+            letter-spacing: 0.04em;
+            flex-shrink: 0;
+        }
+
+        /* Custom Timer Input */
+        .custom-inputs {
+            display: none;
+            gap: 10px;
+            margin-top: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .custom-inputs.visible { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .time-input-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .time-input-label {
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
             color: var(--text-dim);
         }
 
-        /* Habit Progress */
-        .habit-stat {
-            margin-bottom: 20px;
+        .time-input {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: white;
+            font-family: inherit;
+            font-size: 22px;
+            font-weight: 300;
+            letter-spacing: 0.02em;
+            width: 100%;
+            text-align: center;
+            transition: border-color 0.2s, background 0.2s;
+            -moz-appearance: textfield;
         }
+
+        .time-input::-webkit-outer-spin-button,
+        .time-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+        .time-input:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.12);
+        }
+
+        .time-input::placeholder { color: rgba(255,255,255,0.2); }
+
+        .btn-apply {
+            width: 100%;
+            margin-top: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 12px;
+            font-family: inherit;
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-apply:hover { background: rgba(255,255,255,0.18); }
+
+        /* Habit Stats */
+        .habit-stat { margin-bottom: 18px; }
+        .habit-stat:last-of-type { margin-bottom: 0; }
 
         .stat-header {
             display: flex;
             justify-content: space-between;
-            font-size: 14px;
+            font-size: 12px;
+            color: var(--text-mid);
             margin-bottom: 8px;
         }
 
+        .stat-value { color: white; font-weight: 500; }
+
         .progress-bg {
-            height: 6px;
-            background: rgba(255,255,255,0.1);
+            height: 4px;
+            background: rgba(255,255,255,0.08);
             border-radius: 10px;
             overflow: hidden;
         }
@@ -225,129 +498,496 @@
             height: 100%;
             background: white;
             border-radius: 10px;
-            box-shadow: 0 0 10px white;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* Insight Card */
+        .insight-card {
+            margin-top: 16px;
+            padding: 14px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 14px;
+            border-left: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .insight-card p {
+            font-size: 12px;
+            color: var(--text-mid);
+            line-height: 1.6;
+        }
+
+        .insight-card strong { color: white; }
+
+        /* Completion overlay */
+        .completion-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.5);
+            border-radius: 32px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .completion-overlay.visible { display: flex; }
+
+        .completion-emoji {
+            font-size: 56px;
+            margin-bottom: 16px;
+            animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes pop {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .completion-title {
+            font-size: 26px;
+            font-weight: 300;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .completion-sub {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-bottom: 28px;
+        }
+
+        .completion-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Responsive touches */
+        @media (max-height: 700px) {
+            .ring-wrapper { width: 220px; height: 220px; }
+            .timer-display { font-size: 56px; }
+            main { padding: 20px 40px; }
+        }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo">SyllaStudy AI</div>
-        <div class="nav-links">
-            <a href="index.html">Dashboard</a>
-            <a href="chat.html">Study AI</a>
-            <a href="notes.html">Notes</a>
-            <a href="tasks.html">Tasks</a>
-            <a href="focus.html" class="active">Focus</a>
+<nav>
+    <div class="logo">SyllaStudy AI</div>
+    <div class="nav-links">
+        <a href="index.html">Dashboard</a>
+        <a href="chat.html">Study AI</a>
+        <a href="notes.html">Notes</a>
+        <a href="tasks.html">Tasks</a>
+        <a href="focus.html" class="active">Focus</a>
+    </div>
+</nav>
+
+<main>
+    <!-- ── Timer Section ── -->
+    <section class="timer-section" id="timer-section">
+
+        <div class="completion-overlay" id="completion-overlay">
+            <div class="completion-emoji">🎯</div>
+            <div class="completion-title">Session Complete</div>
+            <div class="completion-sub" id="completion-sub">You focused for 25 minutes</div>
+            <div class="completion-actions">
+                <button class="btn-start" id="next-session-btn" style="min-width:auto;">Next Session</button>
+                <button class="btn-ghost" id="done-btn">I'm Done</button>
+            </div>
         </div>
-    </nav>
 
-    <main>
-        <section class="timer-section">
-            <div class="timer-label" id="timer-status">Deep Focus Session</div>
-            <div class="timer-display" id="timer">25:00</div>
-            <div class="timer-controls">
-                <button class="btn-focus" id="start-btn">Start Session</button>
-                <button class="btn-secondary" id="reset-btn">Reset</button>
+        <div class="status-badge" id="status-badge">
+            <span class="status-dot" id="status-dot"></span>
+            <span id="status-text">Ready</span>
+        </div>
+
+        <div class="ring-wrapper">
+            <svg class="ring-svg" viewBox="0 0 280 280">
+                <circle class="ring-track" cx="140" cy="140" r="128"/>
+                <circle class="ring-progress" id="ring-progress" cx="140" cy="140" r="128"/>
+            </svg>
+            <div class="ring-inner">
+                <div class="timer-display" id="timer-display">25:00</div>
+                <div class="timer-session-label" id="session-mode-label">Deep Work</div>
             </div>
-        </section>
+        </div>
 
-        <section class="sidebar-section">
-            <div class="glass-panel">
-                <div class="panel-title">Focus Modes</div>
-                <div class="mode-card active">
-                    <div class="mode-name">Deep Work (Opal Style)</div>
-                    <div class="mode-desc">Blocks all notifications and restricts app access.</div>
+        <div class="timer-controls">
+            <button class="btn-start" id="start-btn">Start Session</button>
+            <button class="btn-ghost" id="reset-btn">Reset</button>
+        </div>
+
+        <div class="session-count">
+            <div>Sessions today</div>
+            <div class="session-dots" id="session-dots">
+                <div class="session-dot done"></div>
+                <div class="session-dot done"></div>
+                <div class="session-dot"></div>
+                <div class="session-dot"></div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ── Sidebar ── -->
+    <section class="sidebar-section">
+
+        <div class="glass-panel">
+            <div class="panel-title">Focus Mode</div>
+
+            <div class="mode-card active" data-minutes="25" data-mode="deep">
+                <div class="mode-icon">🔴</div>
+                <div class="mode-info">
+                    <div class="mode-name">Deep Work</div>
+                    <div class="mode-desc">Full immersion, no interruptions</div>
                 </div>
-                <div class="mode-card">
+                <div class="mode-duration">25 min</div>
+            </div>
+
+            <div class="mode-card" data-minutes="45" data-mode="light">
+                <div class="mode-icon">📖</div>
+                <div class="mode-info">
                     <div class="mode-name">Light Study</div>
-                    <div class="mode-desc">Allow educational apps & music.</div>
+                    <div class="mode-desc">Educational apps & music allowed</div>
                 </div>
-                <div class="mode-card">
-                    <div class="mode-name">Review Session</div>
-                    <div class="mode-desc">Short 15-min bursts for flashcard review.</div>
-                </div>
+                <div class="mode-duration">45 min</div>
             </div>
 
-            <div class="glass-panel">
-                <div class="panel-title">Habit Building</div>
-                
-                <div class="habit-stat">
-                    <div class="stat-header">
-                        <span>Daily Focus Goal</span>
-                        <span>4.5 / 6h</span>
-                    </div>
-                    <div class="progress-bg"><div class="progress-fill" style="width: 75%;"></div></div>
+            <div class="mode-card" data-minutes="15" data-mode="review">
+                <div class="mode-icon">⚡</div>
+                <div class="mode-info">
+                    <div class="mode-name">Review Sprint</div>
+                    <div class="mode-desc">Short burst for flashcards & recall</div>
                 </div>
+                <div class="mode-duration">15 min</div>
+            </div>
 
-                <div class="habit-stat">
-                    <div class="stat-header">
-                        <span>Concentration Score</span>
-                        <span>88%</span>
-                    </div>
-                    <div class="progress-bg"><div class="progress-fill" style="width: 88%;"></div></div>
+            <div class="mode-card" data-minutes="0" data-mode="custom">
+                <div class="mode-icon">✏️</div>
+                <div class="mode-info">
+                    <div class="mode-name">Custom Timer</div>
+                    <div class="mode-desc">Set your own duration</div>
                 </div>
+                <div class="mode-duration" id="custom-label">— min</div>
+            </div>
 
-                <div style="font-size: 13px; color: var(--text-dim); line-height: 1.5;">
-                    Your productivity peaks at <b>11:00 AM</b>. Schedule your heaviest tasks then to reduce decision fatigue.
+            <!-- Custom inputs (revealed when custom is selected) -->
+            <div class="custom-inputs" id="custom-inputs">
+                <div class="time-input-group">
+                    <div class="time-input-label">Hours</div>
+                    <input class="time-input" type="number" id="custom-hours" min="0" max="5" placeholder="0" value="">
+                </div>
+                <div class="time-input-group">
+                    <div class="time-input-label">Minutes</div>
+                    <input class="time-input" type="number" id="custom-minutes" min="0" max="59" placeholder="25" value="">
+                </div>
+                <div class="time-input-group">
+                    <div class="time-input-label">Seconds</div>
+                    <input class="time-input" type="number" id="custom-seconds" min="0" max="59" placeholder="0" value="">
                 </div>
             </div>
-        </section>
-    </main>
+            <button class="btn-apply" id="apply-custom-btn" style="display:none;">Apply Duration</button>
+        </div>
 
-    <script>
-        let timeLeft = 25 * 60;
-        let timerId = null;
-        const display = document.getElementById('timer');
-        const startBtn = document.getElementById('start-btn');
-        const statusLabel = document.getElementById('timer-status');
+        <div class="glass-panel">
+            <div class="panel-title">Today's Progress</div>
 
-        function updateDisplay() {
-            const mins = Math.floor(timeLeft / 60);
-            const secs = timeLeft % 60;
-            display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            <div class="habit-stat">
+                <div class="stat-header">
+                    <span>Focus Goal</span>
+                    <span class="stat-value">4.5 / 6h</span>
+                </div>
+                <div class="progress-bg"><div class="progress-fill" style="width:75%"></div></div>
+            </div>
+
+            <div class="habit-stat">
+                <div class="stat-header">
+                    <span>Concentration</span>
+                    <span class="stat-value">88%</span>
+                </div>
+                <div class="progress-bg"><div class="progress-fill" style="width:88%"></div></div>
+            </div>
+
+            <div class="habit-stat">
+                <div class="stat-header">
+                    <span>Sessions Done</span>
+                    <span class="stat-value">2 / 4</span>
+                </div>
+                <div class="progress-bg"><div class="progress-fill" style="width:50%"></div></div>
+            </div>
+
+            <div class="insight-card">
+                <p>Your productivity peaks at <strong>11:00 AM</strong>. Schedule your heaviest tasks then to reduce decision fatigue.</p>
+            </div>
+        </div>
+
+    </section>
+</main>
+
+<script>
+    // ── State ──────────────────────────────────────────
+    const MODES = {
+        deep:   { label: 'Deep Work',     minutes: 25 },
+        light:  { label: 'Light Study',   minutes: 45 },
+        review: { label: 'Review Sprint', minutes: 15 },
+        custom: { label: 'Custom Timer',  minutes: 25 },
+    };
+
+    let state = {
+        mode: 'deep',
+        totalSeconds: 25 * 60,
+        timeLeft: 25 * 60,
+        running: false,
+        timerId: null,
+        sessionsToday: 2,
+    };
+
+    // ── DOM refs ───────────────────────────────────────
+    const timerSection    = document.getElementById('timer-section');
+    const displayEl       = document.getElementById('timer-display');
+    const statusBadge     = document.getElementById('status-badge');
+    const statusText      = document.getElementById('status-text');
+    const statusDot       = document.getElementById('status-dot');
+    const sessionLabel    = document.getElementById('session-mode-label');
+    const startBtn        = document.getElementById('start-btn');
+    const resetBtn        = document.getElementById('reset-btn');
+    const ringProgress    = document.getElementById('ring-progress');
+    const sessionDotsEl   = document.getElementById('session-dots');
+    const completionOver  = document.getElementById('completion-overlay');
+    const completionSub   = document.getElementById('completion-sub');
+    const nextSessionBtn  = document.getElementById('next-session-btn');
+    const doneBtn         = document.getElementById('done-btn');
+    const customInputsEl  = document.getElementById('custom-inputs');
+    const applyCustomBtn  = document.getElementById('apply-custom-btn');
+    const customHours     = document.getElementById('custom-hours');
+    const customMinutes   = document.getElementById('custom-minutes');
+    const customSeconds   = document.getElementById('custom-seconds');
+    const customLabel     = document.getElementById('custom-label');
+
+    // ── Ring ───────────────────────────────────────────
+    const R = 128;
+    const CIRCUMFERENCE = 2 * Math.PI * R;
+    ringProgress.style.strokeDasharray = CIRCUMFERENCE;
+
+    function updateRing() {
+        const progress = state.totalSeconds > 0 ? state.timeLeft / state.totalSeconds : 0;
+        const offset = CIRCUMFERENCE * (1 - progress);
+        ringProgress.style.strokeDashoffset = offset;
+
+        // Color the ring as time runs low
+        if (progress < 0.2) {
+            ringProgress.style.stroke = 'rgba(255, 130, 100, 0.9)';
+        } else if (progress < 0.4) {
+            ringProgress.style.stroke = 'rgba(255, 200, 80, 0.9)';
+        } else {
+            ringProgress.style.stroke = 'rgba(255,255,255,0.9)';
         }
+    }
 
-        function startTimer() {
-            if (timerId) {
-                clearInterval(timerId);
-                timerId = null;
-                startBtn.textContent = 'Resume Session';
-                statusLabel.textContent = 'Paused';
-            } else {
-                statusLabel.textContent = 'Deep Focus Session';
-                timerId = setInterval(() => {
-                    timeLeft--;
-                    updateDisplay();
-                    if (timeLeft <= 0) {
-                        clearInterval(timerId);
-                        alert("Focus Session Complete! Take a break.");
-                    }
-                }, 1000);
-                startBtn.textContent = 'Pause Session';
-            }
+    // ── Display ────────────────────────────────────────
+    function formatTime(s) {
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const sec = s % 60;
+        if (h > 0) {
+            return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
         }
+        return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    }
 
-        startBtn.addEventListener('click', startTimer);
+    function render() {
+        displayEl.textContent = formatTime(state.timeLeft);
+        updateRing();
 
-        document.getElementById('reset-btn').addEventListener('click', () => {
-            clearInterval(timerId);
-            timerId = null;
-            timeLeft = 25 * 60;
-            updateDisplay();
+        const mode = MODES[state.mode];
+        sessionLabel.textContent = mode.label;
+
+        // Status badge
+        statusBadge.className = 'status-badge';
+        timerSection.className = 'timer-section';
+
+        if (state.running) {
+            statusBadge.classList.add('running');
+            statusText.textContent = 'Focusing';
+            timerSection.classList.add('running');
+            startBtn.textContent = 'Pause';
+        } else if (state.timeLeft < state.totalSeconds && state.timeLeft > 0) {
+            statusBadge.classList.add('paused');
+            statusText.textContent = 'Paused';
+            timerSection.classList.add('paused');
+            startBtn.textContent = 'Resume';
+        } else {
+            statusText.textContent = 'Ready';
             startBtn.textContent = 'Start Session';
-            statusLabel.textContent = 'Deep Focus Session';
-        });
+        }
 
-        // Add visual click feedback for mode cards
-        document.querySelectorAll('.mode-card').forEach(card => {
-            card.addEventListener('click', function() {
-                document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
-            });
+        renderSessionDots();
+    }
+
+    function renderSessionDots() {
+        sessionDotsEl.innerHTML = '';
+        const total = 4;
+        for (let i = 0; i < total; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'session-dot' + (i < state.sessionsToday ? ' done' : '');
+            sessionDotsEl.appendChild(dot);
+        }
+    }
+
+    // ── Timer Logic ────────────────────────────────────
+    function tick() {
+        state.timeLeft--;
+        if (state.timeLeft <= 0) {
+            state.timeLeft = 0;
+            clearInterval(state.timerId);
+            state.timerId = null;
+            state.running = false;
+            onComplete();
+        }
+        render();
+    }
+
+    function startPause() {
+        if (state.running) {
+            // Pause
+            clearInterval(state.timerId);
+            state.timerId = null;
+            state.running = false;
+        } else {
+            // Start / Resume
+            if (state.timeLeft === 0) return;
+            state.running = true;
+            state.timerId = setInterval(tick, 1000);
+        }
+        render();
+    }
+
+    function reset() {
+        clearInterval(state.timerId);
+        state.timerId = null;
+        state.running = false;
+        state.timeLeft = state.totalSeconds;
+        completionOver.classList.remove('visible');
+        render();
+    }
+
+    function onComplete() {
+        state.sessionsToday = Math.min(state.sessionsToday + 1, 4);
+        timerSection.classList.add('finished');
+        statusBadge.classList.add('finished');
+        statusText.textContent = 'Complete';
+        const minsSpent = Math.round(state.totalSeconds / 60);
+        completionSub.textContent = `You focused for ${minsSpent} minute${minsSpent !== 1 ? 's' : ''}`;
+        completionOver.classList.add('visible');
+        render();
+    }
+
+    // ── Completion actions ─────────────────────────────
+    nextSessionBtn.addEventListener('click', () => {
+        completionOver.classList.remove('visible');
+        reset();
+    });
+
+    doneBtn.addEventListener('click', () => {
+        completionOver.classList.remove('visible');
+        reset();
+    });
+
+    // ── Mode selection ─────────────────────────────────
+    document.querySelectorAll('.mode-card').forEach(card => {
+        card.addEventListener('click', function() {
+            if (state.running) return; // don't switch mid-session
+
+            document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+
+            const mode = this.dataset.mode;
+            state.mode = mode;
+
+            if (mode === 'custom') {
+                customInputsEl.classList.add('visible');
+                applyCustomBtn.style.display = 'block';
+                // Use whatever is already set or default 25min
+                // Don't change totalSeconds until Apply is pressed
+            } else {
+                customInputsEl.classList.remove('visible');
+                applyCustomBtn.style.display = 'none';
+                const minutes = parseInt(this.dataset.minutes, 10);
+                state.totalSeconds = minutes * 60;
+                state.timeLeft = state.totalSeconds;
+            }
+
+            completionOver.classList.remove('visible');
+            render();
         });
-    </script>
+    });
+
+    // ── Custom timer ───────────────────────────────────
+    function clampInput(input, min, max) {
+        const v = parseInt(input.value, 10);
+        if (!isNaN(v)) input.value = Math.min(Math.max(v, min), max);
+    }
+
+    customHours.addEventListener('change', () => clampInput(customHours, 0, 5));
+    customMinutes.addEventListener('change', () => clampInput(customMinutes, 0, 59));
+    customSeconds.addEventListener('change', () => clampInput(customSeconds, 0, 59));
+
+    // Live label update
+    [customHours, customMinutes, customSeconds].forEach(inp => {
+        inp.addEventListener('input', updateCustomLabel);
+    });
+
+    function updateCustomLabel() {
+        const h = parseInt(customHours.value) || 0;
+        const m = parseInt(customMinutes.value) || 0;
+        const s = parseInt(customSeconds.value) || 0;
+        const total = h * 3600 + m * 60 + s;
+        if (total === 0) {
+            customLabel.textContent = '— min';
+        } else if (h > 0) {
+            customLabel.textContent = `${h}h ${m}m`;
+        } else if (s > 0) {
+            customLabel.textContent = `${m}m ${s}s`;
+        } else {
+            customLabel.textContent = `${m} min`;
+        }
+    }
+
+    applyCustomBtn.addEventListener('click', () => {
+        const h = parseInt(customHours.value) || 0;
+        const m = parseInt(customMinutes.value) || 0;
+        const s = parseInt(customSeconds.value) || 0;
+        const total = h * 3600 + m * 60 + s;
+
+        if (total <= 0) {
+            customMinutes.focus();
+            customMinutes.style.borderColor = 'rgba(255,100,80,0.6)';
+            setTimeout(() => customMinutes.style.borderColor = '', 1500);
+            return;
+        }
+
+        state.totalSeconds = total;
+        state.timeLeft = total;
+        MODES.custom.minutes = Math.round(total / 60);
+        render();
+    });
+
+    // ── Buttons ────────────────────────────────────────
+    startBtn.addEventListener('click', startPause);
+    resetBtn.addEventListener('click', reset);
+
+    // ── Keyboard shortcuts ─────────────────────────────
+    document.addEventListener('keydown', e => {
+        if (e.target.tagName === 'INPUT') return;
+        if (e.code === 'Space') { e.preventDefault(); startPause(); }
+        if (e.code === 'KeyR') reset();
+    });
+
+    // ── Init ───────────────────────────────────────────
+    render();
+</script>
 </body>
 </html>
-
