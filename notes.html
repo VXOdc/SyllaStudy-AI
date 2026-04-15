@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notes • SyllaStudy AI</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+
         :root {
             --glass-bg: rgba(255, 255, 255, 0.08);
             --glass-active: rgba(255, 255, 255, 0.15);
@@ -14,18 +16,14 @@
             --text-main: #ffffff;
             --text-dim: rgba(255, 255, 255, 0.6);
             --transition-spring: cubic-bezier(0.4, 0, 0.2, 1);
+            --danger: rgba(255, 90, 90, 0.85);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-font-smoothing: antialiased;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.45)), 
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), 
                         url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80');
             background-size: cover;
             background-position: center;
@@ -37,278 +35,731 @@
             overflow: hidden;
         }
 
-        /* Top Navigation */
+        /* ── NAV ── */
         nav {
-            height: 80px;
+            height: 72px;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255,255,255,0.05);
             border-bottom: 1px solid var(--glass-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 60px;
+            padding: 0 48px;
             z-index: 100;
             flex-shrink: 0;
         }
 
-        .logo {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            opacity: 0.9;
-        }
+        .logo { font-family: 'Lora', serif; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; opacity: 0.95; }
 
         .nav-links a {
             color: white;
             text-decoration: none;
-            margin-left: 40px;
-            font-size: 15px;
+            margin-left: 36px;
+            font-size: 14px;
             font-weight: 500;
-            opacity: 0.7;
-            transition: 0.4s var(--transition-spring);
+            opacity: 0.65;
+            transition: opacity 0.3s;
         }
+        .nav-links a:hover, .nav-links a.active { opacity: 1; }
 
-        .nav-links a:hover, .nav-links a.active { 
-            opacity: 1; 
-            text-shadow: 0 0 15px var(--accent-glow);
-        }
+        /* ── LAYOUT ── */
+        .app-container { display: flex; flex: 1; padding: 24px; gap: 20px; overflow: hidden; }
 
-        /* App Layout */
-        .app-container {
-            display: flex;
-            flex: 1;
-            padding: 30px;
-            gap: 30px;
-            overflow: hidden;
-        }
-
-        /* Glass Sidebar */
+        /* ── SIDEBAR ── */
         .sidebar {
-            width: 320px;
+            width: 300px;
             background: var(--glass-bg);
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
             border: 1px solid var(--glass-border);
-            border-radius: 40px 15px 50px 20px; /* Organic Liquid Shape */
+            border-radius: 28px;
             display: flex;
             flex-direction: column;
-            padding: 30px 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            padding: 24px 16px;
+            gap: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            opacity: 0.45;
         }
 
         .new-note-btn {
             background: rgba(255,255,255,0.9);
-            color: #000;
+            color: #111;
             border: none;
-            padding: 16px;
-            border-radius: 100px;
-            font-weight: 600;
-            font-size: 15px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: 300;
             cursor: pointer;
-            transition: all 0.3s var(--transition-spring);
-            margin-bottom: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            transition: all 0.25s var(--transition-spring);
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        .new-note-btn:hover { transform: scale(1.1) rotate(90deg); background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+
+        /* Search */
+        .search-wrap { position: relative; }
+        .search-input {
+            width: 100%;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            padding: 10px 14px 10px 36px;
+            color: white;
+            font-size: 13px;
+            font-family: 'DM Sans', sans-serif;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .search-input::placeholder { color: rgba(255,255,255,0.35); }
+        .search-input:focus { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); }
+        .search-icon {
+            position: absolute;
+            left: 12px; top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.4;
+            pointer-events: none;
         }
 
-        .new-note-btn:hover { 
-            background: #fff;
-            transform: scale(1.03); 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
-        }
-
-        .note-list {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .note-list::-webkit-scrollbar { width: 0px; }
+        /* Note list */
+        .note-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+        .note-list::-webkit-scrollbar { width: 0; }
 
         .note-item {
-            padding: 16px 20px;
-            border-radius: 16px;
+            padding: 14px 16px;
+            border-radius: 14px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.18s ease;
             border: 1px solid transparent;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+            position: relative;
         }
-
-        .note-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .note-item.active {
-            background: var(--glass-active);
-            border-color: var(--glass-border);
-            box-shadow: inset 0 0 20px rgba(255,255,255,0.05);
-        }
-
+        .note-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
+        .note-item.active { background: var(--glass-active); border-color: var(--glass-border); }
+        .note-item-content { flex: 1; min-width: 0; }
         .note-title-preview {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
-        .note-date {
+        .note-snippet {
             font-size: 12px;
             color: var(--text-dim);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+        .note-date { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 4px; }
 
-        /* Editor Area */
+        .delete-btn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 2px 4px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            opacity: 0;
+            line-height: 1;
+        }
+        .note-item:hover .delete-btn { opacity: 1; }
+        .delete-btn:hover { color: var(--danger); background: rgba(255,90,90,0.12); }
+
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            opacity: 0.4;
+            font-size: 13px;
+            text-align: center;
+        }
+        .empty-state svg { opacity: 0.5; }
+
+        /* ── EDITOR ── */
         .editor-container {
             flex: 1;
             background: var(--glass-bg);
             backdrop-filter: blur(var(--glass-blur));
             -webkit-backdrop-filter: blur(var(--glass-blur));
             border: 1px solid var(--glass-border);
-            border-radius: 20px 45px 15px 55px; /* Organic Liquid Shape */
+            border-radius: 28px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
             overflow: hidden;
         }
 
-        /* Floating Toolbar */
+        /* Toolbar */
         .toolbar {
-            position: absolute;
-            top: 30px;
-            right: 40px;
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 100px;
-            padding: 8px 16px;
             display: flex;
-            gap: 15px;
-            z-index: 10;
+            align-items: center;
+            gap: 4px;
+            padding: 14px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
+            flex-wrap: wrap;
         }
 
         .tool-btn {
             background: none;
             border: none;
             color: var(--text-main);
-            font-size: 16px;
-            font-weight: 600;
-            opacity: 0.6;
+            font-size: 13px;
+            font-weight: 700;
+            opacity: 0.5;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.18s;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
         }
+        .tool-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
+        .tool-btn.active { opacity: 1; background: rgba(255,255,255,0.15); }
 
-        .tool-btn:hover {
-            opacity: 1;
+        .tool-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.15); margin: 0 4px; }
+
+        .autosave-indicator {
+            margin-left: auto;
+            font-size: 12px;
+            font-weight: 400;
+            opacity: 0;
+            transition: opacity 0.4s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255,255,255,0.5);
         }
+        .autosave-indicator.show { opacity: 1; }
+        .autosave-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse-dot 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        .editor-content {
+        /* Editor body */
+        .editor-body {
             flex: 1;
-            padding: 60px 80px;
             overflow-y: auto;
-            outline: none;
+            padding: 48px 72px;
+            display: flex;
+            flex-direction: column;
         }
-
-        .editor-content::-webkit-scrollbar { width: 6px; }
-        .editor-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        .editor-body::-webkit-scrollbar { width: 5px; }
+        .editor-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
 
         .document-title {
             background: transparent;
             border: none;
             outline: none;
             color: white;
-            font-size: 42px;
+            font-family: 'Lora', serif;
+            font-size: 38px;
             font-weight: 700;
             width: 100%;
-            margin-bottom: 30px;
-            letter-spacing: -1px;
+            margin-bottom: 28px;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
         }
-
-        .document-title::placeholder {
-            color: rgba(255,255,255,0.3);
-        }
+        .document-title::placeholder { color: rgba(255,255,255,0.25); }
 
         .rich-text {
-            font-size: 17px;
-            line-height: 1.8;
-            color: rgba(255,255,255,0.9);
+            font-size: 16px;
+            line-height: 1.85;
+            color: rgba(255,255,255,0.88);
             outline: none;
-            min-height: 50vh;
+            flex: 1;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .rich-text:empty::before {
+            content: "Start writing…";
+            color: rgba(255,255,255,0.2);
+            pointer-events: none;
+        }
+        .rich-text p { margin-bottom: 20px; }
+        .rich-text h1 { font-family: 'Lora', serif; font-size: 28px; font-weight: 700; margin-bottom: 16px; color: #fff; }
+        .rich-text h2 { font-family: 'Lora', serif; font-size: 22px; font-weight: 600; margin-bottom: 14px; color: #fff; }
+        .rich-text ul, .rich-text ol { padding-left: 24px; margin-bottom: 20px; }
+        .rich-text li { margin-bottom: 6px; }
+
+        /* No-note placeholder */
+        .no-note-placeholder {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            opacity: 0.35;
+        }
+        .no-note-placeholder p { font-size: 15px; }
+
+        /* Word count */
+        .editor-footer {
+            padding: 10px 24px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+            flex-shrink: 0;
         }
 
-        .rich-text p {
-            margin-bottom: 24px;
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(30,30,30,0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 100px;
+            padding: 10px 20px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.85);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s var(--transition-spring);
+            z-index: 9999;
         }
-
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo">SyllaStudy AI</div>
-        <div class="nav-links">
-            <a href="index.html">Dashboard</a>
-            <a href="chat.html">Study AI</a>
-            <a href="notes.html" class="active">Notes</a>
-            <a href="tasks.html">Tasks</a>
-            <a href="focus.html">Focus</a>
-        </div>
-    </nav>
-
-    <div class="app-container">
-        <aside class="sidebar">
-            <button class="new-note-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-                New Document
-            </button>
-            
-            <div class="note-list">
-                <div class="note-item active">
-                    <div class="note-title-preview">2026 Hardware Specs</div>
-                    <div class="note-date">Just now</div>
-                </div>
-                <div class="note-item">
-                    <div class="note-title-preview">Biology Chapter 4 Summary</div>
-                    <div class="note-date">Yesterday</div>
-                </div>
-                <div class="note-item">
-                    <div class="note-title-preview">Project Brainstorming</div>
-                    <div class="note-date">Last Week</div>
-                </div>
-            </div>
-        </aside>
-
-        <main class="editor-container">
-            <div class="toolbar">
-                <button class="tool-btn" style="font-family: serif;">B</button>
-                <button class="tool-btn" style="font-style: italic; font-family: serif;">I</button>
-                <button class="tool-btn" style="text-decoration: underline;">U</button>
-                <div style="width: 1px; background: var(--glass-border); margin: 0 5px;"></div>
-                <button class="tool-btn">H1</button>
-                <button class="tool-btn">H2</button>
-            </div>
-
-            <div class="editor-content">
-                <input type="text" class="document-title" value="The 2026 Advanced Note Taker" placeholder="Untitled Document">
-                
-                <div class="rich-text" contenteditable="true">
-                    <p>In the rapidly evolving landscape of productivity tools for 2026, the advanced note taker emerges as a pinnacle of hardware-software synergy, designed exclusively for users seeking cutting-edge functionality without any reliance on artificial intelligence. At its core, this device features a revolutionary ultra-thin, foldable e-ink display with full-color rendering and adaptive refresh rates up to 120Hz, allowing seamless transitions between writing, sketching, and reading modes on a flexible, durable polymer substrate that weighs under 200 grams.</p>
-                    
-                    <p>The accompanying precision stylus incorporates piezoelectric sensors for variable pressure sensitivity, tilt detection, and haptic feedback loops that simulate the tactile resistance of traditional paper, while the chassis integrates solar-assisted charging panels and a modular battery system capable of lasting up to four weeks on a single charge. Ergonomically optimized with customizable grips and edge-to-edge touch zones, the hardware prioritizes longevity through self-healing screen coatings and IP68 water resistance, making it an indispensable companion for professionals, students, and creatives who demand reliability in any environment.</p>
-
-                    <p>Functionality extends far beyond basic jotting, encompassing an infinite canvas architecture powered by vector-based rendering engines that support unlimited layering, real-time geometric snapping, and dynamic zooming without performance degradation. Users can embed high-resolution multimedia directly—such as 8K photo scans via the integrated hyperspectral camera or lossless audio recordings captured through multi-array microphones with adaptive noise gating—while advanced tagging systems employ hierarchical metadata structures and Boolean search algorithms for instantaneous retrieval across terabytes of synchronized data.</p>
-                    
-                    <p>Integration with existing ecosystems stands as a cornerstone, enabling effortless connectivity to smartphones, laptops, and desktops through ultra-wideband protocols and encrypted near-field communication chips that facilitate one-tap device pairing and bidirectional data streaming at gigabit speeds. Security and sustainability define the final layer of this 2026 vision, with end-to-end quantum-resistant encryption safeguarding all local and transmitted data through hardware root-of-trust modules.</p>
-                </div>
-            </div>
-        </main>
+<nav>
+    <div class="logo">SyllaStudy AI</div>
+    <div class="nav-links">
+        <a href="index.html">Dashboard</a>
+        <a href="chat.html">Study AI</a>
+        <a href="notes.html" class="active">Notes</a>
+        <a href="tasks.html">Tasks</a>
+        <a href="focus.html">Focus</a>
     </div>
+</nav>
 
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Notes</h2>
+            <button class="new-note-btn" id="newNoteBtn" title="New note">+</button>
+        </div>
+
+        <div class="search-wrap">
+            <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input class="search-input" id="searchInput" type="text" placeholder="Search notes…">
+        </div>
+
+        <div class="note-list" id="noteList"></div>
+    </aside>
+
+    <main class="editor-container" id="editorContainer">
+        <!-- toolbar + body injected by JS -->
+    </main>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   SyllaStudy Notes — Full localStorage Engine
+   ═══════════════════════════════════════════════════ */
+
+const STORAGE_KEY = 'syllastudy_notes';
+const ACTIVE_KEY  = 'syllastudy_active_note';
+
+let notes = [];
+let activeId = null;
+let saveTimer = null;
+let searchQuery = '';
+
+// ── Helpers ──────────────────────────────────────
+
+function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function formatDate(ts) {
+    const d = new Date(ts);
+    const now = new Date();
+    const diffMs = now - d;
+    const diffMin = Math.floor(diffMs / 60000);
+    const diffHr  = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHr / 24);
+    if (diffMin < 1)  return 'Just now';
+    if (diffMin < 60) return `${diffMin}m ago`;
+    if (diffHr < 24)  return `${diffHr}h ago`;
+    if (diffDay === 1) return 'Yesterday';
+    if (diffDay < 7)  return `${diffDay} days ago`;
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function stripHtml(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || '';
+}
+
+function wordCount(html) {
+    const text = stripHtml(html).trim();
+    return text ? text.split(/\s+/).length : 0;
+}
+
+// ── Storage ───────────────────────────────────────
+
+function loadFromStorage() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        notes = raw ? JSON.parse(raw) : [];
+    } catch(e) {
+        notes = [];
+    }
+    try {
+        activeId = localStorage.getItem(ACTIVE_KEY) || null;
+    } catch(e) {
+        activeId = null;
+    }
+}
+
+function saveToStorage() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+        if (activeId) localStorage.setItem(ACTIVE_KEY, activeId);
+    } catch(e) {
+        showToast('⚠️ Storage full — could not save');
+    }
+}
+
+// ── Toast ─────────────────────────────────────────
+
+function showToast(msg, duration = 2200) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), duration);
+}
+
+// ── Note CRUD ─────────────────────────────────────
+
+function createNote() {
+    const note = {
+        id: uid(),
+        title: '',
+        content: '',
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+    };
+    notes.unshift(note);
+    saveToStorage();
+    selectNote(note.id);
+    renderSidebar();
+    // focus title
+    setTimeout(() => {
+        const titleEl = document.getElementById('docTitle');
+        if (titleEl) titleEl.focus();
+    }, 50);
+}
+
+function deleteNote(id) {
+    const idx = notes.findIndex(n => n.id === id);
+    if (idx === -1) return;
+    notes.splice(idx, 1);
+    saveToStorage();
+    if (activeId === id) {
+        activeId = notes.length > 0 ? notes[0].id : null;
+        if (activeId) localStorage.setItem(ACTIVE_KEY, activeId);
+        else localStorage.removeItem(ACTIVE_KEY);
+    }
+    renderSidebar();
+    renderEditor();
+}
+
+function selectNote(id) {
+    // Save current before switching
+    flushSave();
+    activeId = id;
+    localStorage.setItem(ACTIVE_KEY, id);
+    renderSidebar();
+    renderEditor();
+}
+
+function updateActiveNote(field, value) {
+    const note = notes.find(n => n.id === activeId);
+    if (!note) return;
+    note[field] = value;
+    note.updatedAt = Date.now();
+
+    // Debounced save
+    clearTimeout(saveTimer);
+    showAutosave(true);
+    saveTimer = setTimeout(() => {
+        saveToStorage();
+        renderSidebar();         // refresh previews
+        showAutosave(false);
+    }, 600);
+}
+
+function flushSave() {
+    clearTimeout(saveTimer);
+    saveToStorage();
+    showAutosave(false);
+}
+
+// ── Autosave indicator ────────────────────────────
+
+function showAutosave(saving) {
+    const el = document.getElementById('autosaveIndicator');
+    if (!el) return;
+    if (saving) {
+        el.innerHTML = '<span class="autosave-dot"></span> Saving…';
+        el.classList.add('show');
+    } else {
+        el.innerHTML = '<span style="color:#4ade80">✓</span> Saved';
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 1500);
+    }
+}
+
+// ── Sidebar ───────────────────────────────────────
+
+function renderSidebar() {
+    const list = document.getElementById('noteList');
+    const q = searchQuery.toLowerCase();
+
+    const filtered = notes.filter(n => {
+        if (!q) return true;
+        return (n.title || '').toLowerCase().includes(q) ||
+               stripHtml(n.content || '').toLowerCase().includes(q);
+    });
+
+    if (filtered.length === 0) {
+        list.innerHTML = `
+            <div class="empty-state">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <p>${q ? 'No results' : 'No notes yet'}</p>
+                ${!q ? '<p style="font-size:12px;opacity:.6">Click + to create one</p>' : ''}
+            </div>`;
+        return;
+    }
+
+    list.innerHTML = filtered.map(n => {
+        const snippet = stripHtml(n.content || '').slice(0, 60);
+        const isActive = n.id === activeId;
+        return `
+            <div class="note-item ${isActive ? 'active' : ''}" 
+                 data-id="${n.id}" 
+                 onclick="selectNote('${n.id}')">
+                <div class="note-item-content">
+                    <div class="note-title-preview">${escHtml(n.title) || 'Untitled'}</div>
+                    <div class="note-snippet">${escHtml(snippet) || 'No content'}</div>
+                    <div class="note-date">${formatDate(n.updatedAt)}</div>
+                </div>
+                <button class="delete-btn" 
+                        title="Delete note"
+                        onclick="event.stopPropagation(); confirmDelete('${n.id}')">×</button>
+            </div>`;
+    }).join('');
+}
+
+function escHtml(str) {
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function confirmDelete(id) {
+    const note = notes.find(n => n.id === id);
+    const title = note?.title || 'Untitled';
+    if (confirm(`Delete "${title}"?\nThis cannot be undone.`)) {
+        deleteNote(id);
+        showToast('🗑 Note deleted');
+    }
+}
+
+// ── Editor ────────────────────────────────────────
+
+function renderEditor() {
+    const container = document.getElementById('editorContainer');
+    const note = notes.find(n => n.id === activeId);
+
+    if (!note) {
+        container.innerHTML = `
+            <div class="no-note-placeholder">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <p>Select a note or create a new one</p>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="toolbar">
+            <button class="tool-btn" onclick="execCmd('bold')" title="Bold"><b>B</b></button>
+            <button class="tool-btn" onclick="execCmd('italic')" title="Italic"><i style="font-family:serif">I</i></button>
+            <button class="tool-btn" onclick="execCmd('underline')" title="Underline" style="text-decoration:underline">U</button>
+            <button class="tool-btn" onclick="execCmd('strikeThrough')" title="Strikethrough" style="text-decoration:line-through">S</button>
+            <div class="tool-sep"></div>
+            <button class="tool-btn" onclick="execCmd('formatBlock','h1')" title="Heading 1">H1</button>
+            <button class="tool-btn" onclick="execCmd('formatBlock','h2')" title="Heading 2">H2</button>
+            <button class="tool-btn" onclick="execCmd('formatBlock','p')" title="Paragraph">¶</button>
+            <div class="tool-sep"></div>
+            <button class="tool-btn" onclick="execCmd('insertUnorderedList')" title="Bullet list">• List</button>
+            <button class="tool-btn" onclick="execCmd('insertOrderedList')" title="Numbered list">1. List</button>
+            <div class="tool-sep"></div>
+            <button class="tool-btn" onclick="execCmd('undo')" title="Undo">↩</button>
+            <button class="tool-btn" onclick="execCmd('redo')" title="Redo">↪</button>
+            <div class="autosave-indicator" id="autosaveIndicator"></div>
+        </div>
+        <div class="editor-body">
+            <input type="text" 
+                   class="document-title" 
+                   id="docTitle" 
+                   placeholder="Untitled Document" 
+                   value="${escHtml(note.title)}"
+                   oninput="updateActiveNote('title', this.value)">
+            <div class="rich-text" 
+                 id="richText"
+                 contenteditable="true"
+                 spellcheck="true">${note.content || ''}</div>
+        </div>
+        <div class="editor-footer">
+            <span id="wordCountEl">0 words</span>
+            <span>·</span>
+            <span>Last edited ${formatDate(note.updatedAt)}</span>
+        </div>`;
+
+    // Setup content listener
+    const richText = document.getElementById('richText');
+    richText.addEventListener('input', () => {
+        updateActiveNote('content', richText.innerHTML);
+        updateWordCount();
+    });
+
+    // Prevent losing content on paste — strip styles, keep text
+    richText.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const text = e.clipboardData.getData('text/plain');
+        document.execCommand('insertText', false, text);
+    });
+
+    updateWordCount();
+}
+
+function updateWordCount() {
+    const el = document.getElementById('wordCountEl');
+    const rt = document.getElementById('richText');
+    if (!el || !rt) return;
+    const count = wordCount(rt.innerHTML);
+    el.textContent = `${count} word${count !== 1 ? 's' : ''}`;
+}
+
+function execCmd(cmd, value = null) {
+    document.getElementById('richText')?.focus();
+    document.execCommand(cmd, false, value);
+    // Update note content after command
+    setTimeout(() => {
+        const rt = document.getElementById('richText');
+        if (rt) updateActiveNote('content', rt.innerHTML);
+        updateWordCount();
+    }, 10);
+}
+
+// ── Search ────────────────────────────────────────
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+    searchQuery = e.target.value;
+    renderSidebar();
+});
+
+// ── New note button ───────────────────────────────
+
+document.getElementById('newNoteBtn').addEventListener('click', createNote);
+
+// ── Save on page hide / close ─────────────────────
+
+window.addEventListener('beforeunload', () => {
+    flushSave();
+});
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushSave();
+});
+
+// ── Init ──────────────────────────────────────────
+
+function init() {
+    loadFromStorage();
+
+    // Seed with demo notes if empty
+    if (notes.length === 0) {
+        const demo1 = {
+            id: uid(),
+            title: '2026 Hardware Specs',
+            content: `<p>In the rapidly evolving landscape of productivity tools for 2026, the advanced note taker emerges as a pinnacle of hardware-software synergy, designed exclusively for users seeking cutting-edge functionality.</p><p>The accompanying precision stylus incorporates piezoelectric sensors for variable pressure sensitivity, tilt detection, and haptic feedback loops that simulate the tactile resistance of traditional paper.</p>`,
+            createdAt: Date.now() - 86400000,
+            updatedAt: Date.now() - 300000
+        };
+        const demo2 = {
+            id: uid(),
+            title: 'Biology Chapter 4 Summary',
+            content: `<p>Cell division includes both mitosis and meiosis. Mitosis produces two genetically identical daughter cells for growth and repair. Meiosis produces four genetically unique haploid cells for reproduction.</p>`,
+            createdAt: Date.now() - 172800000,
+            updatedAt: Date.now() - 86400000
+        };
+        const demo3 = {
+            id: uid(),
+            title: 'Project Brainstorming',
+            content: `<h2>Ideas</h2><ul><li>Interactive study dashboard</li><li>Spaced repetition flashcards</li><li>AI-powered quiz generator</li></ul>`,
+            createdAt: Date.now() - 604800000,
+            updatedAt: Date.now() - 604800000
+        };
+        notes = [demo1, demo2, demo3];
+        saveToStorage();
+        activeId = demo1.id;
+    } else {
+        // Restore last active note, fall back to first
+        if (!activeId || !notes.find(n => n.id === activeId)) {
+            activeId = notes[0]?.id || null;
+        }
+    }
+
+    renderSidebar();
+    renderEditor();
+}
+
+init();
+</script>
 </body>
 </html>
