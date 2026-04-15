@@ -1,192 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" href="/favicon.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SyllaStudy AI</title>
+    <title>Dashboard • SyllaStudy-ai</title>
     <style>
         :root {
             --glass-bg: rgba(255, 255, 255, 0.12);
-            --glass-border: rgba(255, 255, 255, 0.25);
-            --glass-blur: 32px;
+            --glass-border: rgba(255, 255, 255, 0.22);
+            --glass-blur: 40px;
+            --accent-glow: rgba(255, 255, 255, 0.35);
+            --text-main: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.78)),
-                        url("https://media.cntraveler.com/photos/67ed8fae06a38df1bc3aa790/16:9/w_6000,h_3375,c_limit/Plage%20Notre-Dame%20Porquerolles%20GettyImages-2119112839.jpg");
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.45)), 
+                        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            color: white;
-            min-height: 100vh;
+            height: 100vh;
+            color: var(--text-main);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
         }
 
         /* Top Navigation */
         nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
+            height: 80px;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--glass-border);
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            padding: 22px 0;
-            backdrop-filter: blur(24px);
-            border-bottom: 1px solid rgba(255,255,255,0.12);
-            z-index: 1000;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 60px;
+            z-index: 100;
         }
 
-        nav a {
-            color: #fff;
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            opacity: 0.9;
+        }
+
+        .nav-links a {
+            color: white;
             text-decoration: none;
-            font-size: 15.5px;
+            margin-left: 40px;
+            font-size: 15px;
             font-weight: 500;
-            padding: 8px 20px;
-            border-radius: 9999px;
-            transition: 0.3s;
+            opacity: 0.7;
+            transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        nav a:hover, nav a.active {
-            background: rgba(255,255,255,0.18);
+        .nav-links a:hover, .nav-links a.active { 
+            opacity: 1; 
+            text-shadow: 0 0 15px var(--accent-glow);
         }
 
-        /* Logo Area in Hero */
-        .brand-header {
-            text-align: center;
-            margin-top: 140px;
-            margin-bottom: 40px;
+        /* Main Content Layout */
+        main {
+            flex: 1;
+            padding: 80px 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 50px;
+            overflow-y: auto;
         }
 
-        .main-logo {
-            height: 80px; /* Adjust size as needed */
-            width: auto;
-            object-fit: contain;
-            margin-bottom: 20px;
-        }
-
-        .brand-header p {
-            color: #ddd;
-            font-size: 18px;
-            letter-spacing: 0.5px;
-        }
-
-        /* Layout Container */
-        .container {
-            width: 95%;
+        .welcome-section {
             max-width: 1200px;
+        }
+
+        .welcome-section h1 {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -2px;
+        }
+
+        .welcome-section p {
+            font-size: 19px;
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+
+        /* Module Grid */
+        .module-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
-            padding-bottom: 60px;
+            max-width: 1200px;
         }
 
-        /* Glass Cards */
         .glass-card {
             background: var(--glass-bg);
             backdrop-filter: blur(var(--glass-blur));
             border: 1px solid var(--glass-border);
-            border-radius: 32px;
-            padding: 40px;
-            text-align: center;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            box-shadow: 0 15px 55px rgba(0,0,0,0.4);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            padding: 45px 40px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
+        /* Organic Border Radii */
+        .card-ai { border-radius: 40px 15px 50px 20px; }
+        .card-notes { border-radius: 20px 45px 15px 55px; }
+        .card-tasks { border-radius: 50px 20px 45px 15px; }
+        .card-focus { border-radius: 15px 50px 20px 45px; }
+
         .glass-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255,255,255,0.16);
-            box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+            transform: translateY(-12px);
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.45);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
         }
 
         .glass-card h2 {
-            font-size: 26px;
-            margin: 0 0 12px 0;
+            font-size: 28px;
+            margin-bottom: 15px;
             font-weight: 600;
         }
 
         .glass-card p {
-            color: #ccc;
             font-size: 15.5px;
-            line-height: 1.6;
-            margin-bottom: 20px;
+            line-height: 1.7;
+            color: var(--text-dim);
         }
 
-        /* Pill Buttons */
-        .btn {
-            display: inline-block;
-            padding: 14px 32px;
-            background: rgba(255,255,255,0.95);
-            color: #000;
-            font-weight: 700;
-            border-radius: 9999px;
-            text-decoration: none;
-            font-size: 14.5px;
-            transition: all 0.3s;
-            margin-top: auto;
-        }
-
-        .btn:hover {
-            background: white;
-            transform: scale(1.05);
-        }
     </style>
 </head>
 <body>
 
-<nav>
-    <a href="index.html" class="active">Home</a>
-    <a href="chat.html">Study AI</a>
-    <a href="notes.html">Notes</a>
-    <a href="tasks.html">Tasks</a>
-    <a href="focus.html">Focus</a>
-</nav>
-
-<header class="brand-header">
-    <img src="logo.png" alt="SyllaStudy AI" class="main-logo">
-    <p>Premium productivity sanctuary</p>
-</header>
-
-<div class="container">
-    <div class="glass-card">
-        <div>
-            <h2>Study AI</h2>
-            <p>Engage with your intelligent personal tutor for writing and complex problem solving.</p>
+    <nav>
+        <div class="logo">SyllaStudy-ai</div>
+        <div class="nav-links">
+            <a href="index.html" class="active">Dashboard</a>
+            <a href="chat.html">Study AI</a>
+            <a href="notes.html">Notes</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="focus.html">Focus</a>
         </div>
-        <a href="chat.html" class="btn">Launch AI</a>
-    </div>
+    </nav>
 
-    <div class="glass-card">
-        <div>
-            <h2>Notes</h2>
-            <p>Organize and draft your projects in a clean, distraction-free writing environment.</p>
+    <main>
+        <div class="welcome-section">
+            <h1 id="current-date">Today</h1>
+            <p>Welcome back. What should we achieve today?</p>
         </div>
-        <a href="notes.html" class="btn">Write Notes</a>
-    </div>
 
-    <div class="glass-card">
-        <div>
-            <h2>Tasks</h2>
-            <p>Manage your upcoming milestones and track your personal progress efficiently.</p>
+        <div class="module-grid">
+            <a href="chat.html" class="glass-card card-ai">
+                <h2>Study AI</h2>
+                <p>Engage with your intelligent tutor to solve complex problems or brainstorm new ideas.</p>
+            </a>
+
+            <a href="notes.html" class="glass-card card-notes">
+                <h2>Notes</h2>
+                <p>A distraction-free writing environment for organizing your projects and drafts.</p>
+            </a>
+
+            <a href="tasks.html" class="glass-card card-tasks">
+                <h2>Tasks</h2>
+                <p>Manage your upcoming milestones and track your personal progress efficiently.</p>
+            </a>
+
+            <a href="focus.html" class="glass-card card-focus">
+                <h2>Focus</h2>
+                <p>Enter a deep work zone with integrated timers and calming ambient backgrounds.</p>
+            </a>
         </div>
-        <a href="tasks.html" class="btn">View Tasks</a>
-    </div>
+    </main>
 
-    <div class="glass-card">
-        <div>
-            <h2>Focus</h2>
-            <p>Enter deep work sessions with integrated timers and calming ambient backgrounds.</p>
-        </div>
-        <a href="focus.html" class="btn">Start Session</a>
-    </div>
-</div>
-
+    <script>
+        // Set dynamic date (Example: Monday, April 15)
+        const options = { weekday: 'long', month: 'long', day: 'numeric' };
+        const today  = new Date();
+        document.getElementById('current-date').innerText = today.toLocaleDateString("en-US", options);
+    </script>
 </body>
 </html>
