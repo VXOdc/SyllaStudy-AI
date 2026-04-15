@@ -1,1 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus • SyllaStudy AI</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.22);
+            --glass-blur: 40px;
+            --accent-glow: rgba(255, 255, 255, 0.4);
+            --text-main: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), 
+                        url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+            color: var(--text-main);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation */
+        nav {
+            height: 80px;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 60px;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 40px;
+            font-size: 15px;
+            font-weight: 500;
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active { 
+            opacity: 1; 
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* Focus Layout */
+        main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            padding: 40px 60px;
+            gap: 40px;
+            overflow: hidden;
+        }
+
+        /* Left Side: The Timer (The "Restriction" Element) */
+        .timer-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+
+        .timer-display {
+            font-size: 160px;
+            font-weight: 800;
+            letter-spacing: -5px;
+            margin-bottom: 20px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-label {
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--text-dim);
+            margin-bottom: 40px;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn-focus {
+            background: white;
+            color: black;
+            border: none;
+            padding: 18px 50px;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-focus:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255,255,255,0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid var(--glass-border);
+            padding: 18px 30px;
+            border-radius: 100px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Right Side: Habits & Guidance (The "Support" Element) */
+        .sidebar-section {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 30px;
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Focus Mode Cards */
+        .mode-card {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .mode-card:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--glass-border);
+        }
+
+        .mode-card.active {
+            background: rgba(255,255,255,0.15);
+            border-color: white;
+        }
+
+        .mode-name {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .mode-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        /* Habit Progress */
+        .habit-stat {
+            margin-bottom: 20px;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .progress-bg {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px white;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">SyllaStudy-ai</div>
+        <div class="nav-links">
+            <a href="index.html">Dashboard</a>
+            <a href="chat.html">Study AI</a>
+            <a href="notes.html">Notes</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="focus.html" class="active">Focus</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="timer-section">
+            <div class="timer-label" id="timer-status">Deep Focus Session</div>
+            <div class="timer-display" id="timer">25:00</div>
+            <div class="timer-controls">
+                <button class="btn-focus" id="start-btn">Start Session</button>
+                <button class="btn-secondary" id="reset-btn">Reset</button>
+            </div>
+        </section>
+
+        <section class="sidebar-section">
+            <div class="glass-panel">
+                <div class="panel-title">Focus Modes</div>
+                <div class="mode-card active">
+                    <div class="mode-name">Deep Work (Opal Style)</div>
+                    <div class="mode-desc">Blocks all notifications and restricts app access.</div>
+                </div>
+                <div class="mode-card">
+                    <div class="mode-name">Light Study</div>
+                    <div class="mode-desc">Allow educational apps & music.</div>
+                </div>
+                <div class="mode-card">
+                    <div class="mode-name">Review Session</div>
+                    <div class="mode-desc">Short 15-min bursts for flashcard review.</div>
+                </div>
+            </div>
+
+            <div class="glass-panel">
+                <div class="panel-title">Habit Building</div>
+                
+                <div class="habit-stat">
+                    <div class="stat-header">
+                        <span>Daily Focus Goal</span>
+                        <span>4.5 / 6h</span>
+                    </div>
+                    <div class="progress-bg"><div class="progress-fill" style="width: 75%;"></div></div>
+                </div>
+
+                <div class="habit-stat">
+                    <div class="stat-header">
+                        <span>Concentration Score</span>
+                        <span>88%</span>
+                    </div>
+                    <div class="progress-bg"><div class="progress-fill" style="width: 88%;"></div></div>
+                </div>
+
+                <div style="font-size: 13px; color: var(--text-dim); line-height: 1.5;">
+                    Your productivity peaks at <b>11:00 AM</b>. Schedule your heaviest tasks then to reduce decision fatigue.
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let timeLeft = 25 * 60;
+        let timerId = null;
+        const display = document.getElementById('timer');
+        const startBtn = document.getElementById('start-btn');
+        const statusLabel = document.getElementById('timer-status');
+
+        function updateDisplay() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+                startBtn.textContent = 'Resume Session';
+                statusLabel.textContent = 'Paused';
+            } else {
+                statusLabel.textContent = 'Deep Focus Session';
+                timerId = setInterval(() => {
+                    timeLeft--;
+                    updateDisplay();
+                    if (timeLeft <= 0) {
+                        clearInterval(timerId);
+                        alert("Focus Session Complete! Take a break.");
+                    }
+                }, 1000);
+                startBtn.textContent = 'Pause Session';
+            }
+        }
+
+        startBtn.addEventListener('click', startTimer);
+
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            clearInterval(timerId);
+            timerId = null;
+            timeLeft = 25 * 60;
+            updateDisplay();
+            startBtn.textContent = 'Start Session';
+            statusLabel.textContent = 'Deep Focus Session';
+        });
+
+        // Add visual click feedback for mode cards
+        document.querySelectorAll('.mode-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
 
