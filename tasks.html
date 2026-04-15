@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tasks • SyllaStudy-ai</title>
+    <title>Focus • SyllaStudy AI</title>
     <style>
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.12);
+            --glass-bg: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.22);
             --glass-blur: 40px;
-            --accent-glow: rgba(255, 255, 255, 0.35);
+            --accent-glow: rgba(255, 255, 255, 0.4);
             --text-main: #ffffff;
             --text-dim: rgba(255, 255, 255, 0.6);
         }
@@ -23,8 +23,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.45)), 
-                        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80');
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6)), 
+                        url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -35,7 +35,7 @@
             flex-direction: column;
         }
 
-        /* Top Navigation */
+        /* Navigation */
         nav {
             height: 80px;
             backdrop-filter: blur(20px);
@@ -52,7 +52,6 @@
             font-size: 22px;
             font-weight: 700;
             letter-spacing: -0.5px;
-            opacity: 0.9;
         }
 
         .nav-links a {
@@ -62,7 +61,7 @@
             font-size: 15px;
             font-weight: 500;
             opacity: 0.7;
-            transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: 0.3s;
         }
 
         .nav-links a:hover, .nav-links a.active { 
@@ -70,168 +69,163 @@
             text-shadow: 0 0 15px var(--accent-glow);
         }
 
-        /* Task App Layout */
+        /* Focus Layout */
         main {
             flex: 1;
-            padding: 60px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            padding: 40px 60px;
+            gap: 40px;
+            overflow: hidden;
         }
 
-        .task-container {
-            width: 100%;
-            max-width: 650px;
+        /* Left Side: The Timer (The "Restriction" Element) */
+        .timer-section {
             background: var(--glass-bg);
             backdrop-filter: blur(var(--glass-blur));
             border: 1px solid var(--glass-border);
-            border-radius: 30px; 
-            padding: 40px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            border-radius: 40px;
             display: flex;
             flex-direction: column;
-        }
-
-        .task-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 30px;
-        }
-
-        .task-header h1 {
-            font-size: 36px;
-            font-weight: 700;
-            letter-spacing: -1px;
-        }
-
-        .task-stats {
-            font-size: 15px;
-            color: var(--text-dim);
-            margin-bottom: 6px;
-        }
-
-        /* Input Area */
-        .input-group {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .input-group input {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--glass-border);
-            border-radius: 100px;
-            padding: 16px 24px;
-            color: white;
-            font-size: 16px;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        .input-group input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .input-group input:focus {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 15px rgba(255,255,255,0.1);
-        }
-
-        .add-btn {
-            background: rgba(255, 255, 255, 0.9);
-            color: black;
-            border: none;
-            padding: 0 30px;
-            border-radius: 100px;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .add-btn:hover {
-            background: white;
-            transform: scale(1.05);
-        }
-
-        /* Task List */
-        .task-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .task-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 18px 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: 0.3s;
-        }
-
-        .task-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .task-item.completed {
-            opacity: 0.5;
-        }
-
-        .task-item.completed .task-text {
-            text-decoration: line-through;
-        }
-
-        .checkbox {
-            width: 24px;
-            height: 24px;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 14px;
-            color: transparent;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
         }
 
-        .task-item.completed .checkbox {
-            background: white;
-            border-color: white;
-            color: black;
+        .timer-display {
+            font-size: 160px;
+            font-weight: 800;
+            letter-spacing: -5px;
+            margin-bottom: 20px;
+            font-variant-numeric: tabular-nums;
         }
 
-        .task-text {
-            flex: 1;
-            font-size: 16px;
-            line-height: 1.4;
-        }
-
-        .delete-btn {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 22px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .delete-btn:hover {
-            color: #ff5a5a;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
+        .timer-label {
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
             color: var(--text-dim);
-            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn-focus {
+            background: white;
+            color: black;
+            border: none;
+            padding: 18px 50px;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-focus:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255,255,255,0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid var(--glass-border);
+            padding: 18px 30px;
+            border-radius: 100px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Right Side: Habits & Guidance (The "Support" Element) */
+        .sidebar-section {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 30px;
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Focus Mode Cards */
+        .mode-card {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .mode-card:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--glass-border);
+        }
+
+        .mode-card.active {
+            background: rgba(255,255,255,0.15);
+            border-color: white;
+        }
+
+        .mode-name {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .mode-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        /* Habit Progress */
+        .habit-stat {
+            margin-bottom: 20px;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .progress-bg {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px white;
         }
 
     </style>
@@ -244,115 +238,115 @@
             <a href="index.html">Dashboard</a>
             <a href="chat.html">Study AI</a>
             <a href="notes.html">Notes</a>
-            <a href="tasks.html" class="active">Tasks</a>
-            <a href="focus.html">Focus</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="focus.html" class="active">Focus</a>
         </div>
     </nav>
 
     <main>
-        <div class="task-container">
-            <div class="task-header">
-                <h1>Projects & Tasks</h1>
-                <div class="task-stats" id="stats">0 tasks • 0 done</div>
+        <section class="timer-section">
+            <div class="timer-label" id="timer-status">Deep Focus Session</div>
+            <div class="timer-display" id="timer">25:00</div>
+            <div class="timer-controls">
+                <button class="btn-focus" id="start-btn">Start Session</button>
+                <button class="btn-secondary" id="reset-btn">Reset</button>
             </div>
+        </section>
 
-            <div class="input-group">
-                <input type="text" id="task-input" placeholder="Add a new task or project..." autocomplete="off">
-                <button class="add-btn" id="add-btn">Add</button>
-            </div>
-
-            <div class="task-list" id="tasks-list">
+        <section class="sidebar-section">
+            <div class="glass-panel">
+                <div class="panel-title">Focus Modes</div>
+                <div class="mode-card active">
+                    <div class="mode-name">Deep Work (Opal Style)</div>
+                    <div class="mode-desc">Blocks all notifications and restricts app access.</div>
                 </div>
-        </div>
+                <div class="mode-card">
+                    <div class="mode-name">Light Study</div>
+                    <div class="mode-desc">Allow educational apps & music.</div>
+                </div>
+                <div class="mode-card">
+                    <div class="mode-name">Review Session</div>
+                    <div class="mode-desc">Short 15-min bursts for flashcard review.</div>
+                </div>
+            </div>
+
+            <div class="glass-panel">
+                <div class="panel-title">Habit Building</div>
+                
+                <div class="habit-stat">
+                    <div class="stat-header">
+                        <span>Daily Focus Goal</span>
+                        <span>4.5 / 6h</span>
+                    </div>
+                    <div class="progress-bg"><div class="progress-fill" style="width: 75%;"></div></div>
+                </div>
+
+                <div class="habit-stat">
+                    <div class="stat-header">
+                        <span>Concentration Score</span>
+                        <span>88%</span>
+                    </div>
+                    <div class="progress-bg"><div class="progress-fill" style="width: 88%;"></div></div>
+                </div>
+
+                <div style="font-size: 13px; color: var(--text-dim); line-height: 1.5;">
+                    Your productivity peaks at <b>11:00 AM</b>. Schedule your heaviest tasks then to reduce decision fatigue.
+                </div>
+            </div>
+        </section>
     </main>
 
     <script>
-        const taskInput = document.getElementById('task-input');
-        const addBtn = document.getElementById('add-btn');
-        const tasksList = document.getElementById('tasks-list');
-        const statsEl = document.getElementById('stats');
+        let timeLeft = 25 * 60;
+        let timerId = null;
+        const display = document.getElementById('timer');
+        const startBtn = document.getElementById('start-btn');
+        const statusLabel = document.getElementById('timer-status');
 
-        // Changed local storage key to match your app environment
-        let tasks = JSON.parse(localStorage.getItem('syllaTasks')) || [];
-
-        function saveTasks() {
-            localStorage.setItem('syllaTasks', JSON.stringify(tasks));
-            updateStats();
+        function updateDisplay() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        function updateStats() {
-            const total = tasks.length;
-            const done = tasks.filter(t => t.completed).length;
-            statsEl.textContent = `${total} tasks • ${done} done`;
-        }
-
-        function renderTasks() {
-            tasksList.innerHTML = '';
-
-            if (tasks.length === 0) {
-                tasksList.innerHTML = `
-                    <div class="empty-state">
-                        <p>No tasks remaining. You are all caught up.</p>
-                    </div>
-                `;
-                return;
+        function startTimer() {
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+                startBtn.textContent = 'Resume Session';
+                statusLabel.textContent = 'Paused';
+            } else {
+                statusLabel.textContent = 'Deep Focus Session';
+                timerId = setInterval(() => {
+                    timeLeft--;
+                    updateDisplay();
+                    if (timeLeft <= 0) {
+                        clearInterval(timerId);
+                        alert("Focus Session Complete! Take a break.");
+                    }
+                }, 1000);
+                startBtn.textContent = 'Pause Session';
             }
-
-            tasks.forEach((task, index) => {
-                const taskEl = document.createElement('div');
-                taskEl.className = `task-item ${task.completed ? 'completed' : ''}`;
-                
-                taskEl.innerHTML = `
-                    <div class="checkbox" data-index="${index}">${task.completed ? '&#10003;' : ''}</div>
-                    <div class="task-text">${task.text}</div>
-                    <button class="delete-btn" data-index="${index}">&times;</button>
-                `;
-                tasksList.appendChild(taskEl);
-            });
-
-            document.querySelectorAll('.checkbox').forEach(el => {
-                el.addEventListener('click', () => {
-                    const idx = parseInt(el.dataset.index);
-                    tasks[idx].completed = !tasks[idx].completed;
-                    saveTasks();
-                    renderTasks();
-                });
-            });
-
-            document.querySelectorAll('.delete-btn').forEach(el => {
-                el.addEventListener('click', () => {
-                    const idx = parseInt(el.dataset.index);
-                    tasks.splice(idx, 1);
-                    saveTasks();
-                    renderTasks();
-                });
-            });
         }
 
-        function addTask() {
-            const text = taskInput.value.trim();
-            if (!text) return;
+        startBtn.addEventListener('click', startTimer);
 
-            tasks.unshift({
-                text: text,
-                completed: false,
-                created: Date.now()
-            });
-
-            taskInput.value = '';
-            saveTasks();
-            renderTasks();
-        }
-
-        addBtn.addEventListener('click', addTask);
-
-        taskInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addTask();
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            clearInterval(timerId);
+            timerId = null;
+            timeLeft = 25 * 60;
+            updateDisplay();
+            startBtn.textContent = 'Start Session';
+            statusLabel.textContent = 'Deep Focus Session';
         });
 
-        // Load on start
-        renderTasks();
-        updateStats();
+        // Add visual click feedback for mode cards
+        document.querySelectorAll('.mode-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
     </script>
 </body>
 </html>
