@@ -864,6 +864,9 @@ async function applyTransform() {
     const note = notes.find(n => n.id === activeId);
     if (!note) return;
 
+    // Save before closeTransformModal() resets currentTransformAction to null
+    const actionName = currentTransformAction;
+
     const applyBtn = document.getElementById('applyBtn');
     applyBtn.disabled = true;
     applyBtn.classList.add('loading');
@@ -876,7 +879,7 @@ async function applyTransform() {
         }
 
         const result = await callAITransform(
-            currentTransformAction,
+            actionName,
             selectedTransformOption,
             plainText
         );
@@ -884,7 +887,7 @@ async function applyTransform() {
         if (result && result.trim().length > 0) {
             updateActiveNote('content', `<p>${result.replace(/\n/g, '</p><p>')}</p>`);
             closeTransformModal();
-            showToast(`✨ ${currentTransformAction.charAt(0).toUpperCase() + currentTransformAction.slice(1)} complete`);
+            showToast(`✨ ${actionName.charAt(0).toUpperCase() + actionName.slice(1)} complete`);
         } else {
             throw new Error('No result received');
         }
