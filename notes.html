@@ -17,6 +17,7 @@
             --text-dim: rgba(255, 255, 255, 0.6);
             --transition-spring: cubic-bezier(0.4, 0, 0.2, 1);
             --danger: rgba(255, 90, 90, 0.85);
+            --success: rgba(74, 222, 128, 0.85);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
@@ -228,25 +229,36 @@
             border-bottom: 1px solid rgba(255,255,255,0.08);
             flex-shrink: 0;
             flex-wrap: wrap;
+            overflow-x: auto;
+            overflow-y: hidden;
         }
+        .toolbar::-webkit-scrollbar { height: 0; }
 
         .tool-btn {
             background: none;
             border: none;
             color: var(--text-main);
-            font-size: 13px;
-            font-weight: 700;
+            font-size: 12px;
+            font-weight: 600;
             opacity: 0.5;
             cursor: pointer;
             transition: all 0.18s;
             padding: 6px 10px;
             border-radius: 8px;
             font-family: 'DM Sans', sans-serif;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         .tool-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
         .tool-btn.active { opacity: 1; background: rgba(255,255,255,0.15); }
+        .tool-btn.loading {
+            opacity: 0.7;
+            pointer-events: none;
+            animation: pulse-btn 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse-btn { 0%, 100% { opacity: 0.7; } 50% { opacity: 0.4; } }
 
-        .tool-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.15); margin: 0 4px; }
+        .tool-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.15); margin: 0 4px; flex-shrink: 0; }
 
         .autosave-indicator {
             margin-left: auto;
@@ -258,6 +270,7 @@
             align-items: center;
             gap: 6px;
             color: rgba(255,255,255,0.5);
+            flex-shrink: 0;
         }
         .autosave-indicator.show { opacity: 1; }
         .autosave-dot {
@@ -356,6 +369,135 @@
             z-index: 9999;
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* AI Transform Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            font-family: 'Lora', serif;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-close:hover { opacity: 1; }
+
+        .modal-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .modal-option {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            text-align: left;
+        }
+        .modal-option:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(255,255,255,0.25);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .btn-cancel {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-cancel:hover {
+            background: rgba(255,255,255,0.12);
+        }
+
+        .btn-apply {
+            background: var(--success);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-apply:hover {
+            background: rgba(74, 222, 128, 1);
+            box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+        }
+        .btn-apply:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -393,11 +535,28 @@
 
 </div>
 
+<!-- AI Transform Modal -->
+<div class="modal-overlay" id="transformModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Transform Note</h3>
+            <button class="modal-close" onclick="closeTransformModal()">×</button>
+        </div>
+        <div class="modal-options" id="modalOptions"></div>
+        <div class="modal-buttons">
+            <button class="btn-cancel" onclick="closeTransformModal()">Cancel</button>
+            <button class="btn-apply" id="applyBtn" onclick="applyTransform()">Apply</button>
+        </div>
+    </div>
+</div>
+
 <div class="toast" id="toast"></div>
+
+<script src="chat.js"></script>
 
 <script>
 /* ═══════════════════════════════════════════════════
-   SyllaStudy Notes — Full localStorage Engine
+   SyllaStudy Notes — Full localStorage Engine + AI
    ═══════════════════════════════════════════════════ */
 
 const STORAGE_KEY = 'syllastudy_notes';
@@ -407,6 +566,8 @@ let notes = [];
 let activeId = null;
 let saveTimer = null;
 let searchQuery = '';
+let currentTransformAction = null;
+let selectedTransformOption = null;
 
 // ── Helpers ──────────────────────────────────────
 
@@ -488,7 +649,6 @@ function createNote() {
     saveToStorage();
     selectNote(note.id);
     renderSidebar();
-    // focus title
     setTimeout(() => {
         const titleEl = document.getElementById('docTitle');
         if (titleEl) titleEl.focus();
@@ -510,7 +670,6 @@ function deleteNote(id) {
 }
 
 function selectNote(id) {
-    // Save current before switching
     flushSave();
     activeId = id;
     localStorage.setItem(ACTIVE_KEY, id);
@@ -524,12 +683,11 @@ function updateActiveNote(field, value) {
     note[field] = value;
     note.updatedAt = Date.now();
 
-    // Debounced save
     clearTimeout(saveTimer);
     showAutosave(true);
     saveTimer = setTimeout(() => {
         saveToStorage();
-        renderSidebar();         // refresh previews
+        renderSidebar();
         showAutosave(false);
     }, 600);
 }
@@ -609,6 +767,183 @@ function confirmDelete(id) {
     }
 }
 
+// ── AI Transform Modal ─────────────────────────────
+
+function openTransformModal(action) {
+    const note = notes.find(n => n.id === activeId);
+    if (!note || !note.content) {
+        showToast('✍️ Add some content first');
+        return;
+    }
+
+    currentTransformAction = action;
+    selectedTransformOption = null;
+
+    const transformConfigs = {
+        summarize: {
+            title: 'Summarize',
+            options: [
+                { label: 'Quick summary', value: 'brief' },
+                { label: 'Detailed summary', value: 'detailed' },
+                { label: 'Bullet points', value: 'bullets' }
+            ]
+        },
+        rewrite: {
+            title: 'Rewrite',
+            options: [
+                { label: 'More concise', value: 'concise' },
+                { label: 'More academic', value: 'academic' },
+                { label: 'More casual', value: 'casual' },
+                { label: 'More structured', value: 'structured' }
+            ]
+        },
+        extract: {
+            title: 'Extract',
+            options: [
+                { label: 'Key points', value: 'key_points' },
+                { label: 'Definitions', value: 'definitions' },
+                { label: 'Concepts', value: 'concepts' },
+                { label: 'Action items', value: 'action_items' }
+            ]
+        },
+        generate: {
+            title: 'Generate',
+            options: [
+                { label: 'Flashcards', value: 'flashcards' },
+                { label: 'Study questions', value: 'study_questions' },
+                { label: 'Outline', value: 'outline' },
+                { label: 'Mind map (text)', value: 'mindmap' },
+                { label: 'Study plan', value: 'study_plan' }
+            ]
+        },
+        explain: {
+            title: 'Explain',
+            options: [
+                { label: 'Like I\'m 5', value: 'simple' },
+                { label: 'Like I\'m 12', value: 'intermediate' },
+                { label: 'Like a professor', value: 'advanced' }
+            ]
+        },
+        expand: {
+            title: 'Expand',
+            options: [
+                { label: 'Expand all points', value: 'full' },
+                { label: 'Add examples', value: 'examples' },
+                { label: 'Add explanations', value: 'explanations' }
+            ]
+        },
+        translate: {
+            title: 'Translate',
+            options: [
+                { label: 'Spanish', value: 'es' },
+                { label: 'French', value: 'fr' },
+                { label: 'German', value: 'de' },
+                { label: 'Chinese', value: 'zh' },
+                { label: 'Japanese', value: 'ja' }
+            ]
+        }
+    };
+
+    const config = transformConfigs[action];
+    const titleEl = document.getElementById('modalTitle');
+    const optionsEl = document.getElementById('modalOptions');
+
+    titleEl.textContent = config.title;
+
+    optionsEl.innerHTML = config.options.map(opt => `
+        <div class="modal-option" onclick="selectTransformOption('${opt.value}')">
+            ${opt.label}
+        </div>
+    `).join('');
+
+    document.getElementById('transformModal').classList.add('show');
+}
+
+function closeTransformModal() {
+    document.getElementById('transformModal').classList.remove('show');
+    currentTransformAction = null;
+    selectedTransformOption = null;
+}
+
+function selectTransformOption(value) {
+    selectedTransformOption = value;
+    
+    const options = document.querySelectorAll('.modal-option');
+    options.forEach(opt => {
+        if (opt.textContent.includes(value) || 
+            Array.from(opt.attributes).some(attr => attr.value.includes(value))) {
+            opt.style.background = 'rgba(74, 222, 128, 0.2)';
+            opt.style.borderColor = 'rgba(74, 222, 128, 0.5)';
+        } else {
+            opt.style.background = 'rgba(255,255,255,0.08)';
+            opt.style.borderColor = 'rgba(255,255,255,0.12)';
+        }
+    });
+}
+
+async function applyTransform() {
+    if (!currentTransformAction || !selectedTransformOption) {
+        showToast('Please select an option');
+        return;
+    }
+
+    const note = notes.find(n => n.id === activeId);
+    if (!note) return;
+
+    const applyBtn = document.getElementById('applyBtn');
+    applyBtn.disabled = true;
+    applyBtn.classList.add('loading');
+    applyBtn.textContent = 'Processing…';
+
+    try {
+        // Call chat.js AI function
+        const result = await callAITransform(
+            currentTransformAction,
+            selectedTransformOption,
+            stripHtml(note.content)
+        );
+
+        if (result) {
+            // Replace content with transformed result
+            updateActiveNote('content', `<p>${result.replace(/\n/g, '</p><p>')}</p>`);
+            closeTransformModal();
+            showToast(`✨ ${currentTransformAction.charAt(0).toUpperCase() + currentTransformAction.slice(1)} complete`);
+        }
+    } catch (err) {
+        console.error('Transform error:', err);
+        showToast('⚠️ Transform failed. Try again.');
+    } finally {
+        applyBtn.disabled = false;
+        applyBtn.classList.remove('loading');
+        applyBtn.textContent = 'Apply';
+    }
+}
+
+// ── AI Transform API Call ─────────────────────────
+
+async function callAITransform(action, option, content) {
+    try {
+        // Call chat.js with transform request
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: 'transform',
+                action: action,
+                option: option,
+                content: content
+            })
+        });
+
+        if (!response.ok) throw new Error('API error');
+        const data = await response.json();
+        return data.result || '';
+    } catch (err) {
+        console.error('AI Transform failed:', err);
+        return null;
+    }
+}
+
 // ── Editor ────────────────────────────────────────
 
 function renderEditor() {
@@ -640,6 +975,14 @@ function renderEditor() {
             <div class="tool-sep"></div>
             <button class="tool-btn" onclick="execCmd('undo')" title="Undo">↩</button>
             <button class="tool-btn" onclick="execCmd('redo')" title="Redo">↪</button>
+            <div class="tool-sep"></div>
+            <button class="tool-btn" onclick="openTransformModal('summarize')" title="Summarize">📝 Sum</button>
+            <button class="tool-btn" onclick="openTransformModal('rewrite')" title="Rewrite">✏️ Rewrite</button>
+            <button class="tool-btn" onclick="openTransformModal('extract')" title="Extract">🔍 Extract</button>
+            <button class="tool-btn" onclick="openTransformModal('generate')" title="Generate">✨ Gen</button>
+            <button class="tool-btn" onclick="openTransformModal('explain')" title="Explain">💡 Explain</button>
+            <button class="tool-btn" onclick="openTransformModal('expand')" title="Expand">📖 Expand</button>
+            <button class="tool-btn" onclick="openTransformModal('translate')" title="Translate">🌐 Translate</button>
             <div class="autosave-indicator" id="autosaveIndicator"></div>
         </div>
         <div class="editor-body">
@@ -660,14 +1003,12 @@ function renderEditor() {
             <span>Last edited ${formatDate(note.updatedAt)}</span>
         </div>`;
 
-    // Setup content listener
     const richText = document.getElementById('richText');
     richText.addEventListener('input', () => {
         updateActiveNote('content', richText.innerHTML);
         updateWordCount();
     });
 
-    // Prevent losing content on paste — strip styles, keep text
     richText.addEventListener('paste', (e) => {
         e.preventDefault();
         const text = e.clipboardData.getData('text/plain');
@@ -688,7 +1029,6 @@ function updateWordCount() {
 function execCmd(cmd, value = null) {
     document.getElementById('richText')?.focus();
     document.execCommand(cmd, false, value);
-    // Update note content after command
     setTimeout(() => {
         const rt = document.getElementById('richText');
         if (rt) updateActiveNote('content', rt.innerHTML);
@@ -717,12 +1057,17 @@ document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') flushSave();
 });
 
+// ── Close modal on ESC ─────────────────────────────
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeTransformModal();
+});
+
 // ── Init ──────────────────────────────────────────
 
 function init() {
     loadFromStorage();
 
-    // Seed with demo notes if empty
     if (notes.length === 0) {
         const demo1 = {
             id: uid(),
@@ -749,7 +1094,6 @@ function init() {
         saveToStorage();
         activeId = demo1.id;
     } else {
-        // Restore last active note, fall back to first
         if (!activeId || !notes.find(n => n.id === activeId)) {
             activeId = notes[0]?.id || null;
         }
