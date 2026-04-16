@@ -12,7 +12,6 @@
             --glass-active: rgba(255, 255, 255, 0.15);
             --glass-border: rgba(255, 255, 255, 0.22);
             --glass-blur: 40px;
-            --accent-glow: rgba(255, 255, 255, 0.35);
             --text-main: #ffffff;
             --text-dim: rgba(255, 255, 255, 0.6);
             --transition-spring: cubic-bezier(0.4, 0, 0.2, 1);
@@ -24,7 +23,7 @@
 
         body {
             font-family: 'DM Sans', sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), 
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)),
                         url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80');
             background-size: cover;
             background-position: center;
@@ -36,6 +35,7 @@
             overflow: hidden;
         }
 
+        /* ── NAV ── */
         nav {
             height: 72px;
             backdrop-filter: blur(20px);
@@ -49,22 +49,17 @@
             z-index: 100;
             flex-shrink: 0;
         }
-
         .logo { font-family: 'Lora', serif; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; opacity: 0.95; }
-
         .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin-left: 36px;
-            font-size: 14px;
-            font-weight: 500;
-            opacity: 0.65;
-            transition: opacity 0.3s;
+            color: white; text-decoration: none; margin-left: 36px;
+            font-size: 14px; font-weight: 500; opacity: 0.65; transition: opacity 0.3s;
         }
         .nav-links a:hover, .nav-links a.active { opacity: 1; }
 
+        /* ── LAYOUT ── */
         .app-container { display: flex; flex: 1; padding: 24px; gap: 20px; overflow: hidden; }
 
+        /* ── SIDEBAR ── */
         .sidebar {
             width: 300px;
             background: var(--glass-bg);
@@ -79,239 +74,103 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.2);
             flex-shrink: 0;
         }
-
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 8px;
-        }
-
-        .sidebar-header h2 {
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            opacity: 0.45;
-        }
-
+        .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+        .sidebar-header h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.45; }
         .new-note-btn {
-            background: rgba(255,255,255,0.9);
-            color: #111;
-            border: none;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            font-size: 20px;
-            font-weight: 300;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.25s var(--transition-spring);
-            flex-shrink: 0;
-            line-height: 1;
+            background: rgba(255,255,255,0.9); color: #111; border: none;
+            width: 34px; height: 34px; border-radius: 50%; font-size: 20px;
+            font-weight: 300; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; transition: all 0.25s var(--transition-spring); flex-shrink: 0;
         }
         .new-note-btn:hover { transform: scale(1.1) rotate(90deg); background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
 
         .search-wrap { position: relative; }
         .search-input {
-            width: 100%;
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 12px;
-            padding: 10px 14px 10px 36px;
-            color: white;
-            font-size: 13px;
-            font-family: 'DM Sans', sans-serif;
-            outline: none;
-            transition: border-color 0.2s, background 0.2s;
+            width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px; padding: 10px 14px 10px 36px; color: white;
+            font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; transition: all 0.2s;
         }
         .search-input::placeholder { color: rgba(255,255,255,0.35); }
         .search-input:focus { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); }
-        .search-icon {
-            position: absolute;
-            left: 12px; top: 50%;
-            transform: translateY(-50%);
-            opacity: 0.4;
-            pointer-events: none;
-        }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: 0.4; pointer-events: none; }
 
         .note-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
         .note-list::-webkit-scrollbar { width: 0; }
 
         .note-item {
-            padding: 14px 16px;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: all 0.18s ease;
-            border: 1px solid transparent;
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 8px;
-            position: relative;
+            padding: 14px 16px; border-radius: 14px; cursor: pointer;
+            transition: all 0.18s ease; border: 1px solid transparent;
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
         }
         .note-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
         .note-item.active { background: var(--glass-active); border-color: var(--glass-border); }
         .note-item-content { flex: 1; min-width: 0; }
-        .note-title-preview {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .note-snippet {
-            font-size: 12px;
-            color: var(--text-dim);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        .note-title-preview { font-size: 14px; font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .note-snippet { font-size: 12px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .note-date { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 4px; }
-
         .delete-btn {
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.3);
-            cursor: pointer;
-            font-size: 16px;
-            padding: 2px 4px;
-            border-radius: 6px;
-            transition: all 0.2s;
-            flex-shrink: 0;
-            opacity: 0;
-            line-height: 1;
+            background: none; border: none; color: rgba(255,255,255,0.3);
+            cursor: pointer; font-size: 16px; padding: 2px 4px; border-radius: 6px;
+            transition: all 0.2s; flex-shrink: 0; opacity: 0; line-height: 1;
         }
         .note-item:hover .delete-btn { opacity: 1; }
         .delete-btn:hover { color: var(--danger); background: rgba(255,90,90,0.12); }
 
         .empty-state {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            opacity: 0.4;
-            font-size: 13px;
-            text-align: center;
+            flex: 1; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 8px; opacity: 0.4; font-size: 13px; text-align: center;
         }
-        .empty-state svg { opacity: 0.5; }
 
+        /* ── EDITOR ── */
         .editor-container {
-            flex: 1;
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid var(--glass-border);
-            border-radius: 28px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            overflow: hidden;
+            flex: 1; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur)); border: 1px solid var(--glass-border);
+            border-radius: 28px; display: flex; flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2); overflow: hidden;
         }
 
         .toolbar {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 14px 24px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            flex-shrink: 0;
-            flex-wrap: wrap;
-            overflow-x: auto;
-            overflow-y: hidden;
+            display: flex; align-items: center; gap: 4px; padding: 14px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;
+            flex-wrap: wrap; overflow-x: auto; overflow-y: hidden;
         }
         .toolbar::-webkit-scrollbar { height: 0; }
 
         .tool-btn {
-            background: none;
-            border: none;
-            color: var(--text-main);
-            font-size: 12px;
-            font-weight: 600;
-            opacity: 0.5;
-            cursor: pointer;
-            transition: all 0.18s;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-family: 'DM Sans', sans-serif;
-            white-space: nowrap;
-            flex-shrink: 0;
+            background: none; border: none; color: var(--text-main); font-size: 12px;
+            font-weight: 600; opacity: 0.5; cursor: pointer; transition: all 0.18s;
+            padding: 6px 10px; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+            white-space: nowrap; flex-shrink: 0;
         }
         .tool-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
         .tool-btn.active { opacity: 1; background: rgba(255,255,255,0.15); }
-        .tool-btn.loading {
-            opacity: 0.7;
-            pointer-events: none;
-            animation: pulse-btn 1.5s ease-in-out infinite;
-        }
-        @keyframes pulse-btn { 0%, 100% { opacity: 0.7; } 50% { opacity: 0.4; } }
-
         .tool-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.15); margin: 0 4px; flex-shrink: 0; }
 
         .autosave-indicator {
-            margin-left: auto;
-            font-size: 12px;
-            font-weight: 400;
-            opacity: 0;
-            transition: opacity 0.4s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: rgba(255,255,255,0.5);
-            flex-shrink: 0;
+            margin-left: auto; font-size: 12px; font-weight: 400; opacity: 0;
+            transition: opacity 0.4s; display: flex; align-items: center;
+            gap: 6px; color: rgba(255,255,255,0.5); flex-shrink: 0;
         }
         .autosave-indicator.show { opacity: 1; }
-        .autosave-dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: #4ade80;
-            animation: pulse-dot 1.5s ease-in-out infinite;
-        }
+        .autosave-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; animation: pulse-dot 1.5s ease-in-out infinite; }
         @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        .editor-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 48px 72px;
-            display: flex;
-            flex-direction: column;
-        }
+        .editor-body { flex: 1; overflow-y: auto; padding: 48px 72px; display: flex; flex-direction: column; }
         .editor-body::-webkit-scrollbar { width: 5px; }
         .editor-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
 
         .document-title {
-            background: transparent;
-            border: none;
-            outline: none;
-            color: white;
-            font-family: 'Lora', serif;
-            font-size: 38px;
-            font-weight: 700;
-            width: 100%;
-            margin-bottom: 28px;
-            letter-spacing: -0.5px;
-            line-height: 1.2;
+            background: transparent; border: none; outline: none; color: white;
+            font-family: 'Lora', serif; font-size: 38px; font-weight: 700;
+            width: 100%; margin-bottom: 28px; letter-spacing: -0.5px; line-height: 1.2;
         }
         .document-title::placeholder { color: rgba(255,255,255,0.25); }
 
         .rich-text {
-            font-size: 16px;
-            line-height: 1.85;
-            color: rgba(255,255,255,0.88);
-            outline: none;
-            flex: 1;
-            font-family: 'DM Sans', sans-serif;
+            font-size: 16px; line-height: 1.85; color: rgba(255,255,255,0.88);
+            outline: none; flex: 1; font-family: 'DM Sans', sans-serif; min-height: 200px;
         }
-        .rich-text:empty::before {
-            content: "Start writing…";
-            color: rgba(255,255,255,0.2);
-            pointer-events: none;
-        }
+        .rich-text:empty::before { content: "Start writing…"; color: rgba(255,255,255,0.2); pointer-events: none; }
         .rich-text p { margin-bottom: 20px; }
         .rich-text h1 { font-family: 'Lora', serif; font-size: 28px; font-weight: 700; margin-bottom: 16px; color: #fff; }
         .rich-text h2 { font-family: 'Lora', serif; font-size: 22px; font-weight: 600; margin-bottom: 14px; color: #fff; }
@@ -319,173 +178,112 @@
         .rich-text li { margin-bottom: 6px; }
 
         .no-note-placeholder {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            opacity: 0.35;
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 12px; opacity: 0.35;
         }
         .no-note-placeholder p { font-size: 15px; }
 
         .editor-footer {
-            padding: 10px 24px;
-            border-top: 1px solid rgba(255,255,255,0.06);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            font-size: 12px;
-            color: rgba(255,255,255,0.3);
-            flex-shrink: 0;
+            padding: 10px 24px; border-top: 1px solid rgba(255,255,255,0.06);
+            display: flex; align-items: center; gap: 16px;
+            font-size: 12px; color: rgba(255,255,255,0.3); flex-shrink: 0;
         }
 
+        /* ── TOAST ── */
         .toast {
-            position: fixed;
-            bottom: 32px;
-            left: 50%;
+            position: fixed; bottom: 32px; left: 50%;
             transform: translateX(-50%) translateY(20px);
-            background: rgba(30,30,30,0.92);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 100px;
-            padding: 10px 20px;
-            font-size: 13px;
-            color: rgba(255,255,255,0.85);
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s var(--transition-spring);
-            z-index: 9999;
+            background: rgba(30,30,30,0.92); backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 100px;
+            padding: 10px 20px; font-size: 13px; color: rgba(255,255,255,0.85);
+            opacity: 0; pointer-events: none; transition: all 0.3s var(--transition-spring); z-index: 9999;
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+        /* ── MODAL ── */
         .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
-        .modal-overlay.show {
-            opacity: 1;
-            pointer-events: all;
-        }
+        .modal-overlay.show { opacity: 1; pointer-events: all; }
 
         .modal-content {
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 32px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            background: rgba(20,20,30,0.92); backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 32px; max-width: 480px; width: 90%;
+            max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            transform: translateY(10px); transition: transform 0.3s var(--transition-spring);
         }
+        .modal-overlay.show .modal-content { transform: translateY(0); }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .modal-header h3 {
-            font-size: 20px;
-            font-weight: 700;
-            font-family: 'Lora', serif;
-        }
-
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { font-size: 20px; font-weight: 700; font-family: 'Lora', serif; }
         .modal-close {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            opacity: 0.6;
-            transition: opacity 0.2s;
-            padding: 0;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: none; border: none; color: white; font-size: 24px; cursor: pointer;
+            opacity: 0.6; transition: opacity 0.2s; width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
         }
         .modal-close:hover { opacity: 1; }
 
-        .modal-options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
+        .modal-label { font-size: 12px; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+
+        .modal-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px; }
 
         .modal-option {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 12px;
-            padding: 12px 16px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 14px;
-            text-align: left;
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px; padding: 10px 14px; color: white; cursor: pointer;
+            transition: all 0.18s; font-size: 13px; text-align: left;
+            font-family: 'DM Sans', sans-serif;
         }
-        .modal-option:hover {
-            background: rgba(255,255,255,0.12);
-            border-color: rgba(255,255,255,0.25);
-        }
+        .modal-option:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); }
+        .modal-option.selected { background: rgba(74,222,128,0.15); border-color: rgba(74,222,128,0.5); color: #4ade80; }
 
-        .modal-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-        }
-
+        .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
         .btn-cancel {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.12);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.2s;
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+            color: white; padding: 10px 20px; border-radius: 10px; cursor: pointer;
+            font-size: 13px; font-weight: 600; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
         }
-        .btn-cancel:hover {
-            background: rgba(255,255,255,0.12);
+        .btn-cancel:hover { background: rgba(255,255,255,0.12); }
+        .btn-apply {
+            background: rgba(74,222,128,0.85); border: none; color: #0a1a0a;
+            padding: 10px 24px; border-radius: 10px; cursor: pointer; font-size: 13px;
+            font-weight: 700; transition: all 0.2s; font-family: 'DM Sans', sans-serif; min-width: 100px;
+        }
+        .btn-apply:hover:not(:disabled) { background: #4ade80; box-shadow: 0 4px 16px rgba(74,222,128,0.35); }
+        .btn-apply:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Loading spinner inside button */
+        .btn-apply.loading::after {
+            content: '';
+            display: inline-block;
+            width: 12px; height: 12px;
+            border: 2px solid rgba(0,0,0,0.3);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* AI overlay while processing */
+        .ai-processing-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 12px;
+            border-radius: 28px; z-index: 10; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .ai-processing-overlay.show { opacity: 1; pointer-events: all; }
+        .ai-processing-overlay p { font-size: 14px; opacity: 0.7; }
+        .ai-spinner {
+            width: 32px; height: 32px; border: 2px solid rgba(255,255,255,0.2);
+            border-top-color: #4ade80; border-radius: 50%; animation: spin 0.8s linear infinite;
         }
 
-        .btn-apply {
-            background: var(--success);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .btn-apply:hover {
-            background: rgba(74, 222, 128, 1);
-            box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
-        }
-        .btn-apply:disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
+        .editor-wrapper { position: relative; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
     </style>
 </head>
 <body>
@@ -507,28 +305,28 @@
             <h2>Notes</h2>
             <button class="new-note-btn" id="newNoteBtn" title="New note">+</button>
         </div>
-
         <div class="search-wrap">
             <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input class="search-input" id="searchInput" type="text" placeholder="Search notes…">
         </div>
-
         <div class="note-list" id="noteList"></div>
     </aside>
 
     <main class="editor-container" id="editorContainer"></main>
 </div>
 
+<!-- Transform Modal -->
 <div class="modal-overlay" id="transformModal">
     <div class="modal-content">
         <div class="modal-header">
             <h3 id="modalTitle">Transform Note</h3>
-            <button class="modal-close" onclick="closeTransformModal()">×</button>
+            <button class="modal-close" id="modalCloseBtn">×</button>
         </div>
+        <div class="modal-label">Choose a style</div>
         <div class="modal-options" id="modalOptions"></div>
         <div class="modal-buttons">
-            <button class="btn-cancel" onclick="closeTransformModal()">Cancel</button>
-            <button class="btn-apply" id="applyBtn" onclick="applyTransform()">Apply</button>
+            <button class="btn-cancel" id="modalCancelBtn">Cancel</button>
+            <button class="btn-apply" id="applyBtn">Apply</button>
         </div>
     </div>
 </div>
@@ -536,119 +334,125 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ─────────────────────────────────────────────
+//  CONFIG
+// ─────────────────────────────────────────────
 const STORAGE_KEY = 'syllastudy_notes';
 const ACTIVE_KEY  = 'syllastudy_active_note';
 
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
 let notes = [];
 let activeId = null;
 let saveTimer = null;
 let searchQuery = '';
-let currentTransformAction = null;
-let selectedTransformOption = null;
+let currentAction = null;
+let selectedOption = null;
+let isProcessing = false;
 
-// ── SAFE UTILITY FUNCTIONS ──
-
+// ─────────────────────────────────────────────
+//  UTILITIES
+// ─────────────────────────────────────────────
 function uid() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
 function formatDate(ts) {
-    const d = new Date(ts);
-    const now = new Date();
-    const diffMs = now - d;
-    const diffMin = Math.floor(diffMs / 60000);
-    const diffHr  = Math.floor(diffMin / 60);
-    const diffDay = Math.floor(diffHr / 24);
-    if (diffMin < 1)  return 'Just now';
-    if (diffMin < 60) return `${diffMin}m ago`;
-    if (diffHr < 24)  return `${diffHr}h ago`;
-    if (diffDay === 1) return 'Yesterday';
-    if (diffDay < 7)  return `${diffDay} days ago`;
+    const d = new Date(ts), now = new Date();
+    const mins = Math.floor((now - d) / 60000);
+    const hrs = Math.floor(mins / 60);
+    const days = Math.floor(hrs / 24);
+    if (mins < 1)  return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    if (hrs  < 24) return `${hrs}h ago`;
+    if (days === 1) return 'Yesterday';
+    if (days < 7)  return `${days} days ago`;
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 function stripHtml(html) {
-    if (!html || typeof html !== 'string') return '';
-    const tmp = document.createElement('div');
-    tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || '';
+    if (!html) return '';
+    const d = document.createElement('div');
+    d.innerHTML = html;
+    return d.textContent || d.innerText || '';
 }
 
 function wordCount(html) {
-    if (!html || typeof html !== 'string') return 0;
-    const text = stripHtml(html).trim();
+    const text = stripHtml(html || '').trim();
     return text ? text.split(/\s+/).length : 0;
 }
 
-function escHtml(str) {
+function esc(str) {
     if (!str) return '';
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── STORAGE ──
+// Convert plain text (with newlines) to safe HTML paragraphs
+function textToHtml(text) {
+    if (!text) return '';
+    return text
+        .split(/\n\n+/)
+        .map(para => para.trim())
+        .filter(Boolean)
+        .map(para => {
+            // Preserve single newlines within a paragraph as <br>
+            const inner = para.replace(/\n/g, '<br>');
+            // Escape HTML but preserve the <br> we just added
+            return `<p>${inner}</p>`;
+        })
+        .join('');
+}
 
+// ─────────────────────────────────────────────
+//  STORAGE
+// ─────────────────────────────────────────────
 function loadFromStorage() {
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        notes = raw ? JSON.parse(raw) : [];
-    } catch(e) {
-        notes = [];
-    }
-    try {
-        activeId = localStorage.getItem(ACTIVE_KEY) || null;
-    } catch(e) {
-        activeId = null;
-    }
+    try { notes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { notes = []; }
+    try { activeId = localStorage.getItem(ACTIVE_KEY) || null; } catch { activeId = null; }
 }
 
 function saveToStorage() {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
         if (activeId) localStorage.setItem(ACTIVE_KEY, activeId);
-    } catch(e) {
-        showToast('⚠️ Storage full');
+        else localStorage.removeItem(ACTIVE_KEY);
+    } catch {
+        showToast('⚠️ Storage full — oldest notes may not save');
     }
 }
 
-// ── TOAST ──
-
-function showToast(msg, duration = 2200) {
+// ─────────────────────────────────────────────
+//  TOAST
+// ─────────────────────────────────────────────
+let toastTimer = null;
+function showToast(msg, duration = 2400) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), duration);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), duration);
 }
 
-// ── NOTE CRUD ──
-
+// ─────────────────────────────────────────────
+//  NOTE CRUD
+// ─────────────────────────────────────────────
 function createNote() {
-    const note = {
-        id: uid(),
-        title: '',
-        content: '',
-        createdAt: Date.now(),
-        updatedAt: Date.now()
-    };
+    const note = { id: uid(), title: '', content: '', createdAt: Date.now(), updatedAt: Date.now() };
     notes.unshift(note);
     saveToStorage();
     selectNote(note.id);
-    renderSidebar();
-    setTimeout(() => {
-        const titleEl = document.getElementById('docTitle');
-        if (titleEl) titleEl.focus();
-    }, 50);
+    setTimeout(() => { document.getElementById('docTitle')?.focus(); }, 60);
 }
 
 function deleteNote(id) {
     const idx = notes.findIndex(n => n.id === id);
     if (idx === -1) return;
     notes.splice(idx, 1);
-    saveToStorage();
     if (activeId === id) {
-        activeId = notes.length > 0 ? notes[0].id : null;
-        if (activeId) localStorage.setItem(ACTIVE_KEY, activeId);
-        else localStorage.removeItem(ACTIVE_KEY);
+        activeId = notes[0]?.id || null;
     }
+    saveToStorage();
     renderSidebar();
     renderEditor();
 }
@@ -656,7 +460,6 @@ function deleteNote(id) {
 function selectNote(id) {
     flushSave();
     activeId = id;
-    localStorage.setItem(ACTIVE_KEY, id);
     renderSidebar();
     renderEditor();
 }
@@ -666,24 +469,33 @@ function updateActiveNote(field, value) {
     if (!note) return;
     note[field] = value;
     note.updatedAt = Date.now();
-
     clearTimeout(saveTimer);
     showAutosave(true);
     saveTimer = setTimeout(() => {
         saveToStorage();
+        // Only re-render sidebar (not editor) to avoid losing cursor position
         renderSidebar();
         showAutosave(false);
-    }, 600);
+    }, 700);
 }
 
 function flushSave() {
     clearTimeout(saveTimer);
+    const note = notes.find(n => n.id === activeId);
+    if (note) {
+        // Sync DOM content to note object before saving
+        const rt = document.getElementById('richText');
+        const dt = document.getElementById('docTitle');
+        if (rt) note.content = rt.innerHTML;
+        if (dt) note.title = dt.value;
+        note.updatedAt = Date.now();
+    }
     saveToStorage();
-    showAutosave(false);
 }
 
-// ── AUTOSAVE ──
-
+// ─────────────────────────────────────────────
+//  AUTOSAVE INDICATOR
+// ─────────────────────────────────────────────
 function showAutosave(saving) {
     const el = document.getElementById('autosaveIndicator');
     if (!el) return;
@@ -693,313 +505,123 @@ function showAutosave(saving) {
     } else {
         el.innerHTML = '<span style="color:#4ade80">✓</span> Saved';
         el.classList.add('show');
-        setTimeout(() => el.classList.remove('show'), 1500);
+        setTimeout(() => el.classList.remove('show'), 1600);
     }
 }
 
-// ── SIDEBAR ──
-
+// ─────────────────────────────────────────────
+//  SIDEBAR
+// ─────────────────────────────────────────────
 function renderSidebar() {
     const list = document.getElementById('noteList');
     const q = searchQuery.toLowerCase();
+    const filtered = notes.filter(n =>
+        !q || (n.title || '').toLowerCase().includes(q) || stripHtml(n.content || '').toLowerCase().includes(q)
+    );
 
-    const filtered = notes.filter(n => {
-        if (!q) return true;
-        return (n.title || '').toLowerCase().includes(q) ||
-               stripHtml(n.content || '').toLowerCase().includes(q);
-    });
-
-    if (filtered.length === 0) {
-        list.innerHTML = `
-            <div class="empty-state">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                <p>${q ? 'No results' : 'No notes yet'}</p>
-                ${!q ? '<p style="font-size:12px;opacity:.6">Click + to create one</p>' : ''}
-            </div>`;
+    if (!filtered.length) {
+        list.innerHTML = `<div class="empty-state">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            <p>${q ? 'No results' : 'No notes yet'}</p>
+            ${!q ? '<p style="font-size:12px;opacity:.6">Click + to create one</p>' : ''}
+        </div>`;
         return;
     }
 
-    list.innerHTML = filtered.map(n => {
-        const snippet = stripHtml(n.content || '').slice(0, 60);
-        const isActive = n.id === activeId;
-        return `
-            <div class="note-item ${isActive ? 'active' : ''}" data-id="${n.id}" onclick="selectNote('${n.id}')">
-                <div class="note-item-content">
-                    <div class="note-title-preview">${escHtml(n.title) || 'Untitled'}</div>
-                    <div class="note-snippet">${escHtml(snippet) || 'No content'}</div>
-                    <div class="note-date">${formatDate(n.updatedAt)}</div>
-                </div>
-                <button class="delete-btn" title="Delete note" onclick="event.stopPropagation(); confirmDelete('${n.id}')">×</button>
-            </div>`;
-    }).join('');
+    list.innerHTML = filtered.map(n => `
+        <div class="note-item ${n.id === activeId ? 'active' : ''}" onclick="selectNote('${n.id}')">
+            <div class="note-item-content">
+                <div class="note-title-preview">${esc(n.title) || 'Untitled'}</div>
+                <div class="note-snippet">${esc(stripHtml(n.content || '').slice(0, 60)) || 'No content'}</div>
+                <div class="note-date">${formatDate(n.updatedAt)}</div>
+            </div>
+            <button class="delete-btn" title="Delete" onclick="event.stopPropagation(); confirmDelete('${n.id}')">×</button>
+        </div>`).join('');
 }
 
 function confirmDelete(id) {
     const note = notes.find(n => n.id === id);
-    const title = note?.title || 'Untitled';
-    if (confirm(`Delete "${title}"?\nThis cannot be undone.`)) {
+    if (confirm(`Delete "${note?.title || 'Untitled'}"?\nThis cannot be undone.`)) {
         deleteNote(id);
         showToast('🗑 Note deleted');
     }
 }
 
-// ── AI TRANSFORM MODAL ──
-
-function openTransformModal(action) {
-    const note = notes.find(n => n.id === activeId);
-    if (!note || !note.content || stripHtml(note.content).trim().length === 0) {
-        showToast('✍️ Add some content first');
-        return;
-    }
-
-    currentTransformAction = action;
-    selectedTransformOption = null;
-
-    const transformConfigs = {
-        summarize: {
-            title: 'Summarize',
-            options: [
-                { label: 'Quick summary', value: 'brief' },
-                { label: 'Detailed summary', value: 'detailed' },
-                { label: 'Bullet points', value: 'bullets' }
-            ]
-        },
-        rewrite: {
-            title: 'Rewrite',
-            options: [
-                { label: 'More concise', value: 'concise' },
-                { label: 'More academic', value: 'academic' },
-                { label: 'More casual', value: 'casual' },
-                { label: 'More structured', value: 'structured' }
-            ]
-        },
-        extract: {
-            title: 'Extract',
-            options: [
-                { label: 'Key points', value: 'key_points' },
-                { label: 'Definitions', value: 'definitions' },
-                { label: 'Concepts', value: 'concepts' },
-                { label: 'Action items', value: 'action_items' }
-            ]
-        },
-        generate: {
-            title: 'Generate',
-            options: [
-                { label: 'Flashcards', value: 'flashcards' },
-                { label: 'Study questions', value: 'study_questions' },
-                { label: 'Outline', value: 'outline' },
-                { label: 'Mind map (text)', value: 'mindmap' },
-                { label: 'Study plan', value: 'study_plan' }
-            ]
-        },
-        explain: {
-            title: 'Explain',
-            options: [
-                { label: 'Like I\'m 5', value: 'simple' },
-                { label: 'Like I\'m 12', value: 'intermediate' },
-                { label: 'Like a professor', value: 'advanced' }
-            ]
-        },
-        expand: {
-            title: 'Expand',
-            options: [
-                { label: 'Expand all points', value: 'full' },
-                { label: 'Add examples', value: 'examples' },
-                { label: 'Add explanations', value: 'explanations' }
-            ]
-        },
-        translate: {
-            title: 'Translate',
-            options: [
-                { label: 'Spanish', value: 'es' },
-                { label: 'French', value: 'fr' },
-                { label: 'German', value: 'de' },
-                { label: 'Chinese', value: 'zh' },
-                { label: 'Japanese', value: 'ja' }
-            ]
-        }
-    };
-
-    const config = transformConfigs[action];
-    const titleEl = document.getElementById('modalTitle');
-    const optionsEl = document.getElementById('modalOptions');
-
-    titleEl.textContent = config.title;
-    optionsEl.innerHTML = config.options.map(opt => `
-        <div class="modal-option" onclick="selectTransformOption('${opt.value}')">
-            ${opt.label}
-        </div>
-    `).join('');
-
-    document.getElementById('transformModal').classList.add('show');
-}
-
-function closeTransformModal() {
-    document.getElementById('transformModal').classList.remove('show');
-    currentTransformAction = null;
-    selectedTransformOption = null;
-}
-
-function selectTransformOption(value) {
-    selectedTransformOption = value;
-    
-    const options = document.querySelectorAll('.modal-option');
-    options.forEach(opt => {
-        if (opt.textContent.includes(value)) {
-            opt.style.background = 'rgba(74, 222, 128, 0.2)';
-            opt.style.borderColor = 'rgba(74, 222, 128, 0.5)';
-        } else {
-            opt.style.background = 'rgba(255,255,255,0.08)';
-            opt.style.borderColor = 'rgba(255,255,255,0.12)';
-        }
-    });
-}
-
-async function applyTransform() {
-    if (!currentTransformAction || !selectedTransformOption) {
-        showToast('Please select an option');
-        return;
-    }
-
-    const note = notes.find(n => n.id === activeId);
-    if (!note) return;
-
-    // Save before closeTransformModal() resets currentTransformAction to null
-    const actionName = currentTransformAction;
-
-    const applyBtn = document.getElementById('applyBtn');
-    applyBtn.disabled = true;
-    applyBtn.classList.add('loading');
-    applyBtn.textContent = 'Processing…';
-
-    try {
-        const plainText = stripHtml(note.content);
-        if (!plainText || plainText.trim().length === 0) {
-            throw new Error('Content is empty');
-        }
-
-        const result = await callAITransform(
-            actionName,
-            selectedTransformOption,
-            plainText
-        );
-
-        if (result && result.trim().length > 0) {
-            updateActiveNote('content', `<p>${result.replace(/\n/g, '</p><p>')}</p>`);
-            closeTransformModal();
-            showToast(`✨ ${actionName.charAt(0).toUpperCase() + actionName.slice(1)} complete`);
-        } else {
-            throw new Error('No result received');
-        }
-    } catch (err) {
-        console.error('Transform error:', err);
-        showToast('⚠️ ' + err.message);
-    } finally {
-        applyBtn.disabled = false;
-        applyBtn.classList.remove('loading');
-        applyBtn.textContent = 'Apply';
-    }
-}
-
-// ── API CALL ──
-
-async function callAITransform(action, option, content) {
-    if (!content || typeof content !== 'string' || content.trim().length === 0) {
-        throw new Error('Content is empty or invalid');
-    }
-
-    if (!action || !option) {
-        throw new Error('Missing action or option');
-    }
-
-    console.log('Sending transform request:', { action, option, contentLength: content.length });
-
-    const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            type: 'transform',
-            action: action,
-            option: option,
-            content: content.trim()
-        })
-    });
-
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-    }
-
-    const data = await response.json();
-    
-    if (data.error) {
-        throw new Error(data.error);
-    }
-
-    if (!data.result) {
-        throw new Error('No result in response');
-    }
-
-    return data.result;
-}
-
-// ── EDITOR ──
-
+// ─────────────────────────────────────────────
+//  EDITOR RENDER
+// ─────────────────────────────────────────────
 function renderEditor() {
     const container = document.getElementById('editorContainer');
     const note = notes.find(n => n.id === activeId);
 
     if (!note) {
-        container.innerHTML = `
-            <div class="no-note-placeholder">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                <p>Select a note or create a new one</p>
-            </div>`;
+        container.innerHTML = `<div class="no-note-placeholder">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            <p>Select a note or create a new one</p>
+        </div>`;
         return;
     }
 
     container.innerHTML = `
         <div class="toolbar">
-            <button class="tool-btn" onclick="execCmd('bold')" title="Bold"><b>B</b></button>
-            <button class="tool-btn" onclick="execCmd('italic')" title="Italic"><i style="font-family:serif">I</i></button>
-            <button class="tool-btn" onclick="execCmd('underline')" title="Underline" style="text-decoration:underline">U</button>
-            <button class="tool-btn" onclick="execCmd('strikeThrough')" title="Strikethrough" style="text-decoration:line-through">S</button>
+            <button class="tool-btn" onmousedown="preventDefault(event)" onclick="execCmd('bold')"><b>B</b></button>
+            <button class="tool-btn" onmousedown="preventDefault(event)" onclick="execCmd('italic')"><i style="font-family:serif">I</i></button>
+            <button class="tool-btn" onmousedown="preventDefault(event)" onclick="execCmd('underline')" style="text-decoration:underline">U</button>
+            <button class="tool-btn" onmousedown="preventDefault(event)" onclick="execCmd('strikeThrough')" style="text-decoration:line-through">S</button>
             <div class="tool-sep"></div>
-            <button class="tool-btn" onclick="execCmd('formatBlock','h1')" title="Heading 1">H1</button>
-            <button class="tool-btn" onclick="execCmd('formatBlock','h2')" title="Heading 2">H2</button>
-            <button class="tool-btn" onclick="execCmd('formatBlock','p')" title="Paragraph">¶</button>
+            <button class="tool-btn" onmousedown="preventDefault(event)" onclick="execCmd('formatBlock','h1')">H1</button>
+            <button class="tool-btn" onmousedown="preventDefault(event)" onclick="execCmd('formatBlock','h2')">H2</button>
+            <button class="tool-btn" onmousedown="preventDefault(event)" onclick="execCmd('formatBlock','p')">¶</button>
             <div class="tool-sep"></div>
-            <button class="tool-btn" onclick="execCmd('insertUnorderedList')" title="Bullet list">• List</button>
-            <button class="tool-btn" onclick="execCmd('insertOrderedList')" title="Numbered list">1. List</button>
+            <button class="tool-btn" onmousedown="preventDefault(event)" onclick="execCmd('insertUnorderedList')">• List</button>
+            <button class="tool-btn" onmousedown="preventDefault(event)" onclick="execCmd('insertOrderedList')">1. List</button>
             <div class="tool-sep"></div>
-            <button class="tool-btn" onclick="execCmd('undo')" title="Undo">↩</button>
-            <button class="tool-btn" onclick="execCmd('redo')" title="Redo">↪</button>
+            <button class="tool-btn" onmousedown="preventDefault(event)" onclick="execCmd('undo')">↩</button>
+            <button class="tool-btn" onmousedown="preventDefault(event)" onclick="execCmd('redo')">↪</button>
             <div class="tool-sep"></div>
-            <button class="tool-btn" onclick="openTransformModal('summarize')" title="Summarize">📝 Sum</button>
-            <button class="tool-btn" onclick="openTransformModal('rewrite')" title="Rewrite">✏️ Rewrite</button>
-            <button class="tool-btn" onclick="openTransformModal('extract')" title="Extract">🔍 Extract</button>
-            <button class="tool-btn" onclick="openTransformModal('generate')" title="Generate">✨ Gen</button>
-            <button class="tool-btn" onclick="openTransformModal('explain')" title="Explain">💡 Explain</button>
-            <button class="tool-btn" onclick="openTransformModal('expand')" title="Expand">📖 Expand</button>
-            <button class="tool-btn" onclick="openTransformModal('translate')" title="Translate">🌐 Translate</button>
+            <button class="tool-btn" onclick="openTransformModal('summarize')">📝 Sum</button>
+            <button class="tool-btn" onclick="openTransformModal('rewrite')">✏️ Rewrite</button>
+            <button class="tool-btn" onclick="openTransformModal('extract')">🔍 Extract</button>
+            <button class="tool-btn" onclick="openTransformModal('generate')">✨ Gen</button>
+            <button class="tool-btn" onclick="openTransformModal('explain')">💡 Explain</button>
+            <button class="tool-btn" onclick="openTransformModal('expand')">📖 Expand</button>
+            <button class="tool-btn" onclick="openTransformModal('translate')">🌐 Translate</button>
             <div class="autosave-indicator" id="autosaveIndicator"></div>
         </div>
-        <div class="editor-body">
-            <input type="text" class="document-title" id="docTitle" placeholder="Untitled Document" value="${escHtml(note.title)}" oninput="updateActiveNote('title', this.value)">
-            <div class="rich-text" id="richText" contenteditable="true" spellcheck="true">${note.content || ''}</div>
+        <div class="editor-wrapper">
+            <div class="editor-body">
+                <input type="text" class="document-title" id="docTitle"
+                    placeholder="Untitled Document"
+                    value="${esc(note.title)}"
+                    oninput="updateActiveNote('title', this.value)">
+                <div class="rich-text" id="richText" contenteditable="true" spellcheck="true">${note.content || ''}</div>
+            </div>
+            <div class="ai-processing-overlay" id="aiOverlay">
+                <div class="ai-spinner"></div>
+                <p id="aiOverlayMsg">Processing with AI…</p>
+            </div>
         </div>
         <div class="editor-footer">
             <span id="wordCountEl">0 words</span>
             <span>·</span>
-            <span>Last edited ${formatDate(note.updatedAt)}</span>
+            <span id="lastEditedEl">Last edited ${formatDate(note.updatedAt)}</span>
         </div>`;
 
     const richText = document.getElementById('richText');
+
     richText.addEventListener('input', () => {
         updateActiveNote('content', richText.innerHTML);
         updateWordCount();
     });
 
+    // Clean paste — plain text only
     richText.addEventListener('paste', (e) => {
         e.preventDefault();
         const text = e.clipboardData.getData('text/plain');
@@ -1013,73 +635,352 @@ function updateWordCount() {
     const el = document.getElementById('wordCountEl');
     const rt = document.getElementById('richText');
     if (!el || !rt) return;
-    const count = wordCount(rt.innerHTML);
-    el.textContent = `${count} word${count !== 1 ? 's' : ''}`;
+    const n = wordCount(rt.innerHTML);
+    el.textContent = `${n} word${n !== 1 ? 's' : ''}`;
 }
+
+function preventDefault(e) { e.preventDefault(); }
 
 function execCmd(cmd, value = null) {
-    const rt = document.getElementById('richText');
-    if (rt) rt.focus();
     document.execCommand(cmd, false, value);
-    setTimeout(() => {
-        if (rt) {
-            updateActiveNote('content', rt.innerHTML);
-            updateWordCount();
-        }
-    }, 10);
+    const rt = document.getElementById('richText');
+    if (rt) {
+        rt.focus();
+        updateActiveNote('content', rt.innerHTML);
+        updateWordCount();
+    }
 }
 
-// ── EVENTS ──
+// ─────────────────────────────────────────────
+//  AI TRANSFORM CONFIGS
+// ─────────────────────────────────────────────
+const TRANSFORM_CONFIGS = {
+    summarize: {
+        title: '📝 Summarize',
+        options: [
+            { label: 'Quick summary', value: 'brief' },
+            { label: 'Detailed summary', value: 'detailed' },
+            { label: 'Bullet points', value: 'bullets' }
+        ]
+    },
+    rewrite: {
+        title: '✏️ Rewrite',
+        options: [
+            { label: 'More concise', value: 'concise' },
+            { label: 'More academic', value: 'academic' },
+            { label: 'More casual', value: 'casual' },
+            { label: 'More structured', value: 'structured' }
+        ]
+    },
+    extract: {
+        title: '🔍 Extract',
+        options: [
+            { label: 'Key points', value: 'key_points' },
+            { label: 'Definitions', value: 'definitions' },
+            { label: 'Concepts', value: 'concepts' },
+            { label: 'Action items', value: 'action_items' }
+        ]
+    },
+    generate: {
+        title: '✨ Generate',
+        options: [
+            { label: 'Flashcards', value: 'flashcards' },
+            { label: 'Study questions', value: 'study_questions' },
+            { label: 'Outline', value: 'outline' },
+            { label: 'Mind map (text)', value: 'mindmap' },
+            { label: 'Study plan', value: 'study_plan' }
+        ]
+    },
+    explain: {
+        title: '💡 Explain',
+        options: [
+            { label: "Like I'm 5", value: 'simple' },
+            { label: "Like I'm 12", value: 'intermediate' },
+            { label: 'Like a professor', value: 'advanced' }
+        ]
+    },
+    expand: {
+        title: '📖 Expand',
+        options: [
+            { label: 'Expand all points', value: 'full' },
+            { label: 'Add examples', value: 'examples' },
+            { label: 'Add explanations', value: 'explanations' }
+        ]
+    },
+    translate: {
+        title: '🌐 Translate',
+        options: [
+            { label: 'Spanish', value: 'es' },
+            { label: 'French', value: 'fr' },
+            { label: 'German', value: 'de' },
+            { label: 'Chinese', value: 'zh' },
+            { label: 'Japanese', value: 'ja' }
+        ]
+    }
+};
 
-document.getElementById('searchInput').addEventListener('input', (e) => {
+// ─────────────────────────────────────────────
+//  BUILD PROMPT
+// ─────────────────────────────────────────────
+function buildPrompt(action, option, content) {
+    const prompts = {
+        summarize: {
+            brief:    `Summarize this text in 2-3 concise sentences:\n\n${content}`,
+            detailed: `Write a detailed summary of this text, covering all main points:\n\n${content}`,
+            bullets:  `Summarize this text as clear bullet points (use • for each point):\n\n${content}`
+        },
+        rewrite: {
+            concise:    `Rewrite this text to be more concise while preserving all key information:\n\n${content}`,
+            academic:   `Rewrite this text in a formal academic tone:\n\n${content}`,
+            casual:     `Rewrite this text in a friendly, casual conversational tone:\n\n${content}`,
+            structured: `Rewrite this text with clear structure. Use headings and organised paragraphs:\n\n${content}`
+        },
+        extract: {
+            key_points:  `Extract the key points from this text as a numbered list:\n\n${content}`,
+            definitions: `Extract all definitions, terms, and their meanings from this text as a list:\n\n${content}`,
+            concepts:    `Extract the main concepts and ideas from this text as a list:\n\n${content}`,
+            action_items:`Extract all action items and tasks from this text as a numbered list:\n\n${content}`
+        },
+        generate: {
+            flashcards:     `Generate 6-10 flashcards from this text. Format each as:\nQ: [question]\nA: [answer]\n\nText:\n${content}`,
+            study_questions:`Generate 8 study questions (mix of recall, comprehension, and application) from this text:\n\n${content}`,
+            outline:        `Generate a structured outline with main headings and sub-points from this text:\n\n${content}`,
+            mindmap:        `Create a text-based mind map of the key ideas. Use indentation to show hierarchy:\n\n${content}`,
+            study_plan:     `Create a 5-step study plan for mastering the topics in this text:\n\n${content}`
+        },
+        explain: {
+            simple:       `Explain this text as if talking to a 5-year-old. Use very simple words and analogies:\n\n${content}`,
+            intermediate: `Explain this text as if talking to a curious 12-year-old student:\n\n${content}`,
+            advanced:     `Explain this text at a graduate/professor level, using technical terminology where appropriate:\n\n${content}`
+        },
+        expand: {
+            full:         `Expand on all the points in this text with more depth and detail:\n\n${content}`,
+            examples:     `Rewrite this text adding concrete, real-world examples for each point:\n\n${content}`,
+            explanations: `Rewrite this text adding clear explanations and reasoning for each point:\n\n${content}`
+        },
+        translate: {
+            es: `Translate the following text to Spanish:\n\n${content}`,
+            fr: `Translate the following text to French:\n\n${content}`,
+            de: `Translate the following text to German:\n\n${content}`,
+            zh: `Translate the following text to Simplified Chinese:\n\n${content}`,
+            ja: `Translate the following text to Japanese:\n\n${content}`
+        }
+    };
+    return prompts[action]?.[option] || null;
+}
+
+// ─────────────────────────────────────────────
+//  MODAL
+// ─────────────────────────────────────────────
+function openTransformModal(action) {
+    const note = notes.find(n => n.id === activeId);
+    if (!note) { showToast('No note selected'); return; }
+
+    const plainText = stripHtml(note.content || '').trim();
+    if (!plainText) { showToast('✍️ Write something first'); return; }
+
+    currentAction = action;
+    selectedOption = null;
+
+    const config = TRANSFORM_CONFIGS[action];
+    document.getElementById('modalTitle').textContent = config.title;
+
+    const optionsEl = document.getElementById('modalOptions');
+    optionsEl.innerHTML = config.options.map(opt =>
+        `<div class="modal-option" data-value="${opt.value}" onclick="selectTransformOption(this, '${opt.value}')">${opt.label}</div>`
+    ).join('');
+
+    const applyBtn = document.getElementById('applyBtn');
+    applyBtn.textContent = 'Apply';
+    applyBtn.disabled = false;
+    applyBtn.classList.remove('loading');
+
+    document.getElementById('transformModal').classList.add('show');
+}
+
+function closeTransformModal() {
+    document.getElementById('transformModal').classList.remove('show');
+    // Don't reset currentAction/selectedOption here — applyTransform may still be running
+}
+
+function selectTransformOption(el, value) {
+    selectedOption = value;
+    document.querySelectorAll('.modal-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+}
+
+// ─────────────────────────────────────────────
+//  APPLY TRANSFORM  (the main fixed function)
+// ─────────────────────────────────────────────
+async function applyTransform() {
+    if (!selectedOption) { showToast('Please select an option first'); return; }
+    if (!currentAction)  { showToast('Something went wrong — reopen the menu'); return; }
+    if (isProcessing)    return;
+
+    const note = notes.find(n => n.id === activeId);
+    if (!note) { showToast('No active note'); return; }
+
+    const plainText = stripHtml(note.content || '').trim();
+    if (!plainText) { showToast('✍️ Write something first'); return; }
+
+    const prompt = buildPrompt(currentAction, selectedOption, plainText);
+    if (!prompt) { showToast('Unknown transform option'); return; }
+
+    // Snapshot action/option before closing modal (closing resets nothing now)
+    const action = currentAction;
+    const option = selectedOption;
+
+    // UI: set loading state
+    isProcessing = true;
+    const applyBtn = document.getElementById('applyBtn');
+    applyBtn.disabled = true;
+    applyBtn.classList.add('loading');
+    applyBtn.textContent = 'Working';
+
+    // Close modal — editor overlay will show progress
+    closeTransformModal();
+
+    // Show overlay on editor
+    const overlay = document.getElementById('aiOverlay');
+    const overlayMsg = document.getElementById('aiOverlayMsg');
+    if (overlay) {
+        overlayMsg.textContent = `${TRANSFORM_CONFIGS[action]?.title || 'Processing'}…`;
+        overlay.classList.add('show');
+    }
+
+    try {
+        const result = await callClaude(prompt);
+
+        if (!result || !result.trim()) throw new Error('AI returned an empty response');
+
+        // Convert result text → HTML
+        const newHTML = textToHtml(result);
+
+        // ── THE CRITICAL FIX: update both the DOM and the note object ──
+        const richText = document.getElementById('richText');
+        if (richText) {
+            richText.innerHTML = newHTML;       // update visible editor immediately
+        }
+        note.content   = newHTML;               // update note object
+        note.updatedAt = Date.now();
+        saveToStorage();                        // persist
+        renderSidebar();                        // update sidebar snippet
+        updateWordCount();                      // update word count
+
+        const label = TRANSFORM_CONFIGS[action]?.title?.replace(/^[^\s]+\s/, '') || action;
+        showToast(`✨ ${label} applied!`);
+
+    } catch (err) {
+        console.error('AI transform error:', err);
+        showToast(`⚠️ ${err.message || 'Something went wrong'}`);
+    } finally {
+        isProcessing = false;
+        if (overlay) overlay.classList.remove('show');
+        // Reset modal button state for next time
+        if (applyBtn) {
+            applyBtn.disabled = false;
+            applyBtn.classList.remove('loading');
+            applyBtn.textContent = 'Apply';
+        }
+        currentAction  = null;
+        selectedOption = null;
+    }
+}
+
+// ─────────────────────────────────────────────
+//  ANTHROPIC API CALL
+// ─────────────────────────────────────────────
+async function callClaude(prompt) {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            messages: [{ role: 'user', content: prompt }]
+        })
+    });
+
+    if (!response.ok) {
+        let errMsg = `HTTP ${response.status}`;
+        try {
+            const errData = await response.json();
+            errMsg = errData?.error?.message || errMsg;
+        } catch {}
+        throw new Error(errMsg);
+    }
+
+    const data = await response.json();
+
+    // Handle all content block types
+    const text = (data.content || [])
+        .filter(block => block.type === 'text')
+        .map(block => block.text)
+        .join('\n')
+        .trim();
+
+    if (!text) throw new Error('No text in AI response');
+    return text;
+}
+
+// ─────────────────────────────────────────────
+//  EVENT LISTENERS
+// ─────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', e => {
     searchQuery = e.target.value;
     renderSidebar();
 });
 
 document.getElementById('newNoteBtn').addEventListener('click', createNote);
+document.getElementById('modalCloseBtn').addEventListener('click', closeTransformModal);
+document.getElementById('modalCancelBtn').addEventListener('click', closeTransformModal);
+document.getElementById('applyBtn').addEventListener('click', applyTransform);
 
-window.addEventListener('beforeunload', () => {
-    flushSave();
+// Close modal on backdrop click
+document.getElementById('transformModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('transformModal')) closeTransformModal();
 });
 
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeTransformModal();
+    // Ctrl/Cmd+S to force save
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        flushSave();
+        showToast('💾 Saved');
+    }
+});
+
+window.addEventListener('beforeunload', flushSave);
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') flushSave();
 });
 
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeTransformModal();
-});
-
-// ── INIT ──
-
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
 function init() {
     loadFromStorage();
 
-    if (notes.length === 0) {
+    if (!notes.length) {
         const demo1 = {
-            id: uid(),
-            title: '2026 Hardware Specs',
-            content: `<p>In the rapidly evolving landscape of productivity tools for 2026, the advanced note taker emerges as a pinnacle of hardware-software synergy, designed exclusively for users seeking cutting-edge functionality.</p><p>The accompanying precision stylus incorporates piezoelectric sensors for variable pressure sensitivity, tilt detection, and haptic feedback loops that simulate the tactile resistance of traditional paper.</p>`,
-            createdAt: Date.now() - 86400000,
-            updatedAt: Date.now() - 300000
+            id: uid(), title: 'Biology Chapter 4 Summary',
+            content: `<p>Cell division includes both mitosis and meiosis. Mitosis produces two genetically identical daughter cells for growth and repair. Meiosis produces four genetically unique haploid cells for reproduction.</p><p>Key stages of mitosis: Prophase, Metaphase, Anaphase, Telophase (PMAT). Chromosomes condense in prophase, align in metaphase, separate in anaphase, and the cell divides in telophase.</p>`,
+            createdAt: Date.now() - 172800000, updatedAt: Date.now() - 86400000
         };
         const demo2 = {
-            id: uid(),
-            title: 'Biology Chapter 4 Summary',
-            content: `<p>Cell division includes both mitosis and meiosis. Mitosis produces two genetically identical daughter cells for growth and repair. Meiosis produces four genetically unique haploid cells for reproduction.</p>`,
-            createdAt: Date.now() - 172800000,
-            updatedAt: Date.now() - 86400000
+            id: uid(), title: 'Project Brainstorming',
+            content: `<h2>Ideas</h2><ul><li>Interactive study dashboard</li><li>Spaced repetition flashcards</li><li>AI-powered quiz generator</li><li>Pomodoro focus timer</li></ul>`,
+            createdAt: Date.now() - 604800000, updatedAt: Date.now() - 604800000
         };
         const demo3 = {
-            id: uid(),
-            title: 'Project Brainstorming',
-            content: `<h2>Ideas</h2><ul><li>Interactive study dashboard</li><li>Spaced repetition flashcards</li><li>AI-powered quiz generator</li></ul>`,
-            createdAt: Date.now() - 604800000,
-            updatedAt: Date.now() - 604800000
+            id: uid(), title: '2026 Hardware Notes',
+            content: `<p>Next-gen productivity hardware is converging on haptic stylus input with piezoelectric pressure sensors. Variable resistance feedback simulates paper texture for natural writing.</p>`,
+            createdAt: Date.now() - 86400000, updatedAt: Date.now() - 300000
         };
-        notes = [demo1, demo2, demo3];
+        notes = [demo3, demo1, demo2];
         saveToStorage();
-        activeId = demo1.id;
+        activeId = demo3.id;
     } else {
         if (!activeId || !notes.find(n => n.id === activeId)) {
             activeId = notes[0]?.id || null;
