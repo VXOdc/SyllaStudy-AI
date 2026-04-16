@@ -12,7 +12,58 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { type, message, history, action, option, content } = req.body;
+    const { type, message, history, action, option, content, goal, notesContext } = req.body;
+
+    // ── AI Task Explosion Mode ──
+    if (type === "task_explosion") {
+      if (!goal) return res.status(400).json({ error: "Missing goal" });
+
+      const taskPrompt = `You are an elite productivity AI. The user has a single session goal: "${goal}".
+      Break this goal down into 4-8 highly actionable micro-tasks. 
+      Assign a realistic time estimate (in minutes) to each task.
+      Assign an energy level requirement for each task: "high", "medium", or "low".
+      
+      If the user provided context from their notes, use it to make the tasks highly specific:
+      [NOTES CONTEXT: ${notesContext || "None provided"}]
+      
+      OUTPUT FORMAT:
+      You MUST return ONLY a raw JSON array of objects. Do not include markdown formatting like \`\`\`json. 
+      Example:
+      [
+        {"text": "Review chapter 7 notes", "time": 10, "energy": "low"},
+        {"text": "Draft main essay body", "time": 45, "energy": "high"}
+      ]`;
+
+      const r = await fetch("https://api.mistral.ai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "mistral-small-latest",
+          messages: [{ role: "user", content: taskPrompt }]
+        })
+      });
+
+      if (!r.ok) {
+        return res.status(r.status).json({ error: `Mistral API error: ${r.status}` });
+      }
+
+      const json = await r.json();
+      const rawContent = json.choices[0].message?.content || "[]";
+      
+      // Clean up potential markdown formatting from Mistral
+      const cleanJsonStr = rawContent.replace(/```json/g, '').replace(/```/g, '').trim();
+      
+      try {
+        const tasks = JSON.parse(cleanJsonStr);
+        return res.status(200).json({ tasks });
+      } catch (parseError) {
+        console.error("Failed to parse Mistral output:", cleanJsonStr);
+        return res.status(500).json({ error: "AI returned invalid task structure." });
+      }
+    }
 
     // ── Regular Chat Mode ──
     if (type === "chat" || !type) {
@@ -69,12 +120,6 @@ module.exports = async function handler(req, res) {
       }
 
       const json = await r.json();
-      
-      if (!json.choices || !json.choices[0]) {
-        console.error("Invalid Mistral response:", json);
-        return res.status(500).json({ error: "Invalid API response" });
-      }
-
       const result = json.choices[0].message?.content || "Transform failed";
       
       return res.status(200).json({ result });
