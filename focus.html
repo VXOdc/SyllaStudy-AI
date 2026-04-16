@@ -521,7 +521,7 @@
         <div class="completion-overlay" id="completion-overlay">
             <div class="completion-emoji">🎯</div>
             <div class="completion-title">Session Complete</div>
-            <div class="completion-sub" id="completion-sub">You focused for 25 minutes</div>
+            <div class="completion-sub" id="completion-sub">You focused for 45 minutes</div>
             <div class="completion-actions">
                 <button class="btn-start" id="next-session-btn" style="min-width:auto;">Next Session</button>
                 <button class="btn-ghost" id="done-btn">I'm Done</button>
@@ -539,7 +539,7 @@
                 <circle class="ring-progress" id="ring-progress" cx="140" cy="140" r="128"/>
             </svg>
             <div class="ring-inner">
-                <div class="timer-display" id="timer-display">25:00</div>
+                <div class="timer-display" id="timer-display">45:00</div>
                 <div class="timer-session-label" id="session-mode-label">Deep Work</div>
             </div>
         </div>
@@ -617,16 +617,16 @@
 <script>
     // ── State ──────────────────────────────────────────
     const MODES = {
-        deep:   { label: 'Deep Work',     minutes: 25 },
-        light:  { label: 'Light Study',   minutes: 45 },
+        deep:   { label: 'Deep Work',     minutes: 45 },
+        light:  { label: 'Light Study',   minutes: 25 },
         review: { label: 'Review Sprint', minutes: 15 },
         custom: { label: 'Custom Timer',  minutes: 0 },
     };
 
     let state = {
         mode: 'deep',
-        totalSeconds: 25 * 60,
-        timeLeft: 25 * 60,
+        totalSeconds: 45 * 60,
+        timeLeft: 45 * 60,
         running: false,
         timerId: null,
     };
@@ -777,20 +777,22 @@
             this.classList.add('active');
 
             const mode = this.dataset.mode;
+            const minutes = parseInt(this.dataset.minutes, 10);
+
             state.mode = mode;
 
             if (mode === 'custom') {
                 customInputsEl.classList.add('visible');
                 applyCustomBtn.style.display = 'block';
-                // Clear inputs when entering custom mode
                 customHours.value = '';
                 customMinutes.value = '';
                 customSeconds.value = '';
                 updateCustomLabel();
+                // Don't update state.totalSeconds for custom mode until Apply is clicked
             } else {
                 customInputsEl.classList.remove('visible');
                 applyCustomBtn.style.display = 'none';
-                const minutes = parseInt(this.dataset.minutes, 10);
+                // Update total and timeLeft for preset modes
                 state.totalSeconds = minutes * 60;
                 state.timeLeft = state.totalSeconds;
             }
@@ -800,10 +802,12 @@
         });
     });
 
-    // ── Custom timer ───────────────────────────────────
+    // ── Custom timer ───────���───────────────────────────
     function clampInput(input, min, max) {
         const v = parseInt(input.value, 10);
-        if (!isNaN(v)) input.value = Math.min(Math.max(v, min), max);
+        if (!isNaN(v)) {
+            input.value = Math.min(Math.max(v, min), max);
+        }
     }
 
     customHours.addEventListener('change', () => clampInput(customHours, 0, 5));
@@ -863,7 +867,7 @@
     });
 
     // ── Init ───────────────────────────────────────────
-    render();
+    render(); 
 </script>
 </body>
 </html>
