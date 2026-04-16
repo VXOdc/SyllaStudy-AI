@@ -315,7 +315,6 @@
     <main class="editor-container" id="editorContainer"></main>
 </div>
 
-<!-- Transform Modal -->
 <div class="modal-overlay" id="transformModal">
     <div class="modal-content">
         <div class="modal-header">
@@ -720,56 +719,6 @@ const TRANSFORM_CONFIGS = {
 };
 
 // ─────────────────────────────────────────────
-//  BUILD PROMPT
-// ─────────────────────────────────────────────
-function buildPrompt(action, option, content) {
-    const prompts = {
-        summarize: {
-            brief:    `Summarize this text in 2-3 concise sentences:\n\n${content}`,
-            detailed: `Write a detailed summary of this text, covering all main points:\n\n${content}`,
-            bullets:  `Summarize this text as clear bullet points (use • for each point):\n\n${content}`
-        },
-        rewrite: {
-            concise:    `Rewrite this text to be more concise while preserving all key information:\n\n${content}`,
-            academic:   `Rewrite this text in a formal academic tone:\n\n${content}`,
-            casual:     `Rewrite this text in a friendly, casual conversational tone:\n\n${content}`,
-            structured: `Rewrite this text with clear structure. Use headings and organised paragraphs:\n\n${content}`
-        },
-        extract: {
-            key_points:  `Extract the key points from this text as a numbered list:\n\n${content}`,
-            definitions: `Extract all definitions, terms, and their meanings from this text as a list:\n\n${content}`,
-            concepts:    `Extract the main concepts and ideas from this text as a list:\n\n${content}`,
-            action_items:`Extract all action items and tasks from this text as a numbered list:\n\n${content}`
-        },
-        generate: {
-            flashcards:     `Generate 6-10 flashcards from this text. Format each as:\nQ: [question]\nA: [answer]\n\nText:\n${content}`,
-            study_questions:`Generate 8 study questions (mix of recall, comprehension, and application) from this text:\n\n${content}`,
-            outline:        `Generate a structured outline with main headings and sub-points from this text:\n\n${content}`,
-            mindmap:        `Create a text-based mind map of the key ideas. Use indentation to show hierarchy:\n\n${content}`,
-            study_plan:     `Create a 5-step study plan for mastering the topics in this text:\n\n${content}`
-        },
-        explain: {
-            simple:       `Explain this text as if talking to a 5-year-old. Use very simple words and analogies:\n\n${content}`,
-            intermediate: `Explain this text as if talking to a curious 12-year-old student:\n\n${content}`,
-            advanced:     `Explain this text at a graduate/professor level, using technical terminology where appropriate:\n\n${content}`
-        },
-        expand: {
-            full:         `Expand on all the points in this text with more depth and detail:\n\n${content}`,
-            examples:     `Rewrite this text adding concrete, real-world examples for each point:\n\n${content}`,
-            explanations: `Rewrite this text adding clear explanations and reasoning for each point:\n\n${content}`
-        },
-        translate: {
-            es: `Translate the following text to Spanish:\n\n${content}`,
-            fr: `Translate the following text to French:\n\n${content}`,
-            de: `Translate the following text to German:\n\n${content}`,
-            zh: `Translate the following text to Simplified Chinese:\n\n${content}`,
-            ja: `Translate the following text to Japanese:\n\n${content}`
-        }
-    };
-    return prompts[action]?.[option] || null;
-}
-
-// ─────────────────────────────────────────────
 //  MODAL
 // ─────────────────────────────────────────────
 function openTransformModal(action) {
@@ -800,7 +749,6 @@ function openTransformModal(action) {
 
 function closeTransformModal() {
     document.getElementById('transformModal').classList.remove('show');
-    // Don't reset currentAction/selectedOption here — applyTransform may still be running
 }
 
 function selectTransformOption(el, value) {
@@ -810,7 +758,7 @@ function selectTransformOption(el, value) {
 }
 
 // ─────────────────────────────────────────────
-//  APPLY TRANSFORM  (the main fixed function)
+//  APPLY TRANSFORM
 // ─────────────────────────────────────────────
 async function applyTransform() {
     if (!selectedOption) { showToast('Please select an option first'); return; }
@@ -823,10 +771,7 @@ async function applyTransform() {
     const plainText = stripHtml(note.content || '').trim();
     if (!plainText) { showToast('✍️ Write something first'); return; }
 
-    const prompt = buildPrompt(currentAction, selectedOption, plainText);
-    if (!prompt) { showToast('Unknown transform option'); return; }
-
-    // Snapshot action/option before closing modal (closing resets nothing now)
+    // Snapshot action/option before closing modal
     const action = currentAction;
     const option = selectedOption;
 
@@ -849,14 +794,13 @@ async function applyTransform() {
     }
 
     try {
-        const result = await callClaude(prompt);
+        const result = await callMistralBackend(action, option, plainText);
 
         if (!result || !result.trim()) throw new Error('AI returned an empty response');
 
         // Convert result text → HTML
         const newHTML = textToHtml(result);
 
-        // ── THE CRITICAL FIX: update both the DOM and the note object ──
         const richText = document.getElementById('richText');
         if (richText) {
             richText.innerHTML = newHTML;       // update visible editor immediately
@@ -888,16 +832,17 @@ async function applyTransform() {
 }
 
 // ─────────────────────────────────────────────
-//  ANTHROPIC API CALL
+//  MISTRAL BACKEND API CALL
 // ─────────────────────────────────────────────
-async function callClaude(prompt) {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+async function callMistralBackend(action, option, content) {
+    const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 1000,
-            messages: [{ role: 'user', content: prompt }]
+            type: 'transform',
+            action: action,
+            option: option,
+            content: content
         })
     });
 
@@ -905,22 +850,15 @@ async function callClaude(prompt) {
         let errMsg = `HTTP ${response.status}`;
         try {
             const errData = await response.json();
-            errMsg = errData?.error?.message || errMsg;
+            errMsg = errData?.error || errMsg;
         } catch {}
         throw new Error(errMsg);
     }
 
     const data = await response.json();
-
-    // Handle all content block types
-    const text = (data.content || [])
-        .filter(block => block.type === 'text')
-        .map(block => block.text)
-        .join('\n')
-        .trim();
-
-    if (!text) throw new Error('No text in AI response');
-    return text;
+    
+    if (!data.result) throw new Error('No valid result in AI response');
+    return data.result;
 }
 
 // ─────────────────────────────────────────────
