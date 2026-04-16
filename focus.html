@@ -281,33 +281,6 @@
             color: white;
         }
 
-        /* Session counter */
-        .session-count {
-            position: absolute;
-            bottom: 28px;
-            left: 0; right: 0;
-            text-align: center;
-            font-size: 12px;
-            color: var(--text-dim);
-            letter-spacing: 0.08em;
-        }
-
-        .session-dots {
-            display: inline-flex;
-            gap: 6px;
-            margin-top: 8px;
-        }
-
-        .session-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.15);
-            transition: background 0.4s;
-        }
-
-        .session-dot.done { background: white; }
-
         /* ── Sidebar ── */
         .sidebar-section {
             display: flex;
@@ -474,51 +447,6 @@
 
         .btn-apply:hover { background: rgba(255,255,255,0.18); }
 
-        /* Habit Stats */
-        .habit-stat { margin-bottom: 18px; }
-        .habit-stat:last-of-type { margin-bottom: 0; }
-
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: var(--text-mid);
-            margin-bottom: 8px;
-        }
-
-        .stat-value { color: white; font-weight: 500; }
-
-        .progress-bg {
-            height: 4px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: white;
-            border-radius: 10px;
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Insight Card */
-        .insight-card {
-            margin-top: 16px;
-            padding: 14px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 14px;
-            border-left: 2px solid rgba(255,255,255,0.3);
-        }
-
-        .insight-card p {
-            font-size: 12px;
-            color: var(--text-mid);
-            line-height: 1.6;
-        }
-
-        .insight-card strong { color: white; }
-
         /* Completion overlay */
         .completion-overlay {
             display: none;
@@ -621,16 +549,6 @@
             <button class="btn-ghost" id="reset-btn">Reset</button>
         </div>
 
-        <div class="session-count">
-            <div>Sessions today</div>
-            <div class="session-dots" id="session-dots">
-                <div class="session-dot done"></div>
-                <div class="session-dot done"></div>
-                <div class="session-dot"></div>
-                <div class="session-dot"></div>
-            </div>
-        </div>
-
     </section>
 
     <!-- ── Sidebar ── -->
@@ -693,38 +611,6 @@
             <button class="btn-apply" id="apply-custom-btn" style="display:none;">Apply Duration</button>
         </div>
 
-        <div class="glass-panel">
-            <div class="panel-title">Today's Progress</div>
-
-            <div class="habit-stat">
-                <div class="stat-header">
-                    <span>Focus Goal</span>
-                    <span class="stat-value">4.5 / 6h</span>
-                </div>
-                <div class="progress-bg"><div class="progress-fill" style="width:75%"></div></div>
-            </div>
-
-            <div class="habit-stat">
-                <div class="stat-header">
-                    <span>Concentration</span>
-                    <span class="stat-value">88%</span>
-                </div>
-                <div class="progress-bg"><div class="progress-fill" style="width:88%"></div></div>
-            </div>
-
-            <div class="habit-stat">
-                <div class="stat-header">
-                    <span>Sessions Done</span>
-                    <span class="stat-value">2 / 4</span>
-                </div>
-                <div class="progress-bg"><div class="progress-fill" style="width:50%"></div></div>
-            </div>
-
-            <div class="insight-card">
-                <p>Your productivity peaks at <strong>11:00 AM</strong>. Schedule your heaviest tasks then to reduce decision fatigue.</p>
-            </div>
-        </div>
-
     </section>
 </main>
 
@@ -734,7 +620,7 @@
         deep:   { label: 'Deep Work',     minutes: 25 },
         light:  { label: 'Light Study',   minutes: 45 },
         review: { label: 'Review Sprint', minutes: 15 },
-        custom: { label: 'Custom Timer',  minutes: 25 },
+        custom: { label: 'Custom Timer',  minutes: 0 },
     };
 
     let state = {
@@ -743,7 +629,6 @@
         timeLeft: 25 * 60,
         running: false,
         timerId: null,
-        sessionsToday: 2,
     };
 
     // ── DOM refs ───────────────────────────────────────
@@ -756,7 +641,6 @@
     const startBtn        = document.getElementById('start-btn');
     const resetBtn        = document.getElementById('reset-btn');
     const ringProgress    = document.getElementById('ring-progress');
-    const sessionDotsEl   = document.getElementById('session-dots');
     const completionOver  = document.getElementById('completion-overlay');
     const completionSub   = document.getElementById('completion-sub');
     const nextSessionBtn  = document.getElementById('next-session-btn');
@@ -824,18 +708,6 @@
             statusText.textContent = 'Ready';
             startBtn.textContent = 'Start Session';
         }
-
-        renderSessionDots();
-    }
-
-    function renderSessionDots() {
-        sessionDotsEl.innerHTML = '';
-        const total = 4;
-        for (let i = 0; i < total; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'session-dot' + (i < state.sessionsToday ? ' done' : '');
-            sessionDotsEl.appendChild(dot);
-        }
     }
 
     // ── Timer Logic ────────────────────────────────────
@@ -876,7 +748,6 @@
     }
 
     function onComplete() {
-        state.sessionsToday = Math.min(state.sessionsToday + 1, 4);
         timerSection.classList.add('finished');
         statusBadge.classList.add('finished');
         statusText.textContent = 'Complete';
@@ -911,8 +782,11 @@
             if (mode === 'custom') {
                 customInputsEl.classList.add('visible');
                 applyCustomBtn.style.display = 'block';
-                // Use whatever is already set or default 25min
-                // Don't change totalSeconds until Apply is pressed
+                // Clear inputs when entering custom mode
+                customHours.value = '';
+                customMinutes.value = '';
+                customSeconds.value = '';
+                updateCustomLabel();
             } else {
                 customInputsEl.classList.remove('visible');
                 applyCustomBtn.style.display = 'none';
@@ -973,6 +847,7 @@
         state.totalSeconds = total;
         state.timeLeft = total;
         MODES.custom.minutes = Math.round(total / 60);
+        updateCustomLabel();
         render();
     });
 
