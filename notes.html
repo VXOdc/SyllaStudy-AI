@@ -36,7 +36,6 @@
             overflow: hidden;
         }
 
-        /* ── NAV ── */
         nav {
             height: 72px;
             backdrop-filter: blur(20px);
@@ -64,10 +63,8 @@
         }
         .nav-links a:hover, .nav-links a.active { opacity: 1; }
 
-        /* ── LAYOUT ── */
         .app-container { display: flex; flex: 1; padding: 24px; gap: 20px; overflow: hidden; }
 
-        /* ── SIDEBAR ── */
         .sidebar {
             width: 300px;
             background: var(--glass-bg);
@@ -117,7 +114,6 @@
         }
         .new-note-btn:hover { transform: scale(1.1) rotate(90deg); background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
 
-        /* Search */
         .search-wrap { position: relative; }
         .search-input {
             width: 100%;
@@ -141,7 +137,6 @@
             pointer-events: none;
         }
 
-        /* Note list */
         .note-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
         .note-list::-webkit-scrollbar { width: 0; }
 
@@ -206,7 +201,6 @@
         }
         .empty-state svg { opacity: 0.5; }
 
-        /* ── EDITOR ── */
         .editor-container {
             flex: 1;
             background: var(--glass-bg);
@@ -220,7 +214,6 @@
             overflow: hidden;
         }
 
-        /* Toolbar */
         .toolbar {
             display: flex;
             align-items: center;
@@ -281,7 +274,6 @@
         }
         @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* Editor body */
         .editor-body {
             flex: 1;
             overflow-y: auto;
@@ -326,7 +318,6 @@
         .rich-text ul, .rich-text ol { padding-left: 24px; margin-bottom: 20px; }
         .rich-text li { margin-bottom: 6px; }
 
-        /* No-note placeholder */
         .no-note-placeholder {
             flex: 1;
             display: flex;
@@ -338,7 +329,6 @@
         }
         .no-note-placeholder p { font-size: 15px; }
 
-        /* Word count */
         .editor-footer {
             padding: 10px 24px;
             border-top: 1px solid rgba(255,255,255,0.06);
@@ -350,7 +340,6 @@
             flex-shrink: 0;
         }
 
-        /* Toast */
         .toast {
             position: fixed;
             bottom: 32px;
@@ -370,7 +359,6 @@
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* AI Transform Modal */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -514,7 +502,6 @@
 </nav>
 
 <div class="app-container">
-
     <aside class="sidebar">
         <div class="sidebar-header">
             <h2>Notes</h2>
@@ -529,13 +516,9 @@
         <div class="note-list" id="noteList"></div>
     </aside>
 
-    <main class="editor-container" id="editorContainer">
-        <!-- toolbar + body injected by JS -->
-    </main>
-
+    <main class="editor-container" id="editorContainer"></main>
 </div>
 
-<!-- AI Transform Modal -->
 <div class="modal-overlay" id="transformModal">
     <div class="modal-content">
         <div class="modal-header">
@@ -553,10 +536,6 @@
 <div class="toast" id="toast"></div>
 
 <script>
-/* ═══════════════════════════════════════════════════
-   SyllaStudy Notes — Full localStorage Engine + AI
-   ═══════════════════════════════════════════════════ */
-
 const STORAGE_KEY = 'syllastudy_notes';
 const ACTIVE_KEY  = 'syllastudy_active_note';
 
@@ -567,7 +546,7 @@ let searchQuery = '';
 let currentTransformAction = null;
 let selectedTransformOption = null;
 
-// ── Helpers ──────────────────────────────────────
+// ── SAFE UTILITY FUNCTIONS ──
 
 function uid() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -589,17 +568,24 @@ function formatDate(ts) {
 }
 
 function stripHtml(html) {
+    if (!html || typeof html !== 'string') return '';
     const tmp = document.createElement('div');
     tmp.innerHTML = html;
-    return tmp.textContent || '';
+    return tmp.textContent || tmp.innerText || '';
 }
 
 function wordCount(html) {
+    if (!html || typeof html !== 'string') return 0;
     const text = stripHtml(html).trim();
     return text ? text.split(/\s+/).length : 0;
 }
 
-// ── Storage ───────────────────────────────────────
+function escHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── STORAGE ──
 
 function loadFromStorage() {
     try {
@@ -620,11 +606,11 @@ function saveToStorage() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
         if (activeId) localStorage.setItem(ACTIVE_KEY, activeId);
     } catch(e) {
-        showToast('⚠️ Storage full — could not save');
+        showToast('⚠️ Storage full');
     }
 }
 
-// ── Toast ─────────────────────────────────────────
+// ── TOAST ──
 
 function showToast(msg, duration = 2200) {
     const t = document.getElementById('toast');
@@ -633,7 +619,7 @@ function showToast(msg, duration = 2200) {
     setTimeout(() => t.classList.remove('show'), duration);
 }
 
-// ── Note CRUD ─────────────────────────────────────
+// ── NOTE CRUD ──
 
 function createNote() {
     const note = {
@@ -696,7 +682,7 @@ function flushSave() {
     showAutosave(false);
 }
 
-// ── Autosave indicator ────────────────────────────
+// ── AUTOSAVE ──
 
 function showAutosave(saving) {
     const el = document.getElementById('autosaveIndicator');
@@ -711,7 +697,7 @@ function showAutosave(saving) {
     }
 }
 
-// ── Sidebar ───────────────────────────────────────
+// ── SIDEBAR ──
 
 function renderSidebar() {
     const list = document.getElementById('noteList');
@@ -737,23 +723,15 @@ function renderSidebar() {
         const snippet = stripHtml(n.content || '').slice(0, 60);
         const isActive = n.id === activeId;
         return `
-            <div class="note-item ${isActive ? 'active' : ''}" 
-                 data-id="${n.id}" 
-                 onclick="selectNote('${n.id}')">
+            <div class="note-item ${isActive ? 'active' : ''}" data-id="${n.id}" onclick="selectNote('${n.id}')">
                 <div class="note-item-content">
                     <div class="note-title-preview">${escHtml(n.title) || 'Untitled'}</div>
                     <div class="note-snippet">${escHtml(snippet) || 'No content'}</div>
                     <div class="note-date">${formatDate(n.updatedAt)}</div>
                 </div>
-                <button class="delete-btn" 
-                        title="Delete note"
-                        onclick="event.stopPropagation(); confirmDelete('${n.id}')">×</button>
+                <button class="delete-btn" title="Delete note" onclick="event.stopPropagation(); confirmDelete('${n.id}')">×</button>
             </div>`;
     }).join('');
-}
-
-function escHtml(str) {
-    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function confirmDelete(id) {
@@ -765,11 +743,11 @@ function confirmDelete(id) {
     }
 }
 
-// ── AI Transform Modal ─────────────────────────────
+// ── AI TRANSFORM MODAL ──
 
 function openTransformModal(action) {
     const note = notes.find(n => n.id === activeId);
-    if (!note || !note.content) {
+    if (!note || !note.content || stripHtml(note.content).trim().length === 0) {
         showToast('✍️ Add some content first');
         return;
     }
@@ -847,7 +825,6 @@ function openTransformModal(action) {
     const optionsEl = document.getElementById('modalOptions');
 
     titleEl.textContent = config.title;
-
     optionsEl.innerHTML = config.options.map(opt => `
         <div class="modal-option" onclick="selectTransformOption('${opt.value}')">
             ${opt.label}
@@ -868,8 +845,7 @@ function selectTransformOption(value) {
     
     const options = document.querySelectorAll('.modal-option');
     options.forEach(opt => {
-        if (opt.textContent.includes(value) || 
-            Array.from(opt.attributes).some(attr => attr.value.includes(value))) {
+        if (opt.textContent.includes(value)) {
             opt.style.background = 'rgba(74, 222, 128, 0.2)';
             opt.style.borderColor = 'rgba(74, 222, 128, 0.5)';
         } else {
@@ -894,22 +870,27 @@ async function applyTransform() {
     applyBtn.textContent = 'Processing…';
 
     try {
-        // Call API with correct structure
+        const plainText = stripHtml(note.content);
+        if (!plainText || plainText.trim().length === 0) {
+            throw new Error('Content is empty');
+        }
+
         const result = await callAITransform(
             currentTransformAction,
             selectedTransformOption,
-            stripHtml(note.content)
+            plainText
         );
 
-        if (result) {
-            // Replace content with transformed result
+        if (result && result.trim().length > 0) {
             updateActiveNote('content', `<p>${result.replace(/\n/g, '</p><p>')}</p>`);
             closeTransformModal();
             showToast(`✨ ${currentTransformAction.charAt(0).toUpperCase() + currentTransformAction.slice(1)} complete`);
+        } else {
+            throw new Error('No result received');
         }
     } catch (err) {
         console.error('Transform error:', err);
-        showToast('⚠️ Transform failed. Try again.');
+        showToast('⚠️ ' + err.message);
     } finally {
         applyBtn.disabled = false;
         applyBtn.classList.remove('loading');
@@ -917,33 +898,49 @@ async function applyTransform() {
     }
 }
 
-// ── AI Transform API Call (FIXED) ─────────────────
+// ── API CALL ──
 
 async function callAITransform(action, option, content) {
-    try {
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                type: 'transform',
-                action: action,
-                option: option,
-                content: content
-            })
-        });
-
-        if (!response.ok) throw new Error(`API error: ${response.status}`);
-        
-        const data = await response.json();
-        return data.result || '';
-    } catch (err) {
-        console.error('AI Transform API call failed:', err);
-        showToast('⚠️ API error: ' + err.message);
-        return null;
+    if (!content || typeof content !== 'string' || content.trim().length === 0) {
+        throw new Error('Content is empty or invalid');
     }
+
+    if (!action || !option) {
+        throw new Error('Missing action or option');
+    }
+
+    console.log('Sending transform request:', { action, option, contentLength: content.length });
+
+    const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            type: 'transform',
+            action: action,
+            option: option,
+            content: content.trim()
+        })
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.error) {
+        throw new Error(data.error);
+    }
+
+    if (!data.result) {
+        throw new Error('No result in response');
+    }
+
+    return data.result;
 }
 
-// ── Editor ────────────────────────────────────────
+// ── EDITOR ──
 
 function renderEditor() {
     const container = document.getElementById('editorContainer');
@@ -985,16 +982,8 @@ function renderEditor() {
             <div class="autosave-indicator" id="autosaveIndicator"></div>
         </div>
         <div class="editor-body">
-            <input type="text" 
-                   class="document-title" 
-                   id="docTitle" 
-                   placeholder="Untitled Document" 
-                   value="${escHtml(note.title)}"
-                   oninput="updateActiveNote('title', this.value)">
-            <div class="rich-text" 
-                 id="richText"
-                 contenteditable="true"
-                 spellcheck="true">${note.content || ''}</div>
+            <input type="text" class="document-title" id="docTitle" placeholder="Untitled Document" value="${escHtml(note.title)}" oninput="updateActiveNote('title', this.value)">
+            <div class="rich-text" id="richText" contenteditable="true" spellcheck="true">${note.content || ''}</div>
         </div>
         <div class="editor-footer">
             <span id="wordCountEl">0 words</span>
@@ -1026,27 +1015,25 @@ function updateWordCount() {
 }
 
 function execCmd(cmd, value = null) {
-    document.getElementById('richText')?.focus();
+    const rt = document.getElementById('richText');
+    if (rt) rt.focus();
     document.execCommand(cmd, false, value);
     setTimeout(() => {
-        const rt = document.getElementById('richText');
-        if (rt) updateActiveNote('content', rt.innerHTML);
-        updateWordCount();
+        if (rt) {
+            updateActiveNote('content', rt.innerHTML);
+            updateWordCount();
+        }
     }, 10);
 }
 
-// ── Search ────────────────────────────────────────
+// ── EVENTS ──
 
 document.getElementById('searchInput').addEventListener('input', (e) => {
     searchQuery = e.target.value;
     renderSidebar();
 });
 
-// ── New note button ───────────────────────────────
-
 document.getElementById('newNoteBtn').addEventListener('click', createNote);
-
-// ── Save on page hide / close ─────────────────────
 
 window.addEventListener('beforeunload', () => {
     flushSave();
@@ -1056,13 +1043,11 @@ document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') flushSave();
 });
 
-// ── Close modal on ESC ─────────────────────────────
-
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeTransformModal();
 });
 
-// ── Init ──────────────────────────────────────────
+// ── INIT ──
 
 function init() {
     loadFromStorage();
