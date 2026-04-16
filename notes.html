@@ -552,8 +552,6 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="chat.js"></script>
-
 <script>
 /* ═══════════════════════════════════════════════════
    SyllaStudy Notes — Full localStorage Engine + AI
@@ -896,7 +894,7 @@ async function applyTransform() {
     applyBtn.textContent = 'Processing…';
 
     try {
-        // Call chat.js AI function
+        // Call API with correct structure
         const result = await callAITransform(
             currentTransformAction,
             selectedTransformOption,
@@ -919,11 +917,10 @@ async function applyTransform() {
     }
 }
 
-// ── AI Transform API Call ─────────────────────────
+// ── AI Transform API Call (FIXED) ─────────────────
 
 async function callAITransform(action, option, content) {
     try {
-        // Call chat.js with transform request
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -935,11 +932,13 @@ async function callAITransform(action, option, content) {
             })
         });
 
-        if (!response.ok) throw new Error('API error');
+        if (!response.ok) throw new Error(`API error: ${response.status}`);
+        
         const data = await response.json();
         return data.result || '';
     } catch (err) {
-        console.error('AI Transform failed:', err);
+        console.error('AI Transform API call failed:', err);
+        showToast('⚠️ API error: ' + err.message);
         return null;
     }
 }
