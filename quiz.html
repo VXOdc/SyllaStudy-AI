@@ -1,1 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizGen • SyllaStudy AI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
 
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-active: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.22);
+            --glass-blur: 40px;
+            --text-main: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.6);
+            --transition-spring: cubic-bezier(0.4, 0, 0.2, 1);
+            --danger: rgba(255, 90, 90, 0.85);
+            --success: rgba(74, 222, 128, 0.85);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)),
+                        url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── NAV ── */
+        nav {
+            height: 72px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255,255,255,0.05);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 48px;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+        .logo { font-family: 'Lora', serif; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; opacity: 0.95; }
+        .nav-links a {
+            color: white; text-decoration: none; margin-left: 36px;
+            font-size: 14px; font-weight: 500; opacity: 0.65; transition: opacity 0.3s;
+        }
+        .nav-links a:hover, .nav-links a.active { opacity: 1; }
+
+        /* ── LAYOUT ── */
+        .app-container { display: flex; flex: 1; padding: 24px; gap: 20px; overflow: hidden; }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 300px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 16px;
+            gap: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+        }
+        .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+        .sidebar-header h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.45; }
+        .new-btn {
+            background: rgba(255,255,255,0.9); color: #111; border: none;
+            width: 34px; height: 34px; border-radius: 50%; font-size: 20px;
+            font-weight: 300; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; transition: all 0.25s var(--transition-spring); flex-shrink: 0;
+        }
+        .new-btn:hover { transform: scale(1.1) rotate(90deg); background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+
+        .search-wrap { position: relative; }
+        .search-input {
+            width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px; padding: 10px 14px 10px 36px; color: white;
+            font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; transition: all 0.2s;
+        }
+        .search-input::placeholder { color: rgba(255,255,255,0.35); }
+        .search-input:focus { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: 0.4; pointer-events: none; }
+
+        .quiz-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+        .quiz-list::-webkit-scrollbar { width: 0; }
+
+        .quiz-item {
+            padding: 14px 16px; border-radius: 14px; cursor: pointer;
+            transition: all 0.18s ease; border: 1px solid transparent;
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+        }
+        .quiz-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
+        .quiz-item.active { background: var(--glass-active); border-color: var(--glass-border); }
+        .quiz-item-content { flex: 1; min-width: 0; }
+        .quiz-title-preview { font-size: 14px; font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .quiz-stats { font-size: 12px; color: var(--text-dim); }
+        
+        .delete-btn {
+            background: none; border: none; color: rgba(255,255,255,0.3);
+            cursor: pointer; font-size: 16px; padding: 2px 4px; border-radius: 6px;
+            transition: all 0.2s; flex-shrink: 0; opacity: 0; line-height: 1;
+        }
+        .quiz-item:hover .delete-btn { opacity: 1; }
+        .delete-btn:hover { color: var(--danger); background: rgba(255,90,90,0.12); }
+
+        .empty-state {
+            flex: 1; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 8px; opacity: 0.4; font-size: 13px; text-align: center;
+        }
+
+        /* ── MAIN WORKSPACE ── */
+        .workspace {
+            flex: 1; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur)); border: 1px solid var(--glass-border);
+            border-radius: 28px; display: flex; flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2); overflow: hidden; position: relative;
+        }
+
+        /* Generate View */
+        .gen-view { display: flex; flex-direction: column; flex: 1; padding: 48px 72px; overflow-y: auto; }
+        .gen-view::-webkit-scrollbar { width: 5px; }
+        .gen-view::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+        
+        .section-title { font-family: 'Lora', serif; font-size: 32px; font-weight: 700; margin-bottom: 8px; color: #fff; }
+        .section-sub { font-size: 14px; color: var(--text-dim); margin-bottom: 32px; }
+
+        .quiz-title-input {
+            width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.2);
+            color: white; font-size: 24px; font-family: 'Lora', serif; padding: 10px 0; outline: none; margin-bottom: 24px;
+            transition: border-color 0.2s;
+        }
+        .quiz-title-input:focus { border-color: rgba(74,222,128,0.8); }
+        .quiz-title-input::placeholder { color: rgba(255,255,255,0.25); }
+
+        .source-textarea {
+            width: 100%; flex: 1; min-height: 250px; background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px; padding: 20px; color: rgba(255,255,255,0.9); font-family: 'DM Sans', sans-serif;
+            font-size: 15px; line-height: 1.6; outline: none; resize: none; transition: all 0.2s; margin-bottom: 24px;
+        }
+        .source-textarea:focus { border-color: rgba(255,255,255,0.3); background: rgba(0,0,0,0.2); }
+        .source-textarea::placeholder { color: rgba(255,255,255,0.2); }
+
+        .btn-generate {
+            background: rgba(74,222,128,0.85); border: none; color: #0a1a0a; align-self: flex-end;
+            padding: 14px 32px; border-radius: 14px; cursor: pointer; font-size: 15px;
+            font-weight: 700; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+        }
+        .btn-generate:hover { background: #4ade80; box-shadow: 0 4px 20px rgba(74,222,128,0.35); transform: translateY(-2px); }
+
+        /* Quiz Player View */
+        .player-view { display: none; flex-direction: column; flex: 1; align-items: center; justify-content: center; padding: 48px; }
+        .progress-bar-wrap { width: 100%; max-width: 600px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 40px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: #4ade80; width: 0%; transition: width 0.4s var(--transition-spring); }
+        
+        .question-card {
+            width: 100%; max-width: 600px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px; padding: 40px; text-align: left;
+        }
+        .question-counter { font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 16px; }
+        .question-text { font-family: 'Lora', serif; font-size: 24px; font-weight: 600; line-height: 1.4; margin-bottom: 32px; }
+        
+        .options-grid { display: flex; flex-direction: column; gap: 12px; }
+        .option-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+            padding: 16px 20px; border-radius: 14px; color: white; font-size: 15px; font-family: 'DM Sans', sans-serif;
+            text-align: left; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between;
+        }
+        .option-btn:hover:not(.disabled) { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.25); transform: translateX(4px); }
+        .option-btn.selected { background: rgba(255,255,255,0.15); border-color: white; }
+        .option-btn.correct { background: rgba(74,222,128,0.15); border-color: #4ade80; color: #4ade80; }
+        .option-btn.wrong { background: rgba(255,90,90,0.15); border-color: #ff5a5a; color: #ff5a5a; }
+        .option-btn.disabled { cursor: default; opacity: 0.8; }
+
+        .player-actions { margin-top: 32px; display: flex; justify-content: flex-end; width: 100%; max-width: 600px; }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+            color: white; padding: 12px 24px; border-radius: 12px; cursor: pointer;
+            font-size: 14px; font-weight: 600; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.15); }
+
+        /* Results View */
+        .results-view { display: none; flex-direction: column; flex: 1; align-items: center; justify-content: center; padding: 48px; text-align: center; }
+        .score-circle {
+            width: 140px; height: 140px; border-radius: 50%; border: 6px solid #4ade80;
+            display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700;
+            font-family: 'Lora', serif; margin-bottom: 24px; color: #4ade80; box-shadow: 0 0 40px rgba(74,222,128,0.2);
+        }
+        .results-msg { font-size: 20px; font-weight: 500; margin-bottom: 40px; }
+        .results-actions { display: flex; gap: 16px; }
+
+        /* ── OVERLAYS & TOAST ── */
+        .ai-processing-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 16px;
+            z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .ai-processing-overlay.show { opacity: 1; pointer-events: all; }
+        .ai-processing-overlay p { font-size: 15px; font-weight: 500; opacity: 0.9; }
+        .ai-spinner {
+            width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #4ade80; border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast {
+            position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: rgba(30,30,30,0.92); backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 100px;
+            padding: 10px 20px; font-size: 13px; color: rgba(255,255,255,0.85);
+            opacity: 0; pointer-events: none; transition: all 0.3s var(--transition-spring); z-index: 9999;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">SyllaStudy AI</div>
+    <div class="nav-links">
+        <a href="index.html">Dashboard</a>
+        <a href="chat.html">Study AI</a>
+        <a href="notes.html">SmartNotes</a>
+        <a href="quiz.html" class="active">QuizGen</a>
+        <a href="taskflow.html">TaskFlow</a>
+    </div>
+</nav>
+
+<div class="app-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Your Quizzes</h2>
+            <button class="new-btn" id="newQuizBtn" title="Create new quiz">+</button>
+        </div>
+        <div class="search-wrap">
+            <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input class="search-input" id="searchInput" type="text" placeholder="Search quizzes…">
+        </div>
+        <div class="quiz-list" id="quizList"></div>
+    </aside>
+
+    <main class="workspace" id="workspace">
+        <div class="gen-view" id="genView">
+            <h1 class="section-title">Generate a Quiz</h1>
+            <p class="section-sub">Paste your notes, article, or topic below, and AI will create a custom multiple-choice quiz.</p>
+            
+            <input type="text" class="quiz-title-input" id="newQuizTitle" placeholder="Name your quiz (e.g. Chapter 4 Biology)">
+            <textarea class="source-textarea" id="sourceText" placeholder="Paste the content you want to be tested on here..."></textarea>
+            
+            <button class="btn-generate" id="generateBtn">✨ Generate Quiz</button>
+        </div>
+
+        <div class="player-view" id="playerView">
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
+            
+            <div class="question-card">
+                <div class="question-counter" id="qCounter">Question 1 of 5</div>
+                <div class="question-text" id="qText">Loading question...</div>
+                <div class="options-grid" id="optionsGrid">
+                    </div>
+            </div>
+            
+            <div class="player-actions">
+                <button class="btn-generate" id="nextBtn" style="display: none;">Next Question ➔</button>
+            </div>
+        </div>
+
+        <div class="results-view" id="resultsView">
+            <h1 class="section-title" id="resultsTitle">Quiz Complete!</h1>
+            <div class="score-circle" id="scoreCircle">0/0</div>
+            <div class="results-msg" id="resultsMsg">Great effort!</div>
+            <div class="results-actions">
+                <button class="btn-secondary" onclick="retakeQuiz()">Retake Quiz</button>
+                <button class="btn-generate" onclick="createNewQuizUI()">Create Another</button>
+            </div>
+        </div>
+
+        <div class="ai-processing-overlay" id="aiOverlay">
+            <div class="ai-spinner"></div>
+            <p>Analyzing text & generating questions...</p>
+        </div>
+    </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+//  CONFIG & SUPABASE STUB
+// ─────────────────────────────────────────────
+const STORAGE_KEY = 'syllastudy_quizzes';
+let quizzes = [];
+let activeQuizId = null;
+let searchQuery = '';
+
+// Play State
+let activeQuizData = null;
+let currentQuestionIndex = 0;
+let userScore = 0;
+let hasAnsweredCurrent = false;
+
+/* SUPABASE INTEGRATION POINT:
+  To connect Supabase, replace loadFromStorage() and saveToStorage() with async calls 
+  to your Supabase client, e.g., await supabase.from('quizzes').select('*')
+*/
+
+// ─────────────────────────────────────────────
+//  UTILITIES
+// ─────────────────────────────────────────────
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+// ─────────────────────────────────────────────
+//  STORAGE (Local by default)
+// ─────────────────────────────────────────────
+function loadFromStorage() {
+    try { quizzes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { quizzes = []; }
+}
+function saveToStorage() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(quizzes)); } 
+    catch { showToast('⚠️ Storage full — oldest quizzes may not save'); }
+}
+
+// ─────────────────────────────────────────────
+//  TOAST
+// ─────────────────────────────────────────────
+let toastTimer = null;
+function showToast(msg, duration = 2400) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), duration);
+}
+
+// ─────────────────────────────────────────────
+//  SIDEBAR
+// ─────────────────────────────────────────────
+function renderSidebar() {
+    const list = document.getElementById('quizList');
+    const q = searchQuery.toLowerCase();
+    const filtered = quizzes.filter(quiz => !q || (quiz.title || '').toLowerCase().includes(q));
+
+    if (!filtered.length) {
+        list.innerHTML = `<div class="empty-state">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <p>${q ? 'No results' : 'No quizzes yet'}</p>
+        </div>`;
+        return;
+    }
+
+    list.innerHTML = filtered.map(quiz => `
+        <div class="quiz-item ${quiz.id === activeQuizId ? 'active' : ''}" onclick="openQuiz('${quiz.id}')">
+            <div class="quiz-item-content">
+                <div class="quiz-title-preview">${quiz.title || 'Untitled Quiz'}</div>
+                <div class="quiz-stats">${quiz.questions?.length || 0} Questions • Best: ${quiz.bestScore || 0}/${quiz.questions?.length || 0}</div>
+            </div>
+            <button class="delete-btn" title="Delete" onclick="event.stopPropagation(); deleteQuiz('${quiz.id}')">×</button>
+        </div>`).join('');
+}
+
+function deleteQuiz(id) {
+    if(confirm('Delete this quiz?')) {
+        quizzes = quizzes.filter(q => q.id !== id);
+        saveToStorage();
+        if(activeQuizId === id) createNewQuizUI();
+        else renderSidebar();
+    }
+}
+
+// ─────────────────────────────────────────────
+//  VIEW ROUTING
+// ─────────────────────────────────────────────
+function showView(viewId) {
+    document.getElementById('genView').style.display = 'none';
+    document.getElementById('playerView').style.display = 'none';
+    document.getElementById('resultsView').style.display = 'none';
+    document.getElementById(viewId).style.display = 'flex';
+}
+
+function createNewQuizUI() {
+    activeQuizId = null;
+    document.getElementById('newQuizTitle').value = '';
+    document.getElementById('sourceText').value = '';
+    renderSidebar();
+    showView('genView');
+}
+
+function openQuiz(id) {
+    activeQuizId = id;
+    renderSidebar();
+    startQuiz(quizzes.find(q => q.id === id));
+}
+
+// ─────────────────────────────────────────────
+//  QUIZ GENERATION (Mistral API)
+// ─────────────────────────────────────────────
+document.getElementById('generateBtn').addEventListener('click', async () => {
+    const title = document.getElementById('newQuizTitle').value.trim() || 'Untitled Quiz';
+    const text = document.getElementById('sourceText').value.trim();
+
+    if (!text) { showToast('✍️ Please paste some text to generate a quiz'); return; }
+
+    const overlay = document.getElementById('aiOverlay');
+    overlay.classList.add('show');
+
+    try {
+        // Prompt engineered specifically for JSON output via Mistral Chat endpoint
+        const promptText = `You are a strict educational API. Generate a 5-question multiple-choice quiz based on this text:\n\n"${text}"\n\nYou MUST return ONLY a raw JSON array. Do NOT wrap in markdown \`\`\`json. Format strictly as:\n[\n  {\n    "question": "...",\n    "options": ["...", "...", "...", "..."],\n    "correctIndex": 0\n  }\n]`;
+
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'chat', message: promptText })
+        });
+
+        if (!response.ok) throw new Error('API Error');
+        const data = await response.json();
+        
+        let rawStr = data.reply || data.result || "[]";
+        rawStr = rawStr.replace(/```json/g, '').replace(/```/g, '').trim();
+
+        const questionsData = JSON.parse(rawStr);
+
+        if(!Array.isArray(questionsData) || questionsData.length === 0) throw new Error('Invalid quiz format');
+
+        const newQuiz = {
+            id: uid(),
+            title: title,
+            questions: questionsData,
+            bestScore: 0,
+            createdAt: Date.now()
+        };
+
+        quizzes.unshift(newQuiz);
+        saveToStorage();
+        showToast('✨ Quiz generated successfully!');
+        
+        openQuiz(newQuiz.id);
+
+    } catch (err) {
+        console.error(err);
+        showToast('⚠️ Failed to generate quiz. Ensure text is clear.');
+    } finally {
+        overlay.classList.remove('show');
+    }
+});
+
+// ─────────────────────────────────────────────
+//  QUIZ PLAYER LOGIC
+// ─────────────────────────────────────────────
+function startQuiz(quiz) {
+    if(!quiz) return;
+    activeQuizData = quiz;
+    currentQuestionIndex = 0;
+    userScore = 0;
+    
+    showView('playerView');
+    renderQuestion();
+}
+
+function renderQuestion() {
+    hasAnsweredCurrent = false;
+    document.getElementById('nextBtn').style.display = 'none';
+    
+    const qCount = activeQuizData.questions.length;
+    const progress = ((currentQuestionIndex) / qCount) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+    
+    const qData = activeQuizData.questions[currentQuestionIndex];
+    
+    document.getElementById('qCounter').textContent = `Question ${currentQuestionIndex + 1} of ${qCount}`;
+    document.getElementById('qText').textContent = qData.question;
+    
+    const grid = document.getElementById('optionsGrid');
+    grid.innerHTML = qData.options.map((opt, idx) => `
+        <button class="option-btn" onclick="selectAnswer(${idx}, this)">
+            <span>${opt}</span>
+            <svg class="result-icon" style="display:none; width:18px; height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+        </button>
+    `).join('');
+}
+
+function selectAnswer(selectedIndex, btnElement) {
+    if(hasAnsweredCurrent) return;
+    hasAnsweredCurrent = true;
+    
+    const correctIndex = activeQuizData.questions[currentQuestionIndex].correctIndex;
+    const allBtns = document.querySelectorAll('.option-btn');
+    
+    // Disable all
+    allBtns.forEach(b => b.classList.add('disabled'));
+
+    if (selectedIndex === correctIndex) {
+        userScore++;
+        btnElement.classList.add('correct');
+        btnElement.querySelector('.result-icon').style.display = 'block';
+    } else {
+        btnElement.classList.add('wrong');
+        btnElement.querySelector('.result-icon').innerHTML = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
+        btnElement.querySelector('.result-icon').style.display = 'block';
+        
+        // Highlight correct answer
+        allBtns[correctIndex].classList.add('correct');
+    }
+
+    const nextBtn = document.getElementById('nextBtn');
+    if (currentQuestionIndex < activeQuizData.questions.length - 1) {
+        nextBtn.textContent = 'Next Question ➔';
+    } else {
+        nextBtn.textContent = 'See Results ✨';
+    }
+    nextBtn.style.display = 'block';
+}
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+    if (currentQuestionIndex < activeQuizData.questions.length - 1) {
+        currentQuestionIndex++;
+        renderQuestion();
+    } else {
+        finishQuiz();
+    }
+});
+
+function finishQuiz() {
+    const total = activeQuizData.questions.length;
+    
+    // Update Best Score
+    if (userScore > activeQuizData.bestScore) {
+        const idx = quizzes.findIndex(q => q.id === activeQuizData.id);
+        if(idx > -1) quizzes[idx].bestScore = userScore;
+        saveToStorage();
+        renderSidebar();
+    }
+
+    document.getElementById('resultsTitle').textContent = activeQuizData.title;
+    document.getElementById('scoreCircle').textContent = `${userScore}/${total}`;
+    
+    const pct = userScore / total;
+    let msg = "Keep studying, you'll get it!";
+    if (pct === 1) msg = "Perfect score! Brilliant!";
+    else if (pct >= 0.8) msg = "Great job! Almost perfect.";
+    else if (pct >= 0.5) msg = "Good effort, keep reviewing!";
+    
+    document.getElementById('resultsMsg').textContent = msg;
+    showView('resultsView');
+}
+
+function retakeQuiz() {
+    startQuiz(activeQuizData);
+}
+
+// ─────────────────────────────────────────────
+//  EVENTS & INIT
+// ─────────────────────────────────────────────
+document.getElementById('newQuizBtn').addEventListener('click', createNewQuizUI);
+
+document.getElementById('searchInput').addEventListener('input', e => {
+    searchQuery = e.target.value;
+    renderSidebar();
+});
+
+function init() {
+    loadFromStorage();
+    renderSidebar();
+    createNewQuizUI();
+}
+
+init();
+</script>
+</body>
+</html>
