@@ -1,182 +1,275 @@
+/**
+ * TaskFlow API Handler
+ * Unified backend for task explosion, scheduling, focus recommendations,
+ * first-step generation, notes transformation, and general chat.
+ *
+ * Uses Anthropic Claude (claude-haiku-4-5-20251001 for speed, sonnet for complex tasks).
+ * Set ANTHROPIC_API_KEY in your environment.
+ */
+
+const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
+const MODEL_FAST = "claude-haiku-4-5-20251001";    // fast, cheap — first steps, durations
+const MODEL_SMART = "claude-sonnet-4-6";            // deeper reasoning — scheduling, transforms
+
+async function callClaude(model, messages, systemPrompt, maxTokens = 1000) {
+  const body = {
+    model,
+    max_tokens: maxTokens,
+    messages
+  };
+  if (systemPrompt) body.system = systemPrompt;
+
+  const res = await fetch(ANTHROPIC_API, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": process.env.ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01"
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Claude API error ${res.status}: ${err}`);
+  }
+
+  const data = await res.json();
+  const text = data.content?.map(c => c.type === "text" ? c.text : "").join("") || "";
+  return text;
+}
+
+function stripJson(raw) {
+  return raw.replace(/```json/gi, "").replace(/```/g, "").trim();
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method Not Allowed" });
-  }
+  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method !== "POST") return res.status(405).json({ error: "Method Not Allowed" });
 
   try {
-    const { type, message, history, action, option, content, goal, notesContext } = req.body;
+    const {
+      type,
+      message,
+      history,
+      // task explosion
+      goal,
+      notesContext,
+      // focus duration recommendation
+      taskText,
+      taskTime,
+      taskEnergy,
+      // first step
+      task,
+      // notes transform
+      action,
+      option,
+      content
+    } = req.body;
 
-    // ── AI Task Explosion Mode ──
+    /* ──────────────────────────────────────────────────
+       1. TASK EXPLOSION
+       Breaks a goal into 4–8 micro-tasks with time + energy
+    ────────────────────────────────────────────────── */
     if (type === "task_explosion") {
       if (!goal) return res.status(400).json({ error: "Missing goal" });
 
-      const taskPrompt = `You are an elite productivity AI. The user has a single session goal: "${goal}".
-      Break this goal down into 4-8 highly actionable micro-tasks. 
-      Assign a realistic time estimate (in minutes) to each task.
-      Assign an energy level requirement for each task: "high", "medium", or "low".
-      
-      If the user provided context from their notes, use it to make the tasks highly specific:
-      [NOTES CONTEXT: ${notesContext || "None provided"}]
-      
-      OUTPUT FORMAT:
-      You MUST return ONLY a raw JSON array of objects. Do not include markdown formatting like \`\`\`json. 
-      Example:
-      [
-        {"text": "Review chapter 7 notes", "time": 10, "energy": "low"},
-        {"text": "Draft main essay body", "time": 45, "energy": "high"}
-      ]`;
+      const system = `You are an elite productivity AI. Break goals into highly actionable micro-tasks. 
+Never invent facts. Output ONLY raw JSON arrays — no markdown, no prose.`;
 
-      const r = await fetch("https://api.mistral.ai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "mistral-small-latest",
-          messages: [{ role: "user", content: taskPrompt }]
-        })
-      });
+      const prompt = `Goal: "${goal}"
+${notesContext ? `Notes context: ${notesContext}` : ""}
 
-      if (!r.ok) {
-        return res.status(r.status).json({ error: `Mistral API error: ${r.status}` });
-      }
+Break this into 4–8 actionable micro-tasks. Return ONLY a raw JSON array:
+[
+  {"text": "Task description", "time": 15, "energy": "low"},
+  {"text": "Another task", "time": 45, "energy": "high"}
+]
+Energy must be "high", "medium", or "low". Time is integer minutes.`;
 
-      const json = await r.json();
-      const rawContent = json.choices[0].message?.content || "[]";
-      
-      // Clean up potential markdown formatting from Mistral
-      const cleanJsonStr = rawContent.replace(/```json/g, '').replace(/```/g, '').trim();
+      const raw = await callClaude(MODEL_FAST, [{ role: "user", content: prompt }], system, 1000);
       
       try {
-        const tasks = JSON.parse(cleanJsonStr);
+        const tasks = JSON.parse(stripJson(raw));
         return res.status(200).json({ tasks });
-      } catch (parseError) {
-        console.error("Failed to parse Mistral output:", cleanJsonStr);
+      } catch {
+        console.error("Failed to parse task explosion:", raw);
         return res.status(500).json({ error: "AI returned invalid task structure." });
       }
     }
 
-    // ── Regular Chat Mode ──
-    if (type === "chat" || !type) {
-      const messages = (history || []).concat({ role: "user", content: message });
+    /* ──────────────────────────────────────────────────
+       2. AI DURATION RECOMMENDATION
+       Recommends ideal focus session length for a task
+    ────────────────────────────────────────────────── */
+    if (type === "duration_recommendation") {
+      if (!taskText) return res.status(400).json({ error: "Missing taskText" });
 
-      const r = await fetch("https://api.mistral.ai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "mistral-small-latest",
-          messages
-        })
-      });
+      const system = `You are a focus and productivity coach. Recommend ideal focus session durations based on task characteristics. Output ONLY raw JSON — no markdown, no prose.`;
 
-      if (!r.ok) {
-        const errorData = await r.text();
-        console.error("Mistral API Error (Chat):", r.status, errorData);
-        return res.status(r.status).json({ error: `Mistral API error: ${r.status}` });
+      const prompt = `Task: "${taskText}"
+Estimated time: ${taskTime || 25} minutes
+Energy level: ${taskEnergy || "medium"}
+
+Recommend an ideal single focus session duration. Consider:
+- Complex/deep tasks (writing, coding, research): 45–90 min
+- Medium tasks: 25–50 min
+- Simple/clear tasks: 15–25 min
+- High-energy tasks early in day can support longer sessions
+- Low-energy tasks benefit from shorter, more frequent sessions
+
+Respond ONLY with raw JSON:
+{"minutes": 25, "reason": "One-sentence explanation", "options": [15, 25, 50]}`;
+
+      const raw = await callClaude(MODEL_FAST, [{ role: "user", content: prompt }], system, 300);
+
+      try {
+        const rec = JSON.parse(stripJson(raw));
+        return res.status(200).json({ recommendation: rec });
+      } catch {
+        return res.status(200).json({ recommendation: { minutes: 25, reason: "Standard Pomodoro session.", options: [15, 25, 50] } });
       }
-
-      const json = await r.json();
-      const reply = json.choices?.[0]?.message?.content || "No reply";
-      
-      return res.status(200).json({ reply });
     }
 
-    // ── AI Notes Transform Mode ──
+    /* ──────────────────────────────────────────────────
+       3. FIRST STEP GENERATOR
+       Gets the simplest possible first action to beat procrastination
+    ────────────────────────────────────────────────── */
+    if (type === "first_step") {
+      if (!task) return res.status(400).json({ error: "Missing task" });
+
+      const system = `You are a procrastination coach. Give one ultra-simple first action to start a task immediately. Keep it concrete and achievable in under 2 minutes. Reply in one short sentence only.`;
+
+      const raw = await callClaude(
+        MODEL_FAST,
+        [{ role: "user", content: `Task: "${task}"\n\nWhat is the single simplest first action (max 2 min) to break through resistance and start?` }],
+        system,
+        150
+      );
+
+      return res.status(200).json({ firstStep: raw.trim() });
+    }
+
+    /* ──────────────────────────────────────────────────
+       4. SMART SCHEDULE GENERATOR
+       Picks top tasks and assigns time blocks
+    ────────────────────────────────────────────────── */
+    if (type === "schedule") {
+      const { pendingTasks, currentHour } = req.body;
+      if (!pendingTasks || !pendingTasks.length) return res.status(400).json({ error: "No tasks" });
+
+      const system = `You are a strict productivity scheduler. Create realistic, focused daily schedules. Output ONLY raw JSON — no markdown, no prose.`;
+
+      const taskStr = pendingTasks.map(t => `- ${t.text} (${t.time}m, ${t.energy} energy)`).join("\n");
+      const startHour = currentHour || 9;
+
+      const prompt = `Current time: ${startHour}:00
+Pending tasks:\n${taskStr}
+
+Select the best 4 tasks to maximize today's productivity. 
+Order by logical flow (high-energy tasks earlier if before noon, admin/review tasks later).
+Assign time blocks starting from ${startHour}:00, with 10-min breaks between sessions.
+
+Return ONLY a raw JSON array:
+[{"time": "9:00 AM", "end": "9:45 AM", "text": "Task name"}]`;
+
+      const raw = await callClaude(MODEL_SMART, [{ role: "user", content: prompt }], system, 800);
+
+      try {
+        const schedule = JSON.parse(stripJson(raw));
+        return res.status(200).json({ schedule });
+      } catch {
+        return res.status(500).json({ error: "AI returned invalid schedule structure." });
+      }
+    }
+
+    /* ──────────────────────────────────────────────────
+       5. REGULAR CHAT
+       General-purpose AI chat with history
+    ────────────────────────────────────────────────── */
+    if (type === "chat" || !type) {
+      if (!message) return res.status(400).json({ error: "Missing message" });
+
+      const messages = [...(history || []), { role: "user", content: message }];
+      const system = `You are TaskFlow AI — a focused, warm productivity assistant. Help users stay on task, manage their time, and overcome procrastination. Keep responses concise and actionable.`;
+
+      const raw = await callClaude(MODEL_SMART, messages, system, 800);
+      return res.status(200).json({ reply: raw });
+    }
+
+    /* ──────────────────────────────────────────────────
+       6. NOTES TRANSFORM
+       Summarize, rewrite, extract, generate, explain, expand, translate
+    ────────────────────────────────────────────────── */
     if (type === "transform") {
       if (!action || !option || !content) {
         return res.status(400).json({ error: "Missing action, option, or content" });
       }
 
-      const transformPrompt = buildTransformPrompt(action, option, content);
-      
-      const r = await fetch("https://api.mistral.ai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "mistral-small-latest",
-          messages: [{ role: "user", content: transformPrompt }]
-        })
-      });
-
-      if (!r.ok) {
-        const errorData = await r.text();
-        console.error("Mistral API Error (Transform):", r.status, errorData);
-        return res.status(r.status).json({ error: `Mistral API error: ${r.status}` });
-      }
-
-      const json = await r.json();
-      const result = json.choices[0].message?.content || "Transform failed";
-      
-      return res.status(200).json({ result });
+      const prompt = buildTransformPrompt(action, option, content);
+      const raw = await callClaude(MODEL_SMART, [{ role: "user", content: prompt }], null, 1500);
+      return res.status(200).json({ result: raw });
     }
 
-    return res.status(400).json({ error: "Invalid request type" });
+    return res.status(400).json({ error: `Unknown request type: "${type}"` });
 
   } catch (err) {
-    console.error("API Error:", err.message, err.stack);
+    console.error("TaskFlow API Error:", err.message, err.stack);
     return res.status(500).json({ error: "Server error: " + err.message });
   }
 };
 
+/* ──────────────────────────────────────────────────
+   TRANSFORM PROMPT BUILDER
+────────────────────────────────────────────────── */
 function buildTransformPrompt(action, option, content) {
-  const systemContext = `You are an AI notes transformation engine. Your job is to transform note content exactly as requested. Never invent facts. Keep formatting clean and readable. Use Markdown when helpful.`;
+  const ctx = `You are an AI notes transformation engine. Transform content exactly as requested. Never invent facts. Keep formatting clean. Use Markdown when helpful.`;
 
   const prompts = {
     summarize: {
-      brief: `${systemContext}\n\nSummarize this note into a SHORT, concise summary (2-3 sentences max). Keep only essential ideas.\n\nNote:\n${content}`,
-      detailed: `${systemContext}\n\nCreate a DETAILED summary of this note. Keep all important points but organize clearly.\n\nNote:\n${content}`,
-      bullets: `${systemContext}\n\nExtract key points from this note as bullet points. Be concise.\n\nNote:\n${content}`
+      brief:    `${ctx}\n\nSummarize in 2–3 sentences. Keep only essential ideas.\n\nNote:\n${content}`,
+      detailed: `${ctx}\n\nCreate a detailed summary. Keep all important points, organized clearly.\n\nNote:\n${content}`,
+      bullets:  `${ctx}\n\nExtract key points as concise bullet points.\n\nNote:\n${content}`
     },
     rewrite: {
-      concise: `${systemContext}\n\nRewrite this note to be MORE CONCISE. Remove redundancy and filler. Keep the same meaning.\n\nNote:\n${content}`,
-      academic: `${systemContext}\n\nRewrite this note in a MORE ACADEMIC style. Use formal language and structured sentences.\n\nNote:\n${content}`,
-      casual: `${systemContext}\n\nRewrite this note in a MORE CASUAL, conversational style. Make it friendly and approachable.\n\nNote:\n${content}`,
-      structured: `${systemContext}\n\nRewrite this note with BETTER STRUCTURE. Use clear headings, lists, and logical flow.\n\nNote:\n${content}`
+      concise:    `${ctx}\n\nRewrite to be more concise. Remove redundancy, keep meaning.\n\nNote:\n${content}`,
+      academic:   `${ctx}\n\nRewrite in formal academic style.\n\nNote:\n${content}`,
+      casual:     `${ctx}\n\nRewrite in casual, conversational style.\n\nNote:\n${content}`,
+      structured: `${ctx}\n\nRewrite with clear headings, lists, and logical flow.\n\nNote:\n${content}`
     },
     extract: {
-      key_points: `${systemContext}\n\nExtract the KEY POINTS from this note. List each one clearly. No explanations, just the points.\n\nNote:\n${content}`,
-      definitions: `${systemContext}\n\nExtract DEFINITIONS or key terms from this note. Format as "Term: Definition".\n\nNote:\n${content}`,
-      concepts: `${systemContext}\n\nExtract the main CONCEPTS from this note. List each concept and what it means.\n\nNote:\n${content}`,
-      action_items: `${systemContext}\n\nExtract ACTION ITEMS or tasks from this note. List things the user should do. If there are none, say "No action items found".\n\nNote:\n${content}`
+      key_points:   `${ctx}\n\nExtract key points. List each one clearly without explanation.\n\nNote:\n${content}`,
+      definitions:  `${ctx}\n\nExtract definitions and key terms. Format as "Term: Definition".\n\nNote:\n${content}`,
+      concepts:     `${ctx}\n\nExtract main concepts. List each concept and what it means.\n\nNote:\n${content}`,
+      action_items: `${ctx}\n\nExtract action items/tasks. If none, say "No action items found".\n\nNote:\n${content}`
     },
     generate: {
-      flashcards: `${systemContext}\n\nGenerate FLASHCARDS from this note. Format as:\nQ: Question?\nA: Answer\n\nCreate 5-8 flashcards.\n\nNote:\n${content}`,
-      study_questions: `${systemContext}\n\nGenerate STUDY QUESTIONS from this note. Create both basic recall questions and deeper thinking questions. Format:\n- Basic: [question]\n- Deep: [question]\n\nNote:\n${content}`,
-      outline: `${systemContext}\n\nCreate a hierarchical OUTLINE from this note. Use proper indentation and structure.\n\nNote:\n${content}`,
-      mindmap: `${systemContext}\n\nCreate a TEXT-BASED MIND MAP from this note. Show branches and connections.\n\nNote:\n${content}`,
-      study_plan: `${systemContext}\n\nCreate a STUDY PLAN based on this note. Break it into time blocks (Day 1, Day 2, etc.) with specific tasks.\n\nNote:\n${content}`
+      flashcards:     `${ctx}\n\nGenerate 5–8 flashcards.\nFormat:\nQ: Question?\nA: Answer\n\nNote:\n${content}`,
+      study_questions:`${ctx}\n\nGenerate study questions.\nFormat:\n- Basic: [question]\n- Deep: [question]\n\nNote:\n${content}`,
+      outline:        `${ctx}\n\nCreate a hierarchical outline with proper indentation.\n\nNote:\n${content}`,
+      mindmap:        `${ctx}\n\nCreate a text-based mind map showing branches and connections.\n\nNote:\n${content}`,
+      study_plan:     `${ctx}\n\nCreate a study plan in time blocks (Day 1, Day 2, etc.) with specific tasks.\n\nNote:\n${content}`
     },
     explain: {
-      simple: `${systemContext}\n\nExplain this note LIKE I'M 5 YEARS OLD. Use simple words, no jargon, use analogies.\n\nNote:\n${content}`,
-      intermediate: `${systemContext}\n\nExplain this note LIKE I'M 12 YEARS OLD. Use clear language, some structure, basic depth.\n\nNote:\n${content}`,
-      advanced: `${systemContext}\n\nExplain this note LIKE YOU'RE A PROFESSOR. Use technical language, detailed analysis, academic tone.\n\nNote:\n${content}`
+      simple:       `${ctx}\n\nExplain like I'm 5 years old. Simple words, no jargon, use analogies.\n\nNote:\n${content}`,
+      intermediate: `${ctx}\n\nExplain like I'm 12. Clear language, some structure, accessible depth.\n\nNote:\n${content}`,
+      advanced:     `${ctx}\n\nExplain like a professor. Technical language, detailed analysis, academic tone.\n\nNote:\n${content}`
     },
     expand: {
-      full: `${systemContext}\n\nEXPAND this note. Turn bullet points into full paragraphs. Add transitions and explanations. Keep all original info but make it more readable.\n\nNote:\n${content}`,
-      examples: `${systemContext}\n\nEXPAND this note by ADDING EXAMPLES. For each main point, add a concrete example or illustration.\n\nNote:\n${content}`,
-      explanations: `${systemContext}\n\nEXPAND this note by ADDING EXPLANATIONS. For each point, explain the "why" and "how".\n\nNote:\n${content}`
+      full:         `${ctx}\n\nExpand into full paragraphs. Add transitions and explanations.\n\nNote:\n${content}`,
+      examples:     `${ctx}\n\nExpand by adding concrete examples for each main point.\n\nNote:\n${content}`,
+      explanations: `${ctx}\n\nExpand by adding "why" and "how" explanations for each point.\n\nNote:\n${content}`
     },
     translate: {
-      es: `Translate this note to SPANISH. Keep formatting. Only output the translation.\n\nNote:\n${content}`,
-      fr: `Translate this note to FRENCH. Keep formatting. Only output the translation.\n\nNote:\n${content}`,
-      de: `Translate this note to GERMAN. Keep formatting. Only output the translation.\n\nNote:\n${content}`,
-      zh: `Translate this note to CHINESE (Simplified). Keep formatting. Only output the translation.\n\nNote:\n${content}`,
-      ja: `Translate this note to JAPANESE. Keep formatting. Only output the translation.\n\nNote:\n${content}`
+      es: `Translate to SPANISH. Keep formatting. Output translation only.\n\nNote:\n${content}`,
+      fr: `Translate to FRENCH. Keep formatting. Output translation only.\n\nNote:\n${content}`,
+      de: `Translate to GERMAN. Keep formatting. Output translation only.\n\nNote:\n${content}`,
+      zh: `Translate to CHINESE (Simplified). Keep formatting. Output translation only.\n\nNote:\n${content}`,
+      ja: `Translate to JAPANESE. Keep formatting. Output translation only.\n\nNote:\n${content}`
     }
   };
 
