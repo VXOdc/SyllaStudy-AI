@@ -12,19 +12,25 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { type, message, history, action, option, content, goal, notesContext } = req.body;
+    const body = req.body || {};
+    let messages = [];
+    let isTaskExplosion = false;
+    let isTransform = false;
 
-    // ── AI Task Explosion Mode ──
-    if (type === "task_explosion") {
-      if (!goal) return res.status(400).json({ error: "Missing goal" });
+    // 1. Normalize Input (Supports strict "messages" array or legacy payload)
+    if (body.messages && Array.isArray(body.messages)) {
+      messages = body.messages;
+    } else if (body.type === "task_explosion") {
+      isTaskExplosion = true;
+      if (!body.goal) return res.status(400).json({ error: "Missing goal" });
 
-      const taskPrompt = `You are an elite productivity AI. The user has a single session goal: "${goal}".
+      const taskPrompt = `You are an elite productivity AI. The user has a single session goal: "${body.goal}".
       Break this goal down into 4-8 highly actionable micro-tasks. 
       Assign a realistic time estimate (in minutes) to each task.
       Assign an energy level requirement for each task: "high", "medium", or "low".
       
       If the user provided context from their notes, use it to make the tasks highly specific:
-      [NOTES CONTEXT: ${notesContext || "None provided"}]
+      [NOTES CONTEXT: ${body.notesContext || "None provided"}]
       
       OUTPUT FORMAT:
       You MUST return ONLY a raw JSON array of objects. Do not include markdown formatting like \`\`\`json. 
@@ -33,106 +39,138 @@ module.exports = async function handler(req, res) {
         {"text": "Review chapter 7 notes", "time": 10, "energy": "low"},
         {"text": "Draft main essay body", "time": 45, "energy": "high"}
       ]`;
-
-      const r = await fetch("https://api.mistral.ai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "mistral-small-latest",
-          messages: [{ role: "user", content: taskPrompt }]
-        })
-      });
-
-      if (!r.ok) {
-        return res.status(r.status).json({ error: `Mistral API error: ${r.status}` });
-      }
-
-      const json = await r.json();
-      const rawContent = json.choices[0].message?.content || "[]";
-      
-      // Clean up potential markdown formatting from Mistral
-      const cleanJsonStr = rawContent.replace(/```json/g, '').replace(/```/g, '').trim();
-      
-      try {
-        const tasks = JSON.parse(cleanJsonStr);
-        return res.status(200).json({ tasks });
-      } catch (parseError) {
-        console.error("Failed to parse Mistral output:", cleanJsonStr);
-        return res.status(500).json({ error: "AI returned invalid task structure." });
-      }
-    }
-
-    // ── Regular Chat Mode ──
-    if (type === "chat" || !type) {
-      const messages = (history || []).concat({ role: "user", content: message });
-
-      const r = await fetch("https://api.mistral.ai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "mistral-small-latest",
-          messages
-        })
-      });
-
-      if (!r.ok) {
-        const errorData = await r.text();
-        console.error("Mistral API Error (Chat):", r.status, errorData);
-        return res.status(r.status).json({ error: `Mistral API error: ${r.status}` });
-      }
-
-      const json = await r.json();
-      const reply = json.choices?.[0]?.message?.content || "No reply";
-      
-      return res.status(200).json({ reply });
-    }
-
-    // ── AI Notes Transform Mode ──
-    if (type === "transform") {
-      if (!action || !option || !content) {
+      messages = [{ role: "user", content: taskPrompt }];
+    } else if (body.type === "transform") {
+      isTransform = true;
+      if (!body.action || !body.option || !body.content) {
         return res.status(400).json({ error: "Missing action, option, or content" });
       }
-
-      const transformPrompt = buildTransformPrompt(action, option, content);
-      
-      const r = await fetch("https://api.mistral.ai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "mistral-small-latest",
-          messages: [{ role: "user", content: transformPrompt }]
-        })
-      });
-
-      if (!r.ok) {
-        const errorData = await r.text();
-        console.error("Mistral API Error (Transform):", r.status, errorData);
-        return res.status(r.status).json({ error: `Mistral API error: ${r.status}` });
-      }
-
-      const json = await r.json();
-      const result = json.choices[0].message?.content || "Transform failed";
-      
-      return res.status(200).json({ result });
+      messages = [{ role: "user", content: buildTransformPrompt(body.action, body.option, body.content) }];
+    } else {
+      messages = (body.history || []).concat({ role: "user", content: body.message || "" });
     }
 
-    return res.status(400).json({ error: "Invalid request type" });
+    // 2. Execute AI requests with fallback
+    const aiResponse = await getAIResponseWithFallback(messages);
+
+    if (!aiResponse) {
+      return res.status(502).json({ error: "All AI providers failed" });
+    }
+
+    // 3. Format Output
+    const responsePayload = {
+      source: aiResponse.source,
+      reply: aiResponse.text
+    };
+
+    // Maintain legacy app compatibility
+    if (isTaskExplosion) {
+      const cleanJsonStr = aiResponse.text.replace(/```json/g, "").replace(/```/g, "").trim();
+      try {
+        responsePayload.tasks = JSON.parse(cleanJsonStr);
+      } catch (e) {
+        // Suppress parsing error to prevent crashing; return safe raw reply instead
+      }
+    } else if (isTransform) {
+      responsePayload.result = aiResponse.text;
+    }
+
+    return res.status(200).json(responsePayload);
 
   } catch (err) {
-    console.error("API Error:", err.message, err.stack);
-    return res.status(500).json({ error: "Server error: " + err.message });
+    // Completely sanitized error response (no internal details)
+    return res.status(500).json({ error: "All AI providers failed" });
   }
 };
 
+/**
+ * Orchestrates the Mistral primary and Gemini fallback logic.
+ */
+async function getAIResponseWithFallback(messages) {
+  try {
+    const mistralText = await callMistral(messages);
+    return { source: "mistral", text: mistralText };
+  } catch (mistralErr) {
+    console.warn("Mistral failed, switching to Gemini");
+
+    try {
+      const geminiText = await callGemini(messages);
+      return { source: "gemini", text: geminiText };
+    } catch (geminiErr) {
+      console.error("Gemini failed");
+      return null;
+    }
+  }
+}
+
+/**
+ * Primary Provider: Mistral AI (8-second timeout)
+ */
+async function callMistral(messages) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+  try {
+    const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "mistral-small",
+        messages: messages
+      }),
+      signal: controller.signal
+    });
+
+    if (!response.ok) {
+      throw new Error("Mistral API non-200 response");
+    }
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content || "No reply";
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+/**
+ * Fallback Provider: Gemini AI (8-second timeout)
+ */
+async function callGemini(messages) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+  try {
+    const contents = messages.map(m => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }]
+    }));
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents }),
+      signal: controller.signal
+    });
+
+    if (!response.ok) {
+      throw new Error("Gemini API non-200 response");
+    }
+
+    const data = await response.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || "No reply";
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+/**
+ * Generates context prompts for transform tasks
+ */
 function buildTransformPrompt(action, option, content) {
   const systemContext = `You are an AI notes transformation engine. Your job is to transform note content exactly as requested. Never invent facts. Keep formatting clean and readable. Use Markdown when helpful.`;
 
