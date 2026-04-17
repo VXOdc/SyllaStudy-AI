@@ -1,306 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TaskFlow • SyllaStudy AI</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFlow • SyllaStudy AI</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-<style>
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-hover: rgba(255, 255, 255, 0.12);
+      --glass-active: rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.22);
+      --glass-blur: 40px;
+      --text-main: #ffffff;
+      --text-dim: rgba(255, 255, 255, 0.6);
+      --accent: #4ade80; /* Matching task.html accent */
+      --danger: #ff5a5a;
+      --transition-spring: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
     body {
-        margin: 0;
-        padding: 0;
-        font-family: Inter, sans-serif;
-        background: #f7f7f9;
-        color: #222;
+      font-family: 'DM Sans', sans-serif;
+      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)),
+                  url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      height: 100vh;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
-    /* Top Navigation */
-    .nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 18px 28px;
-        background: white;
-        border-bottom: 1px solid #e5e5e5;
-        position: sticky;
-        top: 0;
-        z-index: 10;
+    /* ── NAV ── */
+    nav {
+      height: 72px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(255,255,255,0.05);
+      border-bottom: 1px solid var(--glass-border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; z-index: 100; flex-shrink: 0;
+    }
+    .logo { font-family: 'Lora', serif; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; opacity: 0.95; }
+    
+    .nav-tabs { display: flex; gap: 8px; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 12px; }
+    .nav-tab {
+      padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;
+      color: var(--text-dim); cursor: pointer; transition: 0.3s; border: none; background: none;
+    }
+    .nav-tab.active { background: var(--glass-active); color: white; }
+
+    /* ── LAYOUT ── */
+    .app-container { display: flex; flex: 1; padding: 24px; gap: 24px; overflow: hidden; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+    .main-panel {
+      flex: 1.5; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--glass-border); border-radius: 28px; padding: 32px;
+      display: flex; flex-direction: column; gap: 20px; overflow: hidden;
     }
 
-    .nav .logo {
-        font-size: 20px;
-        font-weight: 700;
+    /* AI EXPLODER INPUT */
+    .input-group { display: flex; gap: 12px; }
+    .input-box {
+      flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
+      border-radius: 16px; padding: 18px; color: white; font-size: 15px; outline: none;
     }
-
-    .nav a {
-        margin-left: 22px;
-        text-decoration: none;
-        color: #444;
-        font-weight: 500;
+    .btn-ai {
+      background: white; color: black; border: none; padding: 0 24px;
+      border-radius: 16px; font-weight: 700; cursor: pointer; transition: 0.3s;
     }
+    .btn-ai:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,255,255,0.2); }
 
-    .container {
-        max-width: 900px;
-        margin: 40px auto;
-        padding: 0 20px;
+    /* TASK CARDS */
+    .task-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .task-card {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
+      padding: 16px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between;
     }
+    .task-card:hover { background: var(--glass-hover); }
 
-    h1 {
-        font-size: 28px;
-        margin-bottom: 10px;
+    /* FOCUS TIMER PANEL */
+    .focus-panel {
+      flex: 1; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--glass-border); border-radius: 28px; padding: 32px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
-
-    .section {
-        background: white;
-        padding: 22px;
-        border-radius: 14px;
-        margin-top: 25px;
-        border: 1px solid #e5e5e5;
+    .timer-display { font-family: 'Lora', serif; font-size: 84px; font-weight: 700; margin: 20px 0; }
+    
+    .timer-btn {
+      width: 100%; padding: 16px; border-radius: 12px; border: none;
+      font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px;
     }
+    .btn-primary { background: var(--accent); color: #06200f; }
+    .btn-secondary { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--glass-border); }
 
-    .section h2 {
-        margin-top: 0;
-        font-size: 22px;
+    #toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: white; color: black; padding: 12px 24px; border-radius: 12px;
+      font-weight: 600; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 1000;
     }
-
-    /* Task Input */
-    .task-input {
-        display: flex;
-        gap: 10px;
-        margin-top: 15px;
-    }
-
-    .task-input input {
-        flex: 1;
-        padding: 12px;
-        border-radius: 10px;
-        border: 1px solid #ccc;
-        font-size: 15px;
-    }
-
-    .task-input button {
-        padding: 12px 18px;
-        border: none;
-        background: #4a6cf7;
-        color: white;
-        border-radius: 10px;
-        cursor: pointer;
-        font-weight: 600;
-    }
-
-    /* Task List */
-    .task-list {
-        margin-top: 20px;
-    }
-
-    .task-item {
-        background: #fafafa;
-        padding: 14px;
-        border-radius: 12px;
-        border: 1px solid #ddd;
-        margin-bottom: 12px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .task-item button {
-        background: #4a6cf7;
-        border: none;
-        padding: 8px 14px;
-        color: white;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 14px;
-    }
-
-    /* Focus Mode */
-    .focus-box {
-        text-align: center;
-        padding: 30px;
-        border-radius: 14px;
-        background: #fdfdfd;
-        border: 1px solid #e5e5e5;
-        margin-top: 20px;
-    }
-
-    .timer {
-        font-size: 48px;
-        font-weight: 700;
-        margin: 20px 0;
-    }
-
-    .focus-controls button {
-        padding: 12px 20px;
-        margin: 8px;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-weight: 600;
-    }
-
-    .start-btn { background: #4a6cf7; color: white; }
-    .reset-btn { background: #ddd; }
-
-    /* AI Explode */
-    .explode-box {
-        margin-top: 20px;
-        padding: 20px;
-        background: #fefefe;
-        border-radius: 14px;
-        border: 1px solid #e5e5e5;
-    }
-
-    .explode-box textarea {
-        width: 100%;
-        height: 90px;
-        padding: 12px;
-        border-radius: 10px;
-        border: 1px solid #ccc;
-        resize: none;
-        font-size: 15px;
-    }
-
-    .explode-box button {
-        margin-top: 12px;
-        padding: 12px 18px;
-        background: #4a6cf7;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        font-weight: 600;
-    }
-
-</style>
+    #toast.show { opacity: 1; bottom: 40px; }
+  </style>
 </head>
 <body>
 
-<div class="nav">
-    <div class="logo">SyllaStudy AI</div>
-    <div>
-        <a href="index.html">Dashboard</a>
-        <a href="smartnotes.html">SmartNotes</a>
-        <a href="taskflow.html" style="font-weight:700;">TaskFlow</a>
-        <a href="focus.html">Focus</a>
+<nav>
+  <div class="logo">TaskFlow • SyllaStudy</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('tasks')">Tasks</button>
+    <button class="nav-tab" onclick="switchTab('focus')">Focus</button>
+  </div>
+  <div style="opacity: 0.6; font-size: 13px;">Backend: Vercel Hosting</div>
+</nav>
+
+<div class="app-container">
+  <div class="main-panel">
+    <div class="input-group">
+      <input type="text" id="goalInput" class="input-box" placeholder="What's your big goal today? (AI will break it down)">
+      <button class="btn-ai" id="explodeBtn" onclick="explodeTasks()">AI Explode</button>
     </div>
+
+    <div class="task-list" id="taskList">
+      </div>
+  </div>
+
+  <div class="focus-panel">
+    <h3 style="font-family: 'Lora', serif; opacity: 0.7;">Current Focus</h3>
+    <div class="timer-display" id="timer">25:00</div>
+    <button class="timer-btn btn-primary" onclick="toggleTimer()" id="startBtn">Start Session</button>
+    <button class="timer-btn btn-secondary" onclick="resetTimer()">Reset</button>
+  </div>
 </div>
 
-<div class="container">
-
-    <h1>TaskFlow</h1>
-    <p>Manage tasks, enter flow state, and let AI guide your productivity.</p>
-
-    <!-- AI Explode -->
-    <div class="section explode-box">
-        <h2>AI Explode ⚡</h2>
-        <p>Describe a goal and AI will break it into micro‑tasks.</p>
-        <textarea id="explodeInput" placeholder="Example: Build my study dashboard..."></textarea>
-        <button onclick="aiExplode()">Generate Tasks</button>
-    </div>
-
-    <!-- Task List -->
-    <div class="section">
-        <h2>Tasks</h2>
-
-        <div class="task-input">
-            <input id="taskInput" placeholder="Add a task...">
-            <button onclick="addTask()">Add</button>
-        </div>
-
-        <div id="taskList" class="task-list"></div>
-    </div>
-
-    <!-- Focus Mode -->
-    <div class="section focus-box">
-        <h2>Focus Mode</h2>
-        <p>Select a task above to begin a session.</p>
-
-        <div class="timer" id="timer">25:00</div>
-
-        <div class="focus-controls">
-            <button class="start-btn" onclick="startTimer()">Start</button>
-            <button class="reset-btn" onclick="resetTimer()">Reset</button>
-        </div>
-    </div>
-
-</div>
+<div id="toast">Task Updated</div>
 
 <script>
-/* LocalStorage Task System */
-let tasks = JSON.parse(localStorage.getItem("syllaTasks")) || [];
+  let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+  let timeLeft = 1500;
+  let timerInterval = null;
 
-function saveTasks() {
-    localStorage.setItem("syllaTasks", JSON.stringify(tasks));
-}
-
-function renderTasks() {
-    const list = document.getElementById("taskList");
-    list.innerHTML = "";
-
-    tasks.forEach((t, i) => {
-        list.innerHTML += `
-            <div class="task-item">
-                <span>${t}</span>
-                <button onclick="startFocus('${t}')">Focus</button>
-            </div>
-        `;
-    });
-}
-
-function addTask() {
-    const input = document.getElementById("taskInput");
-    if (!input.value.trim()) return;
-    tasks.push(input.value.trim());
-    input.value = "";
-    saveTasks();
-    renderTasks();
-}
-
-/* Focus Mode Timer */
-let time = 1500;
-let interval;
-
-function startTimer() {
-    if (interval) return;
-    interval = setInterval(() => {
-        time--;
-        updateTimer();
-        if (time <= 0) {
-            clearInterval(interval);
-            interval = null;
-        }
-    }, 1000);
-}
-
-function resetTimer() {
-    clearInterval(interval);
-    interval = null;
-    time = 1500;
-    updateTimer();
-}
-
-function updateTimer() {
-    const m = Math.floor(time / 60).toString().padStart(2, "0");
-    const s = (time % 60).toString().padStart(2, "0");
-    document.getElementById("timer").innerText = `${m}:${s}`;
-}
-
-function startFocus(task) {
-    alert("Starting focus session for: " + task);
-}
-
-/* AI Explode (Frontend placeholder) */
-function aiExplode() {
-    const goal = document.getElementById("explodeInput").value.trim();
+  async function explodeTasks() {
+    const goal = document.getElementById('goalInput').value;
     if (!goal) return;
 
-    // Placeholder — you will connect this to your Vercel API
-    alert("AI Explode would break this into tasks:\n\n" + goal);
-}
+    const btn = document.getElementById('explodeBtn');
+    btn.disabled = true;
+    btn.innerText = "Thinking...";
 
-renderTasks();
+    try {
+      // VERCEL BACKEND HOSTING: Ensure your serverless function is at /api/explode
+      const response = await fetch('/api/explode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ goal })
+      });
+
+      const data = await response.json();
+      // Expecting data.subtasks = ["task1", "task2"...]
+      if (data.subtasks) {
+        data.subtasks.forEach(t => addTask(t));
+        showToast("AI Exploded your goal!");
+        confetti();
+      }
+    } catch (err) {
+      console.error("AI Error:", err);
+      showToast("Backend connection failed.");
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "AI Explode";
+    }
+  }
+
+  function addTask(text) {
+    const task = { id: Date.now() + Math.random(), text, completed: false };
+    tasks.unshift(task);
+    save();
+    render();
+  }
+
+  function render() {
+    const list = document.getElementById('taskList');
+    list.innerHTML = tasks.map(t => `
+      <div class="task-card">
+        <span>${t.text}</span>
+        <button onclick="deleteTask(${t.id})" style="background:none; border:none; color:var(--danger); cursor:pointer;">✕</button>
+      </div>
+    `).join('');
+  }
+
+  function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    save();
+    render();
+  }
+
+  function save() { localStorage.setItem('tasks', JSON.stringify(tasks)); }
+
+  function toggleTimer() {
+    const btn = document.getElementById('startBtn');
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      btn.innerText = "Resume Session";
+    } else {
+      btn.innerText = "Pause";
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerUI();
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          confetti();
+          showToast("Session Complete!");
+        }
+      }, 1000);
+    }
+  }
+
+  function updateTimerUI() {
+    const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+    const s = (timeLeft % 60).toString().padStart(2, '0');
+    document.getElementById('timer').innerText = `${m}:${s}`;
+  }
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    timeLeft = 1500;
+    updateTimerUI();
+    document.getElementById('startBtn').innerText = "Start Session";
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerText = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  render();
 </script>
-
 </body>
 </html>
