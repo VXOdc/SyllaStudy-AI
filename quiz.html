@@ -159,6 +159,7 @@
             font-weight: 700; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
         }
         .btn-generate:hover { background: #4ade80; box-shadow: 0 4px 20px rgba(74,222,128,0.35); transform: translateY(-2px); }
+        .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
         /* Quiz Player View */
         .player-view { display: none; flex-direction: column; flex: 1; align-items: center; justify-content: center; padding: 48px; }
@@ -183,6 +184,19 @@
         .option-btn.correct { background: rgba(74,222,128,0.15); border-color: #4ade80; color: #4ade80; }
         .option-btn.wrong { background: rgba(255,90,90,0.15); border-color: #ff5a5a; color: #ff5a5a; }
         .option-btn.disabled { cursor: default; opacity: 0.8; }
+
+        /* Explanation panel — extends existing card, matches glass style */
+        .explanation-panel {
+            margin-top: 20px; padding: 16px 20px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px; font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.75);
+            animation: fadeSlideIn 0.3s var(--transition-spring);
+        }
+        .explanation-label {
+            font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+            color: rgba(74,222,128,0.8); margin-bottom: 6px;
+        }
+        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
         .player-actions { margin-top: 32px; display: flex; justify-content: flex-end; width: 100%; max-width: 600px; }
         
@@ -212,6 +226,9 @@
         }
         .ai-processing-overlay.show { opacity: 1; pointer-events: all; }
         .ai-processing-overlay p { font-size: 15px; font-weight: 500; opacity: 0.9; }
+        /* Subtle status line below spinner — extends overlay, same style */
+        .overlay-status { font-size: 13px; opacity: 0.5; min-height: 18px; }
+
         .ai-spinner {
             width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1);
             border-top-color: #4ade80; border-radius: 50%; animation: spin 0.8s linear infinite;
@@ -226,6 +243,14 @@
             opacity: 0; pointer-events: none; transition: all 0.3s var(--transition-spring); z-index: 9999;
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* Question type badge — small pill inside question card */
+        .question-type-badge {
+            display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+            text-transform: uppercase; color: rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 100px; padding: 3px 10px; margin-bottom: 12px;
+        }
     </style>
 </head>
 <body>
@@ -270,9 +295,10 @@
             
             <div class="question-card">
                 <div class="question-counter" id="qCounter">Question 1 of 5</div>
+                <div id="qTypeBadge"></div>
                 <div class="question-text" id="qText">Loading question...</div>
-                <div class="options-grid" id="optionsGrid">
-                    </div>
+                <div class="options-grid" id="optionsGrid"></div>
+                <div id="explanationArea"></div>
             </div>
             
             <div class="player-actions">
@@ -292,7 +318,8 @@
 
         <div class="ai-processing-overlay" id="aiOverlay">
             <div class="ai-spinner"></div>
-            <p>Analyzing text & generating questions...</p>
+            <p>Analyzing text &amp; generating questions...</p>
+            <div class="overlay-status" id="overlayStatus"></div>
         </div>
     </main>
 </div>
@@ -301,9 +328,14 @@
 
 <script>
 // ─────────────────────────────────────────────
-//  CONFIG & SUPABASE STUB
+//  CONFIG
 // ─────────────────────────────────────────────
 const STORAGE_KEY = 'syllastudy_quizzes';
+const API_TIMEOUT_MS = 25000;      // 25 s — safe for Vercel 30 s limit
+const MAX_RETRIES    = 2;
+const MIN_QUESTIONS  = 5;
+const MAX_INPUT_CHARS = 8000;      // guard against huge prompts
+
 let quizzes = [];
 let activeQuizId = null;
 let searchQuery = '';
@@ -314,24 +346,24 @@ let currentQuestionIndex = 0;
 let userScore = 0;
 let hasAnsweredCurrent = false;
 
-/* SUPABASE INTEGRATION POINT:
-  To connect Supabase, replace loadFromStorage() and saveToStorage() with async calls 
-  to your Supabase client, e.g., await supabase.from('quizzes').select('*')
-*/
-
 // ─────────────────────────────────────────────
 //  UTILITIES
 // ─────────────────────────────────────────────
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
+function setOverlayStatus(msg) {
+    const el = document.getElementById('overlayStatus');
+    if (el) el.textContent = msg;
+}
+
 // ─────────────────────────────────────────────
-//  STORAGE (Local by default)
+//  STORAGE
 // ─────────────────────────────────────────────
 function loadFromStorage() {
     try { quizzes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { quizzes = []; }
 }
 function saveToStorage() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(quizzes)); } 
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(quizzes)); }
     catch { showToast('⚠️ Storage full — oldest quizzes may not save'); }
 }
 
@@ -376,10 +408,10 @@ function renderSidebar() {
 }
 
 function deleteQuiz(id) {
-    if(confirm('Delete this quiz?')) {
+    if (confirm('Delete this quiz?')) {
         quizzes = quizzes.filter(q => q.id !== id);
         saveToStorage();
-        if(activeQuizId === id) createNewQuizUI();
+        if (activeQuizId === id) createNewQuizUI();
         else renderSidebar();
     }
 }
@@ -388,8 +420,8 @@ function deleteQuiz(id) {
 //  VIEW ROUTING
 // ─────────────────────────────────────────────
 function showView(viewId) {
-    document.getElementById('genView').style.display = 'none';
-    document.getElementById('playerView').style.display = 'none';
+    document.getElementById('genView').style.display   = 'none';
+    document.getElementById('playerView').style.display  = 'none';
     document.getElementById('resultsView').style.display = 'none';
     document.getElementById(viewId).style.display = 'flex';
 }
@@ -408,69 +440,330 @@ function openQuiz(id) {
     startQuiz(quizzes.find(q => q.id === id));
 }
 
-// ─────────────────────────────────────────────
-//  QUIZ GENERATION (Mistral API)
-// ─────────────────────────────────────────────
-document.getElementById('generateBtn').addEventListener('click', async () => {
-    const title = document.getElementById('newQuizTitle').value.trim() || 'Untitled Quiz';
-    const text = document.getElementById('sourceText').value.trim();
+// ═════════════════════════════════════════════
+//  PRODUCTION QUIZ GENERATION PIPELINE
+// ═════════════════════════════════════════════
 
-    if (!text) { showToast('✍️ Please paste some text to generate a quiz'); return; }
+// ─────────────────────────────────────────────
+//  1. PROMPT BUILDER
+//     Returns a strict-JSON educational prompt.
+// ─────────────────────────────────────────────
+function buildQuizPrompt(sourceText) {
+    // Trim aggressively for token efficiency; keep ≤6000 chars
+    const safeText = sourceText.slice(0, 6000).trim();
 
-    const overlay = document.getElementById('aiOverlay');
-    overlay.classList.add('show');
+    return `You are an expert educator and quiz designer. Your task is to create a high-quality multiple-choice quiz from the provided study material.
+
+STUDY MATERIAL:
+"""
+${safeText}
+"""
+
+INSTRUCTIONS:
+- Generate exactly 7 multiple-choice questions.
+- Mix question types evenly: at least 2 conceptual, 2 definitional, 2 application-based, and 1 of any type.
+- Each question must test UNDERSTANDING, not surface-level recall.
+- Wrong answer options must be plausible and drawn from related concepts — not obviously incorrect.
+- Vary sentence structure and phrasing across questions; never repeat the same opening.
+- Every question must include a clear explanation of why the correct answer is right.
+- Assign a difficulty of "easy", "medium", or "hard" to each question.
+
+OUTPUT FORMAT:
+Return ONLY a raw JSON array. No markdown, no backticks, no preamble, no trailing text.
+Each element must follow this exact schema:
+
+[
+  {
+    "question": "string — the question text",
+    "type": "conceptual" | "definition" | "application",
+    "difficulty": "easy" | "medium" | "hard",
+    "options": ["string", "string", "string", "string"],
+    "correctIndex": 0,
+    "explanation": "string — why this answer is correct and others are not"
+  }
+]
+
+STRICT RULES:
+- correctIndex must be an integer 0–3 matching the correct item in options[].
+- options[] must contain exactly 4 strings.
+- explanation must be 1–3 sentences.
+- Do not number or label the options inside the string values.
+- Return valid JSON only. Any deviation will break the system.`;
+}
+
+// ─────────────────────────────────────────────
+//  2. SAFE JSON EXTRACTOR
+//     Handles markdown fences, leading/trailing text,
+//     and objects accidentally returned instead of arrays.
+// ─────────────────────────────────────────────
+function safeParseJSON(raw) {
+    if (typeof raw !== 'string') return null;
+
+    // Strip ```json ... ``` or ``` ... ``` fences
+    let cleaned = raw
+        .replace(/```json\s*/gi, '')
+        .replace(/```\s*/g, '')
+        .trim();
+
+    // Attempt 1: direct parse
+    try { return JSON.parse(cleaned); } catch (_) {}
+
+    // Attempt 2: extract first [...] or first {...}
+    const arrayMatch = cleaned.match(/(\[[\s\S]*\])/);
+    if (arrayMatch) {
+        try { return JSON.parse(arrayMatch[1]); } catch (_) {}
+    }
+    const objMatch = cleaned.match(/(\{[\s\S]*\})/);
+    if (objMatch) {
+        try {
+            const parsed = JSON.parse(objMatch[1]);
+            // If API accidentally returned a wrapper object with an array inside
+            const inner = parsed.questions || parsed.quiz || parsed.data;
+            if (Array.isArray(inner)) return inner;
+        } catch (_) {}
+    }
+
+    return null;
+}
+
+// ─────────────────────────────────────────────
+//  3. QUESTION VALIDATOR
+//     Returns { valid: bool, issues: string[] }
+// ─────────────────────────────────────────────
+function validateQuestion(q, idx) {
+    const issues = [];
+    if (!q || typeof q !== 'object') return { valid: false, issues: ['Not an object'] };
+    if (typeof q.question !== 'string' || q.question.trim().length < 5)
+        issues.push('Missing or too-short question string');
+    if (!Array.isArray(q.options) || q.options.length !== 4)
+        issues.push(`options must be array of 4; got ${Array.isArray(q.options) ? q.options.length : typeof q.options}`);
+    if (!Number.isInteger(q.correctIndex) || q.correctIndex < 0 || q.correctIndex > 3)
+        issues.push(`correctIndex out of range: ${q.correctIndex}`);
+    return { valid: issues.length === 0, issues };
+}
+
+// ─────────────────────────────────────────────
+//  4. AUTO-REPAIR
+//     Tries to fix minor structural issues in a question.
+//     Returns repaired question or null if unrepairable.
+// ─────────────────────────────────────────────
+function repairQuestion(q) {
+    if (!q || typeof q !== 'object') return null;
+    const r = { ...q };
+
+    // Repair question string
+    if (typeof r.question !== 'string') r.question = String(r.question || '').trim();
+    if (r.question.length < 5) return null; // can't invent a question
+
+    // Repair options array
+    if (!Array.isArray(r.options)) {
+        // Sometimes the model puts options as an object { "A": "...", "B": "...", ... }
+        if (r.options && typeof r.options === 'object') {
+            r.options = Object.values(r.options).slice(0, 4).map(String);
+        } else {
+            return null;
+        }
+    }
+    // Pad to 4 if short
+    while (r.options.length < 4) r.options.push(`Option ${r.options.length + 1}`);
+    // Trim to 4 if long
+    r.options = r.options.slice(0, 4).map(o => String(o));
+
+    // Repair correctIndex
+    if (!Number.isInteger(r.correctIndex) || r.correctIndex < 0 || r.correctIndex > 3) {
+        // Try parsing a string like "0", "1"
+        const parsed = parseInt(r.correctIndex, 10);
+        r.correctIndex = (!isNaN(parsed) && parsed >= 0 && parsed <= 3) ? parsed : 0;
+    }
+
+    // Ensure explanation exists (fallback if missing)
+    if (typeof r.explanation !== 'string' || r.explanation.trim().length === 0) {
+        r.explanation = `The correct answer is option ${r.correctIndex + 1}: "${r.options[r.correctIndex]}".`;
+    }
+
+    // Ensure type + difficulty have valid values
+    const validTypes = ['conceptual', 'definition', 'application'];
+    if (!validTypes.includes(r.type)) r.type = 'conceptual';
+    const validDiff = ['easy', 'medium', 'hard'];
+    if (!validDiff.includes(r.difficulty)) r.difficulty = 'medium';
+
+    return r;
+}
+
+// ─────────────────────────────────────────────
+//  5. VALIDATE + REPAIR BATCH
+//     Returns array of valid (possibly repaired) questions.
+// ─────────────────────────────────────────────
+function validateAndRepairBatch(rawArray) {
+    if (!Array.isArray(rawArray)) return [];
+
+    return rawArray.reduce((acc, q, idx) => {
+        const { valid } = validateQuestion(q, idx);
+        if (valid) {
+            acc.push(q);
+        } else {
+            const repaired = repairQuestion(q);
+            if (repaired) {
+                const { valid: repairedValid } = validateQuestion(repaired, idx);
+                if (repairedValid) acc.push(repaired);
+                // silently drop if still invalid after repair
+            }
+        }
+        return acc;
+    }, []);
+}
+
+// ─────────────────────────────────────────────
+//  6. API CALL WITH TIMEOUT
+//     Returns { ok, reply, errorType }
+//     errorType: 'network' | 'timeout' | 'server' | null
+// ─────────────────────────────────────────────
+async function callChatAPI(promptText) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
 
     try {
-        // Prompt engineered specifically for JSON output via Mistral Chat endpoint
-        const promptText = `You are a strict educational API. Generate a 5-question multiple-choice quiz based on this text:\n\n"${text}"\n\nYou MUST return ONLY a raw JSON array. Do NOT wrap in markdown \`\`\`json. Format strictly as:\n[\n  {\n    "question": "...",\n    "options": ["...", "...", "...", "..."],\n    "correctIndex": 0\n  }\n]`;
-
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type: 'chat', message: promptText })
+            body: JSON.stringify({ type: 'chat', message: promptText }),
+            signal: controller.signal,
         });
+        clearTimeout(timeoutId);
 
-        if (!response.ok) throw new Error('API Error');
+        if (!response.ok) {
+            const isServerError = response.status >= 500;
+            return { ok: false, reply: null, errorType: isServerError ? 'server' : 'client', status: response.status };
+        }
+
         const data = await response.json();
-        
-        let rawStr = data.reply || data.result || "[]";
-        rawStr = rawStr.replace(/```json/g, '').replace(/```/g, '').trim();
+        const reply = data.reply || data.result || null;
+        return { ok: true, reply, errorType: null };
 
-        const questionsData = JSON.parse(rawStr);
+    } catch (err) {
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') return { ok: false, reply: null, errorType: 'timeout' };
+        return { ok: false, reply: null, errorType: 'network' };
+    }
+}
 
-        if(!Array.isArray(questionsData) || questionsData.length === 0) throw new Error('Invalid quiz format');
+// ─────────────────────────────────────────────
+//  7. FETCH WITH EXPONENTIAL BACKOFF
+//     Retries only on server/network/timeout errors.
+//     Skips retry on 4xx client errors (bad input).
+// ─────────────────────────────────────────────
+async function fetchWithRetry(promptText, maxRetries = MAX_RETRIES) {
+    let lastError = null;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        if (attempt > 0) {
+            const delay = Math.pow(2, attempt - 1) * 1000; // 1s, 2s
+            setOverlayStatus(`Retrying (attempt ${attempt + 1} of ${maxRetries + 1})…`);
+            await new Promise(r => setTimeout(r, delay));
+        }
+
+        const result = await callChatAPI(promptText);
+        if (result.ok) return result;
+
+        // Don't retry on client errors (e.g. 400 bad request)
+        if (result.errorType === 'client') throw new Error('Invalid request sent to API.');
+
+        lastError = result.errorType;
+    }
+
+    const messages = {
+        timeout: 'The AI took too long to respond. Please try again.',
+        server:  'The AI service is unavailable. Please try again shortly.',
+        network: 'Network error. Check your connection and try again.',
+    };
+    throw new Error(messages[lastError] || 'Unexpected error. Please try again.');
+}
+
+// ─────────────────────────────────────────────
+//  8. FULL GENERATION PIPELINE
+//     Ties everything together with auto-regenerate
+//     if valid question count < MIN_QUESTIONS.
+// ─────────────────────────────────────────────
+async function generateQuizQuestions(sourceText, attemptNumber = 1) {
+    const MAX_GEN_ATTEMPTS = 2;
+
+    if (attemptNumber > MAX_GEN_ATTEMPTS) {
+        throw new Error('Could not generate enough valid questions after multiple attempts. Try a longer or clearer text.');
+    }
+
+    if (attemptNumber > 1) setOverlayStatus('Not enough valid questions — regenerating…');
+    else setOverlayStatus('');
+
+    const prompt = buildQuizPrompt(sourceText);
+    const { reply } = await fetchWithRetry(prompt);
+
+    const parsed = safeParseJSON(reply);
+    if (!parsed) {
+        // If parse failed completely, try once more with a fresh call
+        return generateQuizQuestions(sourceText, attemptNumber + 1);
+    }
+
+    const questions = validateAndRepairBatch(Array.isArray(parsed) ? parsed : [parsed]);
+
+    if (questions.length < MIN_QUESTIONS) {
+        return generateQuizQuestions(sourceText, attemptNumber + 1);
+    }
+
+    return questions;
+}
+
+// ─────────────────────────────────────────────
+//  GENERATE BUTTON HANDLER
+// ─────────────────────────────────────────────
+document.getElementById('generateBtn').addEventListener('click', async () => {
+    const title   = document.getElementById('newQuizTitle').value.trim() || 'Untitled Quiz';
+    const text    = document.getElementById('sourceText').value.trim();
+    const genBtn  = document.getElementById('generateBtn');
+    const overlay = document.getElementById('aiOverlay');
+
+    if (!text) { showToast('✍️ Please paste some text to generate a quiz'); return; }
+    if (text.length < 50) { showToast('⚠️ Text is too short. Add more content for better questions.'); return; }
+    if (text.length > MAX_INPUT_CHARS) { showToast(`⚠️ Text is too long. Please limit to ${MAX_INPUT_CHARS} characters.`); return; }
+
+    // Show overlay, disable button to prevent duplicate submissions
+    overlay.classList.add('show');
+    genBtn.disabled = true;
+    setOverlayStatus('');
+
+    try {
+        const questions = await generateQuizQuestions(text);
 
         const newQuiz = {
-            id: uid(),
-            title: title,
-            questions: questionsData,
+            id:        uid(),
+            title:     title,
+            questions: questions,
             bestScore: 0,
-            createdAt: Date.now()
+            createdAt: Date.now(),
         };
 
         quizzes.unshift(newQuiz);
         saveToStorage();
-        showToast('✨ Quiz generated successfully!');
-        
+        showToast(`✨ Quiz ready — ${questions.length} questions generated!`);
         openQuiz(newQuiz.id);
 
     } catch (err) {
-        console.error(err);
-        showToast('⚠️ Failed to generate quiz. Ensure text is clear.');
+        console.error('[QuizGen] Generation failed:', err);
+        showToast(`⚠️ ${err.message || 'Failed to generate quiz. Please try again.'}`);
     } finally {
         overlay.classList.remove('show');
+        genBtn.disabled = false;
+        setOverlayStatus('');
     }
 });
 
-// ─────────────────────────────────────────────
+// ═════════════════════════════════════════════
 //  QUIZ PLAYER LOGIC
-// ─────────────────────────────────────────────
+// ═════════════════════════════════════════════
 function startQuiz(quiz) {
-    if(!quiz) return;
-    activeQuizData = quiz;
-    currentQuestionIndex = 0;
-    userScore = 0;
-    
+    if (!quiz) return;
+    activeQuizData        = quiz;
+    currentQuestionIndex  = 0;
+    userScore             = 0;
     showView('playerView');
     renderQuestion();
 }
@@ -478,16 +771,26 @@ function startQuiz(quiz) {
 function renderQuestion() {
     hasAnsweredCurrent = false;
     document.getElementById('nextBtn').style.display = 'none';
-    
-    const qCount = activeQuizData.questions.length;
-    const progress = ((currentQuestionIndex) / qCount) * 100;
+    document.getElementById('explanationArea').innerHTML = '';
+
+    const qCount    = activeQuizData.questions.length;
+    const progress  = (currentQuestionIndex / qCount) * 100;
     document.getElementById('progressBar').style.width = progress + '%';
-    
+
     const qData = activeQuizData.questions[currentQuestionIndex];
-    
+
     document.getElementById('qCounter').textContent = `Question ${currentQuestionIndex + 1} of ${qCount}`;
-    document.getElementById('qText').textContent = qData.question;
-    
+    document.getElementById('qText').textContent    = qData.question;
+
+    // Question type badge (only if type is present)
+    const badge = document.getElementById('qTypeBadge');
+    if (qData.type) {
+        const labels = { conceptual: '💡 Conceptual', definition: '📖 Definition', application: '🔬 Application' };
+        badge.innerHTML = `<span class="question-type-badge">${labels[qData.type] || qData.type}</span>`;
+    } else {
+        badge.innerHTML = '';
+    }
+
     const grid = document.getElementById('optionsGrid');
     grid.innerHTML = qData.options.map((opt, idx) => `
         <button class="option-btn" onclick="selectAnswer(${idx}, this)">
@@ -498,13 +801,14 @@ function renderQuestion() {
 }
 
 function selectAnswer(selectedIndex, btnElement) {
-    if(hasAnsweredCurrent) return;
+    if (hasAnsweredCurrent) return;
     hasAnsweredCurrent = true;
-    
-    const correctIndex = activeQuizData.questions[currentQuestionIndex].correctIndex;
-    const allBtns = document.querySelectorAll('.option-btn');
-    
-    // Disable all
+
+    const qData        = activeQuizData.questions[currentQuestionIndex];
+    const correctIndex = qData.correctIndex;
+    const allBtns      = document.querySelectorAll('.option-btn');
+
+    // Disable all buttons
     allBtns.forEach(b => b.classList.add('disabled'));
 
     if (selectedIndex === correctIndex) {
@@ -513,19 +817,26 @@ function selectAnswer(selectedIndex, btnElement) {
         btnElement.querySelector('.result-icon').style.display = 'block';
     } else {
         btnElement.classList.add('wrong');
-        btnElement.querySelector('.result-icon').innerHTML = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
-        btnElement.querySelector('.result-icon').style.display = 'block';
-        
-        // Highlight correct answer
+        const wrongIcon = btnElement.querySelector('.result-icon');
+        wrongIcon.innerHTML = '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>';
+        wrongIcon.style.display = 'block';
+        // Highlight correct
         allBtns[correctIndex].classList.add('correct');
     }
 
-    const nextBtn = document.getElementById('nextBtn');
-    if (currentQuestionIndex < activeQuizData.questions.length - 1) {
-        nextBtn.textContent = 'Next Question ➔';
-    } else {
-        nextBtn.textContent = 'See Results ✨';
+    // Show explanation if available
+    if (qData.explanation) {
+        document.getElementById('explanationArea').innerHTML = `
+            <div class="explanation-panel">
+                <div class="explanation-label">Explanation</div>
+                <div>${qData.explanation}</div>
+            </div>`;
     }
+
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.textContent = currentQuestionIndex < activeQuizData.questions.length - 1
+        ? 'Next Question ➔'
+        : 'See Results ✨';
     nextBtn.style.display = 'block';
 }
 
@@ -540,31 +851,28 @@ document.getElementById('nextBtn').addEventListener('click', () => {
 
 function finishQuiz() {
     const total = activeQuizData.questions.length;
-    
-    // Update Best Score
+
     if (userScore > activeQuizData.bestScore) {
         const idx = quizzes.findIndex(q => q.id === activeQuizData.id);
-        if(idx > -1) quizzes[idx].bestScore = userScore;
+        if (idx > -1) quizzes[idx].bestScore = userScore;
         saveToStorage();
         renderSidebar();
     }
 
     document.getElementById('resultsTitle').textContent = activeQuizData.title;
-    document.getElementById('scoreCircle').textContent = `${userScore}/${total}`;
-    
+    document.getElementById('scoreCircle').textContent  = `${userScore}/${total}`;
+
     const pct = userScore / total;
     let msg = "Keep studying, you'll get it!";
-    if (pct === 1) msg = "Perfect score! Brilliant!";
+    if (pct === 1)       msg = "Perfect score! Brilliant!";
     else if (pct >= 0.8) msg = "Great job! Almost perfect.";
     else if (pct >= 0.5) msg = "Good effort, keep reviewing!";
-    
+
     document.getElementById('resultsMsg').textContent = msg;
     showView('resultsView');
 }
 
-function retakeQuiz() {
-    startQuiz(activeQuizData);
-}
+function retakeQuiz() { startQuiz(activeQuizData); }
 
 // ─────────────────────────────────────────────
 //  EVENTS & INIT
