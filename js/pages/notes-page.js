@@ -608,4 +608,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 init();
+<<<<<<< HEAD
 
+=======
+>>>>>>> bdec5ee (initial commit)
