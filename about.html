@@ -6,13 +6,13 @@
     <title>About • SyllaStudy AI</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
-       
+        
         :root {
             --glass-bg: rgba(255, 255, 255, 0.08);
             --glass-border: rgba(255, 255, 255, 0.22);
             --glass-blur: 40px;
             --text-main: #ffffff;
-            --text-dim: rgba(255, 255, 255, 0.75);
+            --text-dim: rgba(255, 255, 255, 0.75);  
             --accent-glow: rgba(255, 255, 255, 0.35);
         }
 
@@ -37,7 +37,6 @@
             overflow: hidden;
         }
 
-        /* Navigation */
         nav {
             height: 80px;
             backdrop-filter: blur(20px);
@@ -76,7 +75,6 @@
             text-shadow: 0 0 15px var(--accent-glow);
         }
 
-        /* Main Content */
         main {
             flex: 1;
             display: flex;
@@ -127,21 +125,29 @@
         .feature-tag-container {
             display: flex;
             justify-content: center;
-            flex-wrap: wrap;
-            gap: 14px;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 12px;
             margin: 48px 0 40px;
         }
 
         .tag {
             background: rgba(255,255,255,0.07);
             border: 1px solid rgba(255,255,255,0.12);
-            padding: 10px 22px;
+            padding: 10px 20px;
             border-radius: 100px;
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 600;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
             color: rgba(255,255,255,0.85);
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .feature-tag-container { flex-wrap: wrap; }
+            .glass-card { padding: 40px 24px; }
+            h1 { font-size: 38px; }
         }
 
         .btn-back {
@@ -185,11 +191,11 @@
     <main>
         <div class="glass-card">
             <h1>Productivity Powerhouse</h1>
-           
+            
             <p>
                 SyllaStudy AI is an all-in-one productivity platform built specifically for students.
             </p>
-           
+            
             <p>
                 Whether you're turning raw lecture notes into interactive quizzes with <span class="highlight">QuizGen</span>, 
                 refining your ideas with <span class="highlight">SmartNotes</span>, chatting with an intelligent study assistant, 
