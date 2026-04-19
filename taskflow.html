@@ -1,565 +1,355 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Focus & Tasks • SyllaStudy AI</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Focus & Tasks • SyllaStudy AI</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --glass-bg: rgba(255,255,255,0.08);
+    --glass-bg-hover: rgba(255,255,255,0.13);
+    --glass-border: rgba(255,255,255,0.18);
+    --glass-blur: 36px;
+    --text-main: #fff;
+    --text-dim: rgba(255,255,255,0.5);
+    --text-mid: rgba(255,255,255,0.75);
+    --accent: #4ade80;
+    --ring-bg: rgba(255,255,255,0.08);
+    --danger: rgba(255,90,90,0.85);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  html { overflow-x: hidden; }
 
-    <style>
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-bg-hover: rgba(255, 255, 255, 0.13);
-            --glass-border: rgba(255, 255, 255, 0.18);
-            --glass-blur: 36px;
-            --text-main: #ffffff;
-            --text-dim: rgba(255, 255, 255, 0.5);
-            --text-mid: rgba(255, 255, 255, 0.75);
-            --accent: #4ade80;
-            --ring-bg: rgba(255,255,255,0.08);
-            --danger: rgba(255, 90, 90, 0.85);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background:
-                linear-gradient(160deg, rgba(0,0,0,0.52) 0%, rgba(0,0,0,0.74) 100%),
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(160deg, rgba(0,0,0,0.52) 0%, rgba(0,0,0,0.74) 100%),
                 url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            height: 100vh;
-            color: var(--text-main);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+    background-size: cover; background-position: center; background-attachment: fixed;
+    min-height: 100dvh; color: var(--text-main);
+    display: flex; flex-direction: column; overflow-x: hidden;
+  }
 
-        /* ── NAV ── */
-        nav {
-            height: 72px;
-            backdrop-filter: blur(24px) saturate(1.4);
-            background: rgba(255,255,255,0.04);
-            border-bottom: 1px solid var(--glass-border);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 56px;
-            flex-shrink: 0;
-            z-index: 200;
-        }
-        .logo { font-family: 'Lora', serif; font-size: 19px; font-weight: 700; letter-spacing: -0.3px; text-decoration: none; color: white; }
-        .nav-links a {
-            color: white; text-decoration: none; margin-left: 36px;
-            font-size: 13px; font-weight: 400; letter-spacing: 0.04em;
-            opacity: 0.5; transition: opacity 0.25s;
-        }
-        .nav-links a:hover { opacity: 0.85; }
-        .nav-links a.active { opacity: 1; }
+  /* ── NAV ── */
+  nav {
+    height: 64px; backdrop-filter: blur(24px) saturate(1.4); -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    background: rgba(255,255,255,0.04); border-bottom: 1px solid var(--glass-border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 clamp(20px,4vw,56px); flex-shrink: 0; z-index: 200; position: sticky; top: 0;
+  }
+  .logo { font-family:'Lora',serif; font-size:18px; font-weight:700; letter-spacing:-0.3px; text-decoration:none; color:#fff; white-space:nowrap; }
+  .nav-links { display:flex; align-items:center; gap:2px; }
+  .nav-links a { color:#fff; text-decoration:none; padding:7px 13px; font-size:13px; font-weight:400; letter-spacing:0.04em; opacity:0.5; border-radius:20px; white-space:nowrap; transition:0.25s; }
+  .nav-links a:hover { opacity:0.85; background:rgba(255,255,255,0.08); }
+  .nav-links a.active { opacity:1; background:rgba(255,255,255,0.1); }
+  .nav-burger { display:none; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; width:38px; height:38px; border-radius:10px; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+  .nav-burger svg { width:17px;height:17px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round; }
+  .mobile-drawer { display:none; flex-direction:column; position:fixed; top:64px; left:0; right:0; background:rgba(8,8,16,0.97); backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px); border-bottom:1px solid rgba(255,255,255,0.1); z-index:199; padding:10px 16px 18px; gap:3px; }
+  .mobile-drawer.open { display:flex; }
+  .mobile-drawer a { color:rgba(255,255,255,0.75); text-decoration:none; font-size:15px; font-weight:500; padding:13px 16px; border-radius:12px; transition:0.2s; }
+  .mobile-drawer a.active, .mobile-drawer a:hover { background:rgba(255,255,255,0.09); color:#fff; }
 
-        /* ── GLOBAL FOOTER ── */
-                
-        
-        
-        
-        
-        
-        @media (max-width: 900px) {  }
+  /* ── MAIN LAYOUT ── */
+  main {
+    flex: 1; display: grid;
+    grid-template-columns: 1fr clamp(320px,35vw,420px);
+    padding: clamp(16px,2.5vw,28px) clamp(16px,4vw,56px);
+    gap: clamp(14px,2vw,28px);
+    min-height: 0;
+    /* desktop: fixed viewport height, no scroll */
+    height: calc(100dvh - 64px);
+    overflow: hidden;
+  }
 
-        /* ── MAIN LAYOUT ── */
-        main {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 420px;
-            padding: 28px 56px;
-            gap: 28px;
-            overflow: hidden;
-            min-height: 0;
-        }
+  /* ── TIMER ── */
+  .timer-section {
+    background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border); border-radius: 28px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative; overflow: hidden; transition: border-color 0.5s; gap: 0;
+  }
+  .timer-section.running  { border-color: rgba(255,255,255,0.35); }
+  .timer-section.paused   { border-color: rgba(255,200,80,0.35); }
+  .timer-section.finished { border-color: rgba(80,220,120,0.45); }
+  .timer-section::before { content:''; position:absolute; width:500px; height:500px; border-radius:50%; background:radial-gradient(circle,rgba(255,255,255,0.04) 0%,transparent 70%); pointer-events:none; opacity:0; transition:opacity 0.6s; }
+  .timer-section.running::before { opacity:1; animation:ambientPulse 4s ease-in-out infinite; }
+  @keyframes ambientPulse { 0%,100%{transform:scale(0.9);opacity:0.4} 50%{transform:scale(1.1);opacity:0.9} }
 
-        /* ════════════════════════════════════
-           LEFT — FOCUS TIMER
-        ════════════════════════════════════ */
-        .timer-section {
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid var(--glass-border);
-            border-radius: 32px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-            transition: border-color 0.5s;
-            gap: 0;
-        }
-        .timer-section.running  { border-color: rgba(255,255,255,0.35); box-shadow: inset 0 0 80px rgba(255,255,255,0.03); }
-        .timer-section.paused   { border-color: rgba(255,200,80,0.35); }
-        .timer-section.finished { border-color: rgba(80,220,120,0.45); }
+  .active-task-banner { position:absolute; top:20px; left:50%; transform:translateX(-50%); background:rgba(74,222,128,0.12); border:1px solid rgba(74,222,128,0.3); border-radius:100px; padding:5px 16px; font-size:12px; color:rgba(74,222,128,0.9); letter-spacing:0.05em; white-space:nowrap; max-width:80%; overflow:hidden; text-overflow:ellipsis; opacity:0; pointer-events:none; transition:opacity 0.35s; }
+  .active-task-banner.visible { opacity:1; }
 
-        /* Ambient glow */
-        .timer-section::before {
-            content: '';
-            position: absolute;
-            width: 500px; height: 500px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
-            pointer-events: none;
-            opacity: 0; transition: opacity 0.6s;
-        }
-        .timer-section.running::before { opacity: 1; animation: ambientPulse 4s ease-in-out infinite; }
-        @keyframes ambientPulse {
-            0%,100% { transform: scale(0.9); opacity: 0.4; }
-            50%      { transform: scale(1.1); opacity: 0.9; }
-        }
+  .status-badge { display:inline-flex; align-items:center; gap:7px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:18px; padding:6px 15px; border:1px solid var(--glass-border); border-radius:100px; backdrop-filter:blur(10px); background:rgba(255,255,255,0.05); transition:all 0.4s; }
+  .status-dot { width:6px; height:6px; border-radius:50%; background:var(--text-dim); transition:background 0.4s; }
+  .status-badge.running  { border-color:rgba(80,220,120,0.4); color:rgba(80,220,120,0.9); }
+  .status-badge.running .status-dot { background:rgba(80,220,120,0.9); animation:blink 1.5s infinite; }
+  .status-badge.paused   { border-color:rgba(255,200,80,0.4); color:rgba(255,200,80,0.9); }
+  .status-badge.paused .status-dot { background:rgba(255,200,80,0.9); }
+  .status-badge.finished { border-color:rgba(80,200,255,0.4); color:rgba(80,200,255,0.9); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-        /* Active task banner */
-        .active-task-banner {
-            position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
-            background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.3);
-            border-radius: 100px; padding: 6px 18px;
-            font-size: 12px; color: rgba(74,222,128,0.9);
-            letter-spacing: 0.05em; white-space: nowrap; max-width: 80%;
-            overflow: hidden; text-overflow: ellipsis;
-            opacity: 0; pointer-events: none; transition: opacity 0.35s;
-        }
-        .active-task-banner.visible { opacity: 1; }
+  .ring-wrapper { position:relative; width:clamp(180px,22vw,260px); height:clamp(180px,22vw,260px); margin-bottom:24px; }
+  .ring-svg { position:absolute; top:0; left:0; width:100%; height:100%; transform:rotate(-90deg); }
+  .ring-track  { fill:none; stroke:var(--ring-bg); stroke-width:5; }
+  .ring-progress { fill:none; stroke:#fff; stroke-width:5; stroke-linecap:round; transition:stroke-dashoffset 1s linear,stroke 0.4s; }
+  .ring-inner { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
+  .timer-display { font-size:clamp(44px,6vw,68px); font-weight:300; letter-spacing:-2px; line-height:1; font-variant-numeric:tabular-nums; transition:color 0.4s; }
+  .timer-session-label { font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(--text-dim); margin-top:7px; }
 
-        /* Status badge */
-        .status-badge {
-            display: inline-flex; align-items: center; gap: 7px;
-            font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
-            color: var(--text-dim); margin-bottom: 20px; padding: 6px 16px;
-            border: 1px solid var(--glass-border); border-radius: 100px;
-            backdrop-filter: blur(10px); background: rgba(255,255,255,0.05);
-            transition: all 0.4s;
-        }
-        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim); transition: background 0.4s; }
-        .status-badge.running  { border-color: rgba(80,220,120,0.4); color: rgba(80,220,120,0.9); }
-        .status-badge.running .status-dot { background: rgba(80,220,120,0.9); animation: blink 1.5s infinite; }
-        .status-badge.paused   { border-color: rgba(255,200,80,0.4);  color: rgba(255,200,80,0.9); }
-        .status-badge.paused .status-dot  { background: rgba(255,200,80,0.9); }
-        .status-badge.finished { border-color: rgba(80,200,255,0.4);  color: rgba(80,200,255,0.9); }
-        @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+  .timer-controls { display:flex; gap:12px; margin-top:4px; }
+  .btn-start-timer { background:#fff; color:#000; border:none; padding:14px 36px; border-radius:100px; font-family:inherit; font-weight:500; font-size:14px; letter-spacing:0.04em; cursor:pointer; min-width:150px; transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.2s; }
+  .btn-start-timer:hover { transform:scale(1.04); box-shadow:0 8px 30px rgba(255,255,255,0.25); }
+  .btn-start-timer:active { transform:scale(0.98); }
+  .btn-ghost { background:transparent; color:var(--text-mid); border:1px solid var(--glass-border); padding:14px 20px; border-radius:100px; font-family:inherit; font-size:13px; letter-spacing:0.04em; cursor:pointer; transition:0.2s; }
+  .btn-ghost:hover { background:rgba(255,255,255,0.1); color:#fff; }
 
-        /* Ring */
-        .ring-wrapper { position: relative; width: 260px; height: 260px; margin-bottom: 28px; }
-        .ring-svg { position: absolute; top:0; left:0; width:100%; height:100%; transform: rotate(-90deg); }
-        .ring-track    { fill: none; stroke: var(--ring-bg); stroke-width: 5; }
-        .ring-progress { fill: none; stroke: white; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.4s; }
-        .ring-inner { position: absolute; top:50%; left:50%; transform: translate(-50%,-50%); text-align: center; }
-        .timer-display { font-size: 68px; font-weight: 300; letter-spacing: -2px; line-height: 1; font-variant-numeric: tabular-nums; transition: color 0.4s; }
-        .timer-session-label { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim); margin-top: 8px; }
+  .mode-strip { position:absolute; bottom:0; left:0; right:0; border-top:1px solid var(--glass-border); display:flex; }
+  .mode-pill { flex:1; padding:11px 5px; text-align:center; cursor:pointer; border-right:1px solid var(--glass-border); transition:background 0.2s; display:flex; flex-direction:column; align-items:center; gap:2px; }
+  .mode-pill:last-child { border-right:none; }
+  .mode-pill:hover { background:rgba(255,255,255,0.06); }
+  .mode-pill.active { background:rgba(255,255,255,0.1); }
+  .mode-pill-icon { font-size:14px; }
+  .mode-pill-label { font-size:9.5px; color:var(--text-dim); letter-spacing:0.05em; }
+  .mode-pill-time  { font-size:10.5px; font-weight:500; color:var(--text-mid); }
+  .mode-pill.active .mode-pill-label, .mode-pill.active .mode-pill-time { color:#fff; }
 
-        /* Controls */
-        .timer-controls { display: flex; gap: 14px; margin-top: 4px; }
-        .btn-start-timer {
-            background: white; color: black; border: none;
-            padding: 15px 44px; border-radius: 100px;
-            font-family: inherit; font-weight: 500; font-size: 15px;
-            letter-spacing: 0.04em; cursor: pointer; min-width: 170px;
-            transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
-        }
-        .btn-start-timer:hover { transform: scale(1.04); box-shadow: 0 8px 30px rgba(255,255,255,0.25); }
-        .btn-start-timer:active { transform: scale(0.98); }
-        .btn-ghost {
-            background: transparent; color: var(--text-mid);
-            border: 1px solid var(--glass-border);
-            padding: 15px 22px; border-radius: 100px;
-            font-family: inherit; font-size: 14px; letter-spacing: 0.04em;
-            cursor: pointer; transition: background 0.2s, color 0.2s;
-        }
-        .btn-ghost:hover { background: rgba(255,255,255,0.1); color: white; }
+  .custom-modal { display:none; position:absolute; bottom:80px; left:50%; transform:translateX(-50%); background:rgba(15,15,20,0.92); backdrop-filter:blur(20px); border:1px solid var(--glass-border); border-radius:18px; padding:18px 22px; z-index:20; min-width:250px; }
+  .custom-modal.visible { display:block; animation:fadeUp 0.25s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateX(-50%) translateY(8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+  .custom-modal-title { font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-dim); margin-bottom:13px; }
+  .custom-row { display:flex; gap:9px; }
+  .time-input-group { flex:1; display:flex; flex-direction:column; gap:5px; }
+  .time-input-label { font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim); }
+  .time-input { background:rgba(255,255,255,0.08); border:1px solid var(--glass-border); border-radius:10px; padding:9px 11px; color:#fff; font-family:inherit; font-size:20px; font-weight:300; width:100%; text-align:center; -moz-appearance:textfield; transition:border-color 0.2s; }
+  .time-input::-webkit-outer-spin-button, .time-input::-webkit-inner-spin-button { -webkit-appearance:none; }
+  .time-input:focus { outline:none; border-color:rgba(255,255,255,0.5); }
+  .time-input::placeholder { color:rgba(255,255,255,0.2); }
+  .btn-apply { width:100%; margin-top:11px; background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); border-radius:10px; padding:10px; font-family:inherit; font-size:13px; letter-spacing:0.07em; cursor:pointer; transition:0.2s; }
+  .btn-apply:hover { background:rgba(255,255,255,0.18); }
 
-        /* Mode cards (bottom strip in timer panel) */
-        .mode-strip {
-            position: absolute; bottom: 0; left: 0; right: 0;
-            border-top: 1px solid var(--glass-border);
-            display: flex; padding: 0;
-        }
-        .mode-pill {
-            flex: 1; padding: 12px 6px; text-align: center; cursor: pointer;
-            border-right: 1px solid var(--glass-border);
-            transition: background 0.2s;
-            display: flex; flex-direction: column; align-items: center; gap: 2px;
-        }
-        .mode-pill:last-child { border-right: none; }
-        .mode-pill:hover { background: rgba(255,255,255,0.06); }
-        .mode-pill.active { background: rgba(255,255,255,0.1); }
-        .mode-pill-icon { font-size: 15px; }
-        .mode-pill-label { font-size: 10px; color: var(--text-dim); letter-spacing: 0.06em; }
-        .mode-pill-time { font-size: 11px; font-weight: 500; color: var(--text-mid); }
-        .mode-pill.active .mode-pill-label,
-        .mode-pill.active .mode-pill-time { color: white; }
+  .completion-overlay { display:none; position:absolute; inset:0; backdrop-filter:blur(8px); background:rgba(0,0,0,0.5); border-radius:28px; flex-direction:column; align-items:center; justify-content:center; z-index:10; animation:fadeIn 0.4s ease; }
+  .completion-overlay.visible { display:flex; }
+  .completion-emoji { font-size:48px; margin-bottom:12px; animation:pop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+  @keyframes pop { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+  .completion-title { font-size:22px; font-weight:300; letter-spacing:-0.5px; margin-bottom:7px; }
+  .completion-sub { font-size:13px; color:var(--text-dim); margin-bottom:22px; }
+  .completion-actions { display:flex; gap:11px; }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
 
-        /* Custom input modal */
-        .custom-modal {
-            display: none; position: absolute; bottom: 80px;
-            left: 50%; transform: translateX(-50%);
-            background: rgba(15,15,20,0.9); backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border); border-radius: 20px;
-            padding: 20px 24px; z-index: 20; min-width: 260px;
-        }
-        .custom-modal.visible { display: block; animation: fadeUp 0.25s ease; }
-        @keyframes fadeUp { from { opacity:0; transform: translateX(-50%) translateY(8px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
-        .custom-modal-title { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 14px; }
-        .custom-row { display: flex; gap: 10px; }
-        .time-input-group { flex:1; display: flex; flex-direction: column; gap: 5px; }
-        .time-input-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
-        .time-input {
-            background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border);
-            border-radius: 10px; padding: 10px 12px; color: white;
-            font-family: inherit; font-size: 20px; font-weight: 300; width: 100%;
-            text-align: center; -moz-appearance: textfield; transition: border-color 0.2s;
-        }
-        .time-input::-webkit-outer-spin-button, .time-input::-webkit-inner-spin-button { -webkit-appearance: none; }
-        .time-input:focus { outline: none; border-color: rgba(255,255,255,0.5); }
-        .time-input::placeholder { color: rgba(255,255,255,0.2); }
-        .btn-apply {
-            width: 100%; margin-top: 12px;
-            background: rgba(255,255,255,0.1); color: white;
-            border: 1px solid rgba(255,255,255,0.2); border-radius: 10px;
-            padding: 11px; font-family: inherit; font-size: 13px; letter-spacing: 0.08em;
-            cursor: pointer; transition: background 0.2s;
-        }
-        .btn-apply:hover { background: rgba(255,255,255,0.18); }
+  /* ── TASKS PANEL ── */
+  .tasks-panel { background:var(--glass-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur)); border:1px solid var(--glass-border); border-radius:28px; display:flex; flex-direction:column; overflow:hidden; min-height:0; }
+  .panel-tabs { display:flex; border-bottom:1px solid var(--glass-border); flex-shrink:0; }
+  .panel-tab { flex:1; padding:15px 8px; text-align:center; cursor:pointer; font-size:11.5px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-dim); border-right:1px solid var(--glass-border); transition:0.2s; }
+  .panel-tab:last-child { border-right:none; }
+  .panel-tab.active { background:rgba(255,255,255,0.07); color:#fff; }
+  .panel-tab:hover:not(.active) { background:rgba(255,255,255,0.04); color:var(--text-mid); }
+  .tasks-body { flex:1; overflow-y:auto; scrollbar-width:none; padding:18px; display:flex; flex-direction:column; gap:13px; min-height:0; }
+  .tasks-body::-webkit-scrollbar { display:none; }
+  .ai-input-wrap { position:relative; display:flex; gap:9px; }
+  .ai-input { flex:1; background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.14); border-radius:13px; padding:13px 16px; color:#fff; font-size:14px; font-family:inherit; outline:none; transition:0.3s; }
+  .ai-input:focus { border-color:rgba(74,222,128,0.5); background:rgba(0,0,0,0.42); }
+  .ai-input::placeholder { color:rgba(255,255,255,0.3); }
+  .btn-explode { background:rgba(255,255,255,0.9); color:#000; border:none; padding:0 16px; height:46px; border-radius:13px; font-weight:700; font-size:13px; cursor:pointer; flex-shrink:0; white-space:nowrap; transition:0.25s; display:flex; align-items:center; gap:5px; }
+  .btn-explode:hover:not(:disabled) { background:#fff; transform:scale(1.03); }
+  .btn-explode:disabled { opacity:0.5; cursor:not-allowed; }
+  .section-label { font-size:10.5px; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-dim); display:flex; align-items:center; justify-content:space-between; }
+  .task-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:13px; padding:13px 15px; display:flex; align-items:center; gap:11px; transition:0.2s; position:relative; }
+  .task-card:hover { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.18); }
+  .check-circle { width:21px; height:21px; border:2px solid rgba(255,255,255,0.25); border-radius:50%; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:0.2s; }
+  .check-circle:hover { border-color:var(--accent); }
+  .task-card.completed .check-circle { background:var(--accent); border-color:var(--accent); }
+  .task-card.completed .check-circle::after { content:'✓'; color:#000; font-weight:bold; font-size:12px; }
+  .task-card.completed .task-text { text-decoration:line-through; opacity:0.4; }
+  .task-info { flex:1; min-width:0; }
+  .task-text { font-size:13.5px; font-weight:500; margin-bottom:4px; transition:0.2s; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .task-tags { display:flex; gap:5px; flex-wrap:wrap; }
+  .tag { padding:2px 7px; border-radius:6px; font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; }
+  .tag-time { color:#60a5fa; background:rgba(96,165,250,0.15); }
+  .energy-high   { color:#ff5a5a; background:rgba(255,90,90,0.15); }
+  .energy-medium { color:#fbbf24; background:rgba(251,191,36,0.15); }
+  .energy-low    { color:#4ade80; background:rgba(74,222,128,0.15); }
+  .btn-focus-task { background:rgba(74,222,128,0.15); color:#4ade80; border:1px solid rgba(74,222,128,0.28); padding:5px 11px; border-radius:8px; font-weight:600; font-size:11.5px; cursor:pointer; flex-shrink:0; transition:0.2s; white-space:nowrap; }
+  .btn-focus-task:hover { background:#4ade80; color:#000; }
+  .btn-focus-task.active-focus { background:rgba(255,200,80,0.15); color:#fbbf24; border-color:rgba(255,200,80,0.3); }
+  .btn-delete-task { background:none; border:none; color:var(--text-dim); cursor:pointer; padding:5px; opacity:0; transition:0.2s; flex-shrink:0; }
+  .task-card:hover .btn-delete-task { opacity:1; }
+  .btn-delete-task:hover { color:var(--danger); }
+  .empty-state { text-align:center; padding:28px 14px; opacity:0.4; font-size:13px; }
+  .schedule-section { display:flex; flex-direction:column; gap:14px; }
+  .btn-schedule { width:100%; background:linear-gradient(135deg,#60a5fa,#8b5cf6); color:#fff; border:none; padding:13px; border-radius:13px; font-weight:700; font-size:14px; cursor:pointer; transition:0.3s; box-shadow:0 4px 15px rgba(139,92,246,0.3); }
+  .btn-schedule:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 25px rgba(139,92,246,0.5); }
+  .btn-schedule:disabled { opacity:0.5; cursor:not-allowed; }
+  .time-block { background:rgba(255,255,255,0.05); border-left:3px solid #8b5cf6; padding:11px 15px; border-radius:0 11px 11px 0; }
+  .time-label-block { font-size:10.5px; color:#a78bfa; font-weight:700; margin-bottom:3px; text-transform:uppercase; letter-spacing:0.05em; }
+  .time-task-text { font-size:13.5px; font-weight:500; }
+  .schedule-placeholder { text-align:center; padding:28px 18px; opacity:0.38; font-size:13px; line-height:1.6; }
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(14px); background:rgba(20,20,25,0.92); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.12); border-radius:100px; padding:10px 20px; font-size:13px; font-weight:500; color:#fff; opacity:0; pointer-events:none; transition:0.3s; z-index:9999; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .spinner { width:16px; height:16px; border:2px solid rgba(0,0,0,0.2); border-top-color:#000; border-radius:50%; animation:spin 0.8s linear infinite; }
+  .spinner.w { border-color:rgba(255,255,255,0.2); border-top-color:#fff; }
+  @keyframes spin { to{transform:rotate(360deg)} }
 
-        /* Completion overlay */
-        .completion-overlay {
-            display: none; position: absolute; inset: 0;
-            backdrop-filter: blur(8px); background: rgba(0,0,0,0.5);
-            border-radius: 32px; flex-direction: column;
-            align-items: center; justify-content: center; z-index: 10;
-            animation: fadeIn 0.4s ease;
-        }
-        .completion-overlay.visible { display: flex; }
-        .completion-emoji { font-size: 52px; margin-bottom: 14px; animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
-        @keyframes pop { from { transform:scale(0.5); opacity:0; } to { transform:scale(1); opacity:1; } }
-        .completion-title { font-size: 24px; font-weight: 300; letter-spacing: -0.5px; margin-bottom: 8px; }
-        .completion-sub { font-size: 13px; color: var(--text-dim); margin-bottom: 24px; }
-        .completion-actions { display: flex; gap: 12px; }
-        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  /* ── FOOTER ── */
+  .site-footer { flex-shrink:0; margin:0 16px 16px; border-radius:16px; backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); padding:14px clamp(16px,3vw,36px); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+  .footer-copy { font-size:12px; color:rgba(255,255,255,0.3); }
+  .footer-nav { display:flex; align-items:center; gap:4px; flex-wrap:wrap; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:12px; padding:4px 5px; }
+  .footer-nav a { font-size:12px; font-weight:500; color:rgba(255,255,255,0.38); text-decoration:none; padding:5px 10px; border-radius:18px; border:1px solid rgba(255,255,255,0.07); background:rgba(255,255,255,0.03); transition:0.22s; }
+  .footer-nav a:hover { color:rgba(255,255,255,0.85); background:rgba(255,255,255,0.08); }
+  .footer-nav a.active { color:rgba(255,255,255,0.75); background:rgba(255,255,255,0.06); }
+  .footer-sep { width:1px; height:12px; background:rgba(255,255,255,0.12); margin:0 3px; }
 
-        /* ════════════════════════════════════
-           RIGHT — TASKS PANEL
-        ════════════════════════════════════ */
-        .tasks-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid var(--glass-border);
-            border-radius: 32px;
-            display: flex; flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* Panel header tabs */
-        .panel-tabs {
-            display: flex; border-bottom: 1px solid var(--glass-border);
-            flex-shrink: 0;
-        }
-        .panel-tab {
-            flex: 1; padding: 16px 8px; text-align: center; cursor: pointer;
-            font-size: 12px; font-weight: 500; letter-spacing: 0.08em;
-            text-transform: uppercase; color: var(--text-dim);
-            border-right: 1px solid var(--glass-border);
-            transition: background 0.2s, color 0.2s;
-        }
-        .panel-tab:last-child { border-right: none; }
-        .panel-tab.active { background: rgba(255,255,255,0.07); color: white; }
-        .panel-tab:hover:not(.active) { background: rgba(255,255,255,0.04); color: var(--text-mid); }
-
-        /* Scrollable task body */
-        .tasks-body {
-            flex: 1; overflow-y: auto; scrollbar-width: none; padding: 20px;
-            display: flex; flex-direction: column; gap: 14px; min-height: 0;
-        }
-        .tasks-body::-webkit-scrollbar { display: none; }
-
-        /* AI Input */
-        .ai-input-wrap { position: relative; display: flex; gap: 10px; }
-        .ai-input {
-            flex: 1; background: rgba(0,0,0,0.28); border: 1px solid rgba(255,255,255,0.14);
-            border-radius: 14px; padding: 14px 18px; color: white; font-size: 14px;
-            font-family: inherit; outline: none; transition: 0.3s;
-        }
-        .ai-input:focus { border-color: rgba(74,222,128,0.5); background: rgba(0,0,0,0.42); }
-        .ai-input::placeholder { color: rgba(255,255,255,0.3); }
-        .btn-explode {
-            background: rgba(255,255,255,0.9); color: black; border: none;
-            padding: 0 18px; height: 48px; border-radius: 14px; font-weight: 700;
-            font-size: 13px; cursor: pointer; flex-shrink: 0; white-space: nowrap;
-            transition: all 0.25s; display: flex; align-items: center; gap: 6px;
-        }
-        .btn-explode:hover:not(:disabled) { background: white; transform: scale(1.03); box-shadow: 0 8px 20px rgba(255,255,255,0.2); }
-        .btn-explode:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* Section label */
-        .section-label {
-            font-size: 11px; font-weight: 500; letter-spacing: 0.14em;
-            text-transform: uppercase; color: var(--text-dim);
-            display: flex; align-items: center; justify-content: space-between;
-        }
-
-        /* Task cards */
-        .task-card {
-            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
-            border-radius: 14px; padding: 14px 16px;
-            display: flex; align-items: center; gap: 12px;
-            transition: 0.2s; position: relative;
-        }
-        .task-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
-        .check-circle {
-            width: 22px; height: 22px; border: 2px solid rgba(255,255,255,0.25);
-            border-radius: 50%; cursor: pointer; flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.2s;
-        }
-        .check-circle:hover { border-color: var(--accent); }
-        .task-card.completed .check-circle { background: var(--accent); border-color: var(--accent); }
-        .task-card.completed .check-circle::after { content: '✓'; color: #000; font-weight: bold; font-size: 13px; }
-        .task-card.completed .task-text { text-decoration: line-through; opacity: 0.4; }
-        .task-info { flex: 1; min-width: 0; }
-        .task-text { font-size: 14px; font-weight: 500; margin-bottom: 5px; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .task-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-        .tag { padding: 3px 8px; border-radius: 7px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
-        .tag-time    { color: #60a5fa; background: rgba(96,165,250,0.15); }
-        .energy-high   { color: #ff5a5a; background: rgba(255,90,90,0.15); }
-        .energy-medium { color: #fbbf24; background: rgba(251,191,36,0.15); }
-        .energy-low    { color: #4ade80; background: rgba(74,222,128,0.15); }
-        .btn-focus-task {
-            background: rgba(74,222,128,0.15); color: #4ade80;
-            border: 1px solid rgba(74,222,128,0.28);
-            padding: 6px 12px; border-radius: 9px; font-weight: 600; font-size: 12px;
-            cursor: pointer; flex-shrink: 0; transition: 0.2s; white-space: nowrap;
-        }
-        .btn-focus-task:hover { background: #4ade80; color: #000; }
-        .btn-focus-task.active-focus {
-            background: rgba(255,200,80,0.15); color: #fbbf24;
-            border-color: rgba(255,200,80,0.3);
-        }
-        .btn-delete-task {
-            background: none; border: none; color: var(--text-dim);
-            cursor: pointer; padding: 6px; opacity: 0; transition: 0.2s; flex-shrink: 0;
-        }
-        .task-card:hover .btn-delete-task { opacity: 1; }
-        .btn-delete-task:hover { color: var(--danger); }
-
-        /* Empty state */
-        .empty-state { text-align: center; padding: 30px 16px; opacity: 0.4; font-size: 13px; }
-
-        /* Schedule tab */
-        .schedule-section { display: flex; flex-direction: column; gap: 14px; }
-        .btn-schedule {
-            width: 100%; background: linear-gradient(135deg, #60a5fa, #8b5cf6);
-            color: white; border: none; padding: 14px; border-radius: 14px;
-            font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(139,92,246,0.3); letter-spacing: 0.04em;
-        }
-        .btn-schedule:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(139,92,246,0.5); }
-        .btn-schedule:disabled { opacity: 0.5; cursor: not-allowed; }
-        .time-block {
-            background: rgba(255,255,255,0.05); border-left: 3px solid #8b5cf6;
-            padding: 12px 16px; border-radius: 0 12px 12px 0;
-        }
-        .time-label-block { font-size: 11px; color: #a78bfa; font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
-        .time-task-text { font-size: 14px; font-weight: 500; }
-        .schedule-placeholder { text-align: center; padding: 32px 20px; opacity: 0.38; font-size: 13px; line-height: 1.6; }
-
-        /* Toast */
-        .toast {
-            position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(14px);
-            background: rgba(20,20,25,0.92); backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.12); border-radius: 100px;
-            padding: 11px 22px; font-size: 13px; font-weight: 500; color: white;
-            opacity: 0; pointer-events: none; transition: 0.3s; z-index: 9999;
-        }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-        /* Spinner */
-        .spinner { width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.8s linear infinite; }
-        .spinner.w { border-color: rgba(255,255,255,0.2); border-top-color: #fff; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Responsive */
-        @media (max-height: 720px) {
-            .ring-wrapper { width: 210px; height: 210px; }
-            .timer-display { font-size: 54px; }
-            main { padding: 18px 40px; }
-        }
-    </style>
+  /* ── RESPONSIVE ── */
+  @media (max-width: 860px) {
+    .nav-links { display:none; }
+    .nav-burger { display:flex; }
+    /* Stack layout, allow scrolling on mobile */
+    main {
+      display:flex; flex-direction:column;
+      height:auto; overflow:visible;
+      padding:14px 14px 0;
+    }
+    .timer-section { min-height:420px; border-radius:22px; }
+    .tasks-panel { min-height:400px; border-radius:22px; }
+    .site-footer { flex-direction:column; align-items:flex-start; }
+  }
+  @media (max-width: 480px) {
+    .timer-display { font-size:46px; }
+    .ring-wrapper { width:190px; height:190px; }
+    .btn-start-timer { padding:12px 28px; min-width:130px; font-size:13px; }
+    .btn-ghost { padding:12px 16px; font-size:12px; }
+    .mode-strip { overflow-x:auto; scrollbar-width:none; }
+    .mode-strip::-webkit-scrollbar { display:none; }
+    .mode-pill { min-width:58px; }
+    .ai-input-wrap { flex-wrap:wrap; }
+    .btn-explode { width:100%; justify-content:center; height:44px; }
+    .task-text { white-space:normal; }
+    .btn-delete-task { opacity:1; }
+    .completion-actions { flex-direction:column; gap:10px; }
+    .completion-actions > * { width:100%; text-align:center; }
+  }
+</style>
 </head>
 <body>
 
-<!-- ── NAV ── -->
 <nav>
-    <a href="index.html" class="logo">SyllaStudy AI</a>
-    <div class="nav-links">
-        <a href="index.html">Dashboard</a>
-        <a href="chat.html">Study AI</a>
-        <a href="notes.html">SmartNotes</a>
-        <a href="quiz.html">QuizGen</a>
-        <a href="taskflow.html" class="active">TaskFlow</a>
-        <a href="about.html">About</a>
-    </div>
+  <a href="index.html" class="logo">SyllaStudy AI</a>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="chat.html">Study AI</a>
+    <a href="notes.html">SmartNotes</a>
+    <a href="quiz.html">QuizGen</a>
+    <a href="taskflow.html" class="active">TaskFlow</a>
+    <a href="about.html">About</a>
+  </div>
+  <button class="nav-burger" onclick="toggleDrawer()" aria-label="Menu">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
 </nav>
+<div class="mobile-drawer" id="drawer">
+  <a href="index.html">Dashboard</a><a href="chat.html">Study AI</a>
+  <a href="notes.html">SmartNotes</a><a href="quiz.html">QuizGen</a>
+  <a href="taskflow.html" class="active">TaskFlow</a><a href="about.html">About</a>
+</div>
 
 <main>
+  <!-- TIMER -->
+  <section class="timer-section" id="timerSection">
+    <div class="active-task-banner" id="activeTaskBanner">Focusing on: —</div>
+    <div class="completion-overlay" id="completionOverlay">
+      <div class="completion-emoji">🎯</div>
+      <div class="completion-title">Session Complete</div>
+      <div class="completion-sub" id="completionSub">You focused for 25 minutes</div>
+      <div class="completion-actions">
+        <button class="btn-start-timer" id="nextSessionBtn" style="min-width:auto;padding:13px 28px;">Next Session</button>
+        <button class="btn-ghost" id="doneBtn">I'm Done</button>
+      </div>
+    </div>
+    <div class="status-badge" id="statusBadge">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Ready</span>
+    </div>
+    <div class="ring-wrapper">
+      <svg class="ring-svg" viewBox="0 0 260 260">
+        <circle class="ring-track"    cx="130" cy="130" r="118"/>
+        <circle class="ring-progress" cx="130" cy="130" r="118" id="ringProgress"/>
+      </svg>
+      <div class="ring-inner">
+        <div class="timer-display" id="timerDisplay">25:00</div>
+        <div class="timer-session-label" id="sessionLabel">Focus Session</div>
+      </div>
+    </div>
+    <div class="timer-controls">
+      <button class="btn-start-timer" id="startBtn">Start Session</button>
+      <button class="btn-ghost" id="resetBtn">Reset</button>
+    </div>
+    <div class="custom-modal" id="customModal">
+      <div class="custom-modal-title">Custom Duration</div>
+      <div class="custom-row">
+        <div class="time-input-group"><div class="time-input-label">Hrs</div><input class="time-input" type="number" id="customHours" min="0" max="5" placeholder="0"></div>
+        <div class="time-input-group"><div class="time-input-label">Min</div><input class="time-input" type="number" id="customMinutes" min="0" max="59" placeholder="25"></div>
+        <div class="time-input-group"><div class="time-input-label">Sec</div><input class="time-input" type="number" id="customSeconds" min="0" max="59" placeholder="0"></div>
+      </div>
+      <button class="btn-apply" id="applyCustomBtn">Apply Duration</button>
+    </div>
+    <div class="mode-strip">
+      <div class="mode-pill active" data-mode="focus" data-minutes="25"><span class="mode-pill-icon">🔴</span><span class="mode-pill-label">Focus</span><span class="mode-pill-time">25 min</span></div>
+      <div class="mode-pill" data-mode="deep" data-minutes="45"><span class="mode-pill-icon">🧠</span><span class="mode-pill-label">Deep Work</span><span class="mode-pill-time">45 min</span></div>
+      <div class="mode-pill" data-mode="review" data-minutes="15"><span class="mode-pill-icon">⚡</span><span class="mode-pill-label">Sprint</span><span class="mode-pill-time">15 min</span></div>
+      <div class="mode-pill" data-mode="break" data-minutes="5"><span class="mode-pill-icon">🌊</span><span class="mode-pill-label">Break</span><span class="mode-pill-time">5 min</span></div>
+      <div class="mode-pill" data-mode="custom" data-minutes="0"><span class="mode-pill-icon">✏️</span><span class="mode-pill-label">Custom</span><span class="mode-pill-time" id="customPillTime">— min</span></div>
+    </div>
+  </section>
 
-    <!-- ════════════ LEFT — FOCUS TIMER ════════════ -->
-    <section class="timer-section" id="timerSection">
-
-        <!-- Active task banner -->
-        <div class="active-task-banner" id="activeTaskBanner">Focusing on: —</div>
-
-        <!-- Completion overlay -->
-        <div class="completion-overlay" id="completionOverlay">
-            <div class="completion-emoji">🎯</div>
-            <div class="completion-title">Session Complete</div>
-            <div class="completion-sub" id="completionSub">You focused for 25 minutes</div>
-            <div class="completion-actions">
-                <button class="btn-start-timer" id="nextSessionBtn" style="min-width:auto; padding:14px 32px;">Next Session</button>
-                <button class="btn-ghost" id="doneBtn">I'm Done</button>
-            </div>
+  <!-- TASKS -->
+  <section class="tasks-panel">
+    <div class="panel-tabs">
+      <div class="panel-tab active" data-tab="tasks"> AI Tasks</div>
+      <div class="panel-tab" data-tab="schedule"> Daily Plan</div>
+    </div>
+    <div class="tasks-body" id="tabTasks">
+      <div class="ai-input-wrap">
+        <input type="text" id="goalInput" class="ai-input" placeholder="Type a big goal… AI breaks it down">
+        <button class="btn-explode" id="explodeBtn">⚡ Break Down</button>
+      </div>
+      <div class="section-label"><span>To Do</span><span id="taskCount" style="font-size:11px;color:var(--text-dim);">0 tasks</span></div>
+      <div id="todoList"><div class="empty-state">Enter a goal above and let AI break it into micro-tasks 🌊</div></div>
+      <div class="section-label" style="margin-top:4px;opacity:0.6;"><span>Completed</span></div>
+      <div id="completedList"></div>
+    </div>
+    <div class="tasks-body" id="tabSchedule" style="display:none;">
+      <div class="schedule-section">
+        <div style="text-align:center;">
+          <div style="font-family:'Lora',serif;font-size:19px;font-weight:600;margin-bottom:5px;">AI Auto-Scheduler</div>
+          <div style="font-size:13px;color:var(--text-dim);">Turn your task list into a focused daily plan</div>
         </div>
-
-        <!-- Status badge -->
-        <div class="status-badge" id="statusBadge">
-            <span class="status-dot" id="statusDot"></span>
-            <span id="statusText">Ready</span>
-        </div>
-
-        <!-- Ring -->
-        <div class="ring-wrapper">
-            <svg class="ring-svg" viewBox="0 0 260 260">
-                <circle class="ring-track"    cx="130" cy="130" r="118"/>
-                <circle class="ring-progress" cx="130" cy="130" r="118" id="ringProgress"/>
-            </svg>
-            <div class="ring-inner">
-                <div class="timer-display" id="timerDisplay">25:00</div>
-                <div class="timer-session-label" id="sessionLabel">Focus Session</div>
-            </div>
-        </div>
-
-        <!-- Buttons -->
-        <div class="timer-controls">
-            <button class="btn-start-timer" id="startBtn">Start Session</button>
-            <button class="btn-ghost" id="resetBtn">Reset</button>
-        </div>
-
-        <!-- Custom duration modal -->
-        <div class="custom-modal" id="customModal">
-            <div class="custom-modal-title">Custom Duration</div>
-            <div class="custom-row">
-                <div class="time-input-group">
-                    <div class="time-input-label">Hrs</div>
-                    <input class="time-input" type="number" id="customHours" min="0" max="5" placeholder="0">
-                </div>
-                <div class="time-input-group">
-                    <div class="time-input-label">Min</div>
-                    <input class="time-input" type="number" id="customMinutes" min="0" max="59" placeholder="25">
-                </div>
-                <div class="time-input-group">
-                    <div class="time-input-label">Sec</div>
-                    <input class="time-input" type="number" id="customSeconds" min="0" max="59" placeholder="0">
-                </div>
-            </div>
-            <button class="btn-apply" id="applyCustomBtn">Apply Duration</button>
-        </div>
-
-        <!-- Mode strip -->
-        <div class="mode-strip">
-            <div class="mode-pill active" data-mode="focus" data-minutes="25">
-                <span class="mode-pill-icon">🔴</span>
-                <span class="mode-pill-label">Focus</span>
-                <span class="mode-pill-time">25 min</span>
-            </div>
-            <div class="mode-pill" data-mode="deep" data-minutes="45">
-                <span class="mode-pill-icon">🧠</span>
-                <span class="mode-pill-label">Deep Work</span>
-                <span class="mode-pill-time">45 min</span>
-            </div>
-            <div class="mode-pill" data-mode="review" data-minutes="15">
-                <span class="mode-pill-icon">⚡</span>
-                <span class="mode-pill-label">Sprint</span>
-                <span class="mode-pill-time">15 min</span>
-            </div>
-            <div class="mode-pill" data-mode="break" data-minutes="5">
-                <span class="mode-pill-icon">🌊</span>
-                <span class="mode-pill-label">Break</span>
-                <span class="mode-pill-time">5 min</span>
-            </div>
-            <div class="mode-pill" data-mode="custom" data-minutes="0">
-                <span class="mode-pill-icon">✏️</span>
-                <span class="mode-pill-label">Custom</span>
-                <span class="mode-pill-time" id="customPillTime">— min</span>
-            </div>
-        </div>
-
-    </section>
-
-    <!-- ════════════ RIGHT — TASKS PANEL ════════════ -->
-    <section class="tasks-panel">
-
-        <!-- Tabs -->
-        <div class="panel-tabs">
-            <div class="panel-tab active" data-tab="tasks"> AI Tasks</div>
-            <div class="panel-tab" data-tab="schedule"> Daily Plan</div>
-        </div>
-
-        <!-- TAB: Tasks -->
-        <div class="tasks-body" id="tabTasks">
-
-            <!-- AI Input -->
-            <div class="ai-input-wrap">
-                <input type="text" id="goalInput" class="ai-input" placeholder="Type a big goal… AI breaks it down">
-                <button class="btn-explode" id="explodeBtn">⚡ Break Down</button>
-            </div>
-
-            <!-- To Do -->
-            <div class="section-label">
-                <span>To Do</span>
-                <span id="taskCount" style="font-size:11px; color:var(--text-dim);">0 tasks</span>
-            </div>
-            <div id="todoList">
-                <div class="empty-state">Enter a goal above and let AI break it into micro-tasks 🌊</div>
-            </div>
-
-            <!-- Completed -->
-            <div class="section-label" style="margin-top:4px; opacity:0.6;">
-                <span>Completed</span>
-            </div>
-            <div id="completedList"></div>
-
-        </div>
-
-        <!-- TAB: Schedule -->
-        <div class="tasks-body" id="tabSchedule" style="display:none;">
-            <div class="schedule-section">
-                <div style="text-align:center;">
-                    <div style="font-family:'Lora',serif; font-size:20px; font-weight:600; margin-bottom:6px;">AI Auto-Scheduler</div>
-                    <div style="font-size:13px; color:var(--text-dim);">Turn your task list into a focused daily plan</div>
-                </div>
-                <button class="btn-schedule" id="scheduleBtn">Generate Today's Plan</button>
-                <div id="scheduleList">
-                    <div class="schedule-placeholder">Click Generate to let AI pick your top tasks and schedule your day.</div>
-                </div>
-            </div>
-        </div>
-
-    </section>
-
+        <button class="btn-schedule" id="scheduleBtn">Generate Today's Plan</button>
+        <div id="scheduleList"><div class="schedule-placeholder">Click Generate to let AI pick your top tasks and schedule your day.</div></div>
+      </div>
+    </div>
+  </section>
 </main>
 
-<!-- Toast -->
+<footer class="site-footer">
+  <span class="footer-copy">© 2026 SyllaStudy AI</span>
+  <nav class="footer-nav">
+    <a href="index.html">Home</a><a href="about.html">About</a>
+    <div class="footer-sep"></div>
+    <a href="terms.html">Terms</a><a href="privacy.html">Privacy</a>
+  </nav>
+</footer>
+
 <div class="toast" id="toast"></div>
 
 <script>
 window.SUPABASE_URL = window.SUPABASE_URL || '';
 window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
+function toggleDrawer() { document.getElementById('drawer').classList.toggle('open'); }
+document.addEventListener('click', e => {
+  const d = document.getElementById('drawer');
+  if (!d.contains(e.target) && !e.target.closest('.nav-burger')) d.classList.remove('open');
+});
 </script>
 <script type="module" src="js/pages/taskflow-page.js"></script>
 </body>
