@@ -63,13 +63,8 @@
 .site-footer {
     position: relative;
     z-index: 40;
-    flex-shrink: 0;
     width: 100%;
-    padding: 18px 24px max(22px, env(safe-area-inset-bottom));
-    border-top: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
-    background: linear-gradient(180deg, rgba(6, 10, 20, 0.16), rgba(6, 10, 20, 0.42));
-    backdrop-filter: blur(calc(var(--glass-blur, 32px) * 0.45)) saturate(1.02);
-    -webkit-backdrop-filter: blur(calc(var(--glass-blur, 32px) * 0.45)) saturate(1.02);
+    padding: 0;
     opacity: 0;
     transform: translateY(8px);
     transition: opacity 260ms ease, transform 260ms ease;
@@ -80,18 +75,29 @@
     transform: translateY(0);
 }
 
+.site-footer-shell {
+    width: 100%;
+    min-height: clamp(160px, 22vh, 220px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 24px max(20px, env(safe-area-inset-bottom));
+}
+
 .site-footer__inner {
-    max-width: 1280px;
+    width: min(100%, 1120px);
     margin: 0 auto;
-    padding: 20px 24px;
-    border-radius: calc(var(--radius, 14px) + 10px);
+    padding: 18px 22px;
+    border-radius: calc(var(--radius, 14px) + 8px);
     border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.02));
-    box-shadow: var(--glass-shadow, 0 8px 30px rgba(0, 0, 0, 0.25));
+    background: linear-gradient(180deg, rgba(10, 16, 25, 0.46), rgba(10, 16, 25, 0.3));
+    backdrop-filter: blur(calc(var(--glass-blur, 32px) * 0.4)) saturate(1.04);
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur, 32px) * 0.4)) saturate(1.04);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 24px 40px;
+    gap: 18px 32px;
     flex-wrap: wrap;
 }
 
@@ -104,7 +110,7 @@
 
 .site-footer__nav {
     display: flex;
-    gap: 20px 36px;
+    gap: 18px 28px;
     align-items: flex-start;
     justify-content: flex-end;
     flex-wrap: wrap;
@@ -135,7 +141,7 @@
 .site-footer__links a {
     color: var(--muted, var(--text-dim, #9aa6b2));
     text-decoration: none;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.6;
     transition:
         color var(--transition-fast, 180ms) ease,
@@ -158,12 +164,13 @@
 }
 
 @media (max-width: 840px) {
-    .site-footer {
-        padding: 16px 16px max(18px, env(safe-area-inset-bottom));
+    .site-footer-shell {
+        min-height: 132px;
+        padding: 0 16px max(18px, env(safe-area-inset-bottom));
     }
 
     .site-footer__inner {
-        padding: 18px;
+        padding: 16px 18px;
         gap: 18px;
     }
 
