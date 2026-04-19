@@ -234,6 +234,40 @@
  
     .chat-item:hover .menu-btn { opacity: 0.6; }
     .menu-btn:hover { opacity: 1 !important; background: var(--glass-border); }
+
+    /* ── Sidebar footer links ── */
+    .sidebar-footer {
+        padding: 14px 16px;
+        border-top: 1px solid rgba(255,255,255,0.07);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex-shrink: 0;
+        transition: opacity 0.3s;
+    }
+
+    .sidebar.collapsed .sidebar-footer {
+        display: none;
+    }
+
+    .sidebar-footer a {
+        font-size: 11.5px;
+        color: rgba(255,255,255,0.3);
+        text-decoration: none;
+        padding: 3px 0;
+        transition: color 0.2s;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .sidebar-footer a:hover { color: rgba(255,255,255,0.7); }
+
+    .sidebar-footer .footer-copy-chat {
+        font-size: 11px;
+        color: rgba(255,255,255,0.2);
+        margin-top: 4px;
+    }
  
     /* ==========================================================================
        MAIN CHAT AREA
@@ -680,6 +714,13 @@
  
     <div class="history-label">Recent Chats</div>
     <div id="historyList" class="history"></div>
+
+    <div class="sidebar-footer">
+        <a href="index.html">← Dashboard</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <span class="footer-copy-chat">© 2026 SyllaStudy AI</span>
+    </div>
 </nav>
  
 <main class="main">
