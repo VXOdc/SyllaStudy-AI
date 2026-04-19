@@ -1,419 +1,329 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizGen • SyllaStudy AI</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuizGen • SyllaStudy AI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700&family=DM+Sans:wght@300;400;500;600&display=swap');
+  :root {
+    --glass-bg: rgba(255,255,255,0.08);
+    --glass-active: rgba(255,255,255,0.15);
+    --glass-border: rgba(255,255,255,0.22);
+    --glass-blur: 40px;
+    --text-main: #fff;
+    --text-dim: rgba(255,255,255,0.6);
+    --spring: cubic-bezier(0.4,0,0.2,1);
+    --danger: rgba(255,90,90,0.85);
+    --success: rgba(74,222,128,0.85);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  html { overflow-x: hidden; }
 
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-active: rgba(255, 255, 255, 0.15);
-            --glass-border: rgba(255, 255, 255, 0.22);
-            --glass-blur: 40px;
-            --text-main: #ffffff;
-            --text-dim: rgba(255, 255, 255, 0.6);
-            --transition-spring: cubic-bezier(0.4, 0, 0.2, 1);
-            --danger: rgba(255, 90, 90, 0.85);
-            --success: rgba(74, 222, 128, 0.85);
-        }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)),
+                url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80');
+    background-size: cover; background-position: center; background-attachment: fixed;
+    min-height: 100dvh; color: var(--text-main);
+    display: flex; flex-direction: column; overflow-x: hidden;
+  }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  /* ── NAV ── */
+  nav {
+    height: 64px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    background: rgba(255,255,255,0.05); border-bottom: 1px solid var(--glass-border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 clamp(20px,4vw,48px); z-index: 200; flex-shrink: 0; position: sticky; top: 0;
+  }
+  .logo { font-family: 'Lora', serif; font-size: 18px; font-weight: 700; letter-spacing: -0.3px; text-decoration: none; color: #fff; white-space: nowrap; }
+  .nav-links { display: flex; align-items: center; gap: 2px; }
+  .nav-links a { color: #fff; text-decoration: none; padding: 7px 13px; font-size: 13.5px; font-weight: 500; opacity: 0.65; border-radius: 20px; white-space: nowrap; transition: 0.25s; }
+  .nav-links a:hover, .nav-links a.active { opacity: 1; background: rgba(255,255,255,0.1); }
+  .nav-burger { display:none; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; width:38px; height:38px; border-radius:10px; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+  .nav-burger svg { width:17px;height:17px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round; }
+  .mobile-drawer { display:none; flex-direction:column; position:fixed; top:64px; left:0; right:0; background:rgba(8,8,16,0.97); backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px); border-bottom:1px solid rgba(255,255,255,0.1); z-index:199; padding:10px 16px 18px; gap:3px; }
+  .mobile-drawer.open { display:flex; }
+  .mobile-drawer a { color:rgba(255,255,255,0.75); text-decoration:none; font-size:15px; font-weight:500; padding:13px 16px; border-radius:12px; transition:0.2s; }
+  .mobile-drawer a.active, .mobile-drawer a:hover { background:rgba(255,255,255,0.09); color:#fff; }
 
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)),
-                        url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            min-height: 100vh;
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-        }
+  /* ── LAYOUT ── */
+  .app-container {
+    display: flex; flex: 1; padding: clamp(14px,2vw,24px); gap: clamp(12px,1.5vw,20px);
+    min-height: 0; overflow: hidden;
+  }
 
-        /* ── NAV ── */
-        nav {
-            height: 72px;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            background: rgba(255,255,255,0.05);
-            border-bottom: 1px solid var(--glass-border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 48px;
-            z-index: 100;
-            flex-shrink: 0;
-        }
-        .logo { font-family: 'Lora', serif; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; opacity: 0.95; text-decoration: none; color: white; }
-        .nav-links a {
-            color: white; text-decoration: none; margin-left: 36px;
-            font-size: 14px; font-weight: 500; opacity: 0.65; transition: opacity 0.3s;
-        }
-        .nav-links a:hover, .nav-links a.active { opacity: 1; }
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: clamp(220px,22vw,300px); background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border); border-radius: 24px;
+    display: flex; flex-direction: column; padding: 20px 14px; gap: 14px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.2); flex-shrink: 0; min-height: 0; overflow: hidden;
+  }
+  .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; }
+  .sidebar-header h2 { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.45; }
+  .new-btn {
+    background: rgba(255,255,255,0.9); color: #111; border: none;
+    width: 32px; height: 32px; border-radius: 50%; font-size: 20px; font-weight: 300;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.25s var(--spring); flex-shrink: 0;
+  }
+  .new-btn:hover { transform: scale(1.1) rotate(90deg); background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+  .search-wrap { position: relative; }
+  .search-input {
+    width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 11px; padding: 9px 13px 9px 34px; color: #fff; font-size: 13px;
+    font-family: 'DM Sans', sans-serif; outline: none; transition: 0.2s;
+  }
+  .search-input::placeholder { color: rgba(255,255,255,0.35); }
+  .search-input:focus { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); }
+  .search-icon { position:absolute; left:11px; top:50%; transform:translateY(-50%); opacity:0.4; pointer-events:none; }
+  .quiz-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; scrollbar-width: none; }
+  .quiz-list::-webkit-scrollbar { display: none; }
+  .quiz-item {
+    padding: 12px 14px; border-radius: 13px; cursor: pointer; transition: all 0.18s; border: 1px solid transparent;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  }
+  .quiz-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
+  .quiz-item.active { background: var(--glass-active); border-color: var(--glass-border); }
+  .quiz-item-content { flex: 1; min-width: 0; }
+  .quiz-title-preview { font-size: 13.5px; font-weight: 600; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .quiz-stats { font-size: 11.5px; color: var(--text-dim); }
+  .delete-btn { background:none; border:none; color:rgba(255,255,255,0.3); cursor:pointer; font-size:15px; padding:2px 4px; border-radius:6px; transition:0.2s; flex-shrink:0; opacity:0; line-height:1; }
+  .quiz-item:hover .delete-btn { opacity:1; }
+  .delete-btn:hover { color:var(--danger); background:rgba(255,90,90,0.12); }
+  .empty-state { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; opacity:0.4; font-size:13px; text-align:center; padding:20px; }
 
-        /* ── GLOBAL FOOTER ── */
-                
-        
-        
-        
-        
-        
-        @media (max-width: 768px) {  }
+  /* ── WORKSPACE ── */
+  .workspace {
+    flex: 1; background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border); border-radius: 24px;
+    display: flex; flex-direction: column; box-shadow: 0 16px 40px rgba(0,0,0,0.2);
+    overflow: hidden; position: relative; min-height: 0; min-width: 0;
+  }
 
-        /* ── LAYOUT ── */
-        .app-container { display: flex; flex: 1; min-height: 0; padding: 24px; gap: 20px; }
+  /* Generate */
+  .gen-view { display:flex; flex-direction:column; flex:1; min-height:0; padding: clamp(24px,4vw,48px) clamp(20px,5vw,64px); overflow-y:auto; gap:0; }
+  .gen-view::-webkit-scrollbar { width:5px; }
+  .gen-view::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15); border-radius:10px; }
+  .section-title { font-family:'Lora',serif; font-size:clamp(24px,3.5vw,32px); font-weight:700; margin-bottom:6px; }
+  .section-sub { font-size:14px; color:var(--text-dim); margin-bottom:28px; }
+  .quiz-title-input {
+    width:100%; background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,0.2);
+    color:#fff; font-size:clamp(18px,2.5vw,24px); font-family:'Lora',serif;
+    padding:9px 0; outline:none; margin-bottom:22px; transition:border-color 0.2s;
+  }
+  .quiz-title-input:focus { border-color:rgba(74,222,128,0.8); }
+  .quiz-title-input::placeholder { color:rgba(255,255,255,0.25); }
+  .settings-row { display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap; margin-bottom:22px; }
+  .setting-field { display:flex; flex-direction:column; gap:7px; flex:1; min-width:180px; max-width:260px; }
+  .setting-label { font-size:11.5px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-dim); }
+  .setting-input {
+    width:100%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
+    border-radius:12px; padding:11px 13px; color:#fff; font-size:15px;
+    font-family:'DM Sans',sans-serif; outline:none; transition:0.2s;
+  }
+  .setting-input:focus { border-color:rgba(255,255,255,0.3); background:rgba(255,255,255,0.1); }
+  .setting-help { font-size:12px; color:rgba(255,255,255,0.45); align-self:flex-end; padding-bottom:4px; }
+  .source-textarea {
+    width:100%; flex:1; min-height:200px;
+    background:rgba(0,0,0,0.15); border:1px solid rgba(255,255,255,0.1);
+    border-radius:14px; padding:18px; color:rgba(255,255,255,0.9);
+    font-family:'DM Sans',sans-serif; font-size:15px; line-height:1.6;
+    outline:none; resize:none; transition:0.2s; margin-bottom:20px;
+  }
+  .source-textarea:focus { border-color:rgba(255,255,255,0.3); background:rgba(0,0,0,0.2); }
+  .source-textarea::placeholder { color:rgba(255,255,255,0.2); }
+  .btn-generate {
+    background:rgba(74,222,128,0.85); border:none; color:#0a1a0a;
+    align-self:flex-end; padding:13px 28px; border-radius:13px; cursor:pointer;
+    font-size:15px; font-weight:700; transition:0.2s; font-family:'DM Sans',sans-serif; white-space:nowrap;
+  }
+  .btn-generate:hover { background:#4ade80; box-shadow:0 4px 20px rgba(74,222,128,0.35); transform:translateY(-2px); }
+  .btn-generate:disabled { opacity:0.5; cursor:not-allowed; transform:none; box-shadow:none; }
 
-        /* ── SIDEBAR ── */
-        .sidebar {
-            width: 300px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid var(--glass-border);
-            border-radius: 28px;
-            display: flex;
-            flex-direction: column;
-            padding: 24px 16px;
-            gap: 16px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            flex-shrink: 0;
-            min-height: 0;
-        }
-        .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
-        .sidebar-header h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.45; }
-        .new-btn {
-            background: rgba(255,255,255,0.9); color: #111; border: none;
-            width: 34px; height: 34px; border-radius: 50%; font-size: 20px;
-            font-weight: 300; cursor: pointer; display: flex; align-items: center;
-            justify-content: center; transition: all 0.25s var(--transition-spring); flex-shrink: 0;
-        }
-        .new-btn:hover { transform: scale(1.1) rotate(90deg); background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+  /* Player */
+  .player-view { display:none; flex-direction:column; flex:1; min-height:0; padding: clamp(20px,3vw,32px) clamp(16px,4vw,40px) clamp(16px,2vw,24px); }
+  .player-shell { width:100%; max-width:680px; margin:0 auto; display:flex; flex-direction:column; flex:1; min-height:0; gap:18px; }
+  .player-scroll-area { flex:1; min-height:0; overflow-y:auto; display:flex; flex-direction:column; gap:22px; padding-right:6px; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.15) transparent; }
+  .progress-bar-wrap { width:100%; height:5px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; flex-shrink:0; }
+  .progress-bar-fill { height:100%; background:#4ade80; width:0%; transition:width 0.4s var(--spring); }
+  .question-card { width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:22px; padding: clamp(22px,3vw,40px); text-align:left; }
+  .question-counter { font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-dim); margin-bottom:14px; }
+  .question-text { font-family:'Lora',serif; font-size:clamp(18px,2.5vw,24px); font-weight:600; line-height:1.4; margin-bottom:28px; }
+  .options-grid { display:flex; flex-direction:column; gap:10px; }
+  .option-btn {
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);
+    padding:14px 18px; border-radius:13px; color:#fff;
+    font-size:14.5px; font-family:'DM Sans',sans-serif; text-align:left;
+    cursor:pointer; transition:0.2s; display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .option-btn:hover:not(.disabled) { background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.25); transform:translateX(3px); }
+  .option-btn.selected { background:rgba(255,255,255,0.15); border-color:#fff; }
+  .option-btn.correct { background:rgba(74,222,128,0.15); border-color:#4ade80; color:#4ade80; }
+  .option-btn.wrong   { background:rgba(255,90,90,0.15);  border-color:#ff5a5a; color:#ff5a5a; }
+  .option-btn.disabled { cursor:default; opacity:0.8; }
+  .explanation-panel { margin-top:18px; padding:14px 18px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:13px; font-size:14px; line-height:1.6; color:rgba(255,255,255,0.75); animation:fadeSlideIn 0.3s var(--spring); }
+  .explanation-label { font-size:10.5px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:rgba(74,222,128,0.8); margin-bottom:5px; }
+  @keyframes fadeSlideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+  .player-actions { display:flex; justify-content:flex-end; width:100%; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08); flex-shrink:0; }
+  .btn-secondary { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:#fff; padding:11px 22px; border-radius:11px; cursor:pointer; font-size:14px; font-weight:600; transition:0.2s; font-family:'DM Sans',sans-serif; }
+  .btn-secondary:hover { background:rgba(255,255,255,0.15); }
+  .question-type-badge { display:inline-block; font-size:10.5px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:rgba(255,255,255,0.35); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:100px; padding:3px 9px; margin-bottom:11px; }
 
-        .search-wrap { position: relative; }
-        .search-input {
-            width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 12px; padding: 10px 14px 10px 36px; color: white;
-            font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; transition: all 0.2s;
-        }
-        .search-input::placeholder { color: rgba(255,255,255,0.35); }
-        .search-input:focus { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); }
-        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: 0.4; pointer-events: none; }
+  /* Results */
+  .results-view { display:none; flex-direction:column; flex:1; align-items:center; justify-content:center; padding: clamp(24px,4vw,48px); text-align:center; }
+  .score-circle { width:130px; height:130px; border-radius:50%; border:5px solid #4ade80; display:flex; align-items:center; justify-content:center; font-size:clamp(28px,5vw,38px); font-weight:700; font-family:'Lora',serif; margin-bottom:22px; color:#4ade80; box-shadow:0 0 36px rgba(74,222,128,0.2); }
+  .results-msg { font-size:18px; font-weight:500; margin-bottom:32px; }
+  .results-actions { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
 
-        .quiz-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
-        .quiz-list::-webkit-scrollbar { width: 0; }
+  /* Overlays */
+  .ai-processing-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; z-index:10; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+  .ai-processing-overlay.show { opacity:1; pointer-events:all; }
+  .ai-processing-overlay p { font-size:15px; font-weight:500; opacity:0.9; }
+  .overlay-status { font-size:13px; opacity:0.5; min-height:18px; }
+  .ai-spinner { width:38px; height:38px; border:3px solid rgba(255,255,255,0.1); border-top-color:#4ade80; border-radius:50%; animation:spin 0.8s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px); background:rgba(30,30,30,0.92); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.12); border-radius:100px; padding:9px 18px; font-size:13px; color:rgba(255,255,255,0.85); opacity:0; pointer-events:none; transition:0.3s var(--spring); z-index:9999; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-        .quiz-item {
-            padding: 14px 16px; border-radius: 14px; cursor: pointer;
-            transition: all 0.18s ease; border: 1px solid transparent;
-            display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
-        }
-        .quiz-item:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
-        .quiz-item.active { background: var(--glass-active); border-color: var(--glass-border); }
-        .quiz-item-content { flex: 1; min-width: 0; }
-        .quiz-title-preview { font-size: 14px; font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .quiz-stats { font-size: 12px; color: var(--text-dim); }
-        
-        .delete-btn {
-            background: none; border: none; color: rgba(255,255,255,0.3);
-            cursor: pointer; font-size: 16px; padding: 2px 4px; border-radius: 6px;
-            transition: all 0.2s; flex-shrink: 0; opacity: 0; line-height: 1;
-        }
-        .quiz-item:hover .delete-btn { opacity: 1; }
-        .delete-btn:hover { color: var(--danger); background: rgba(255,90,90,0.12); }
+  /* ── FOOTER ── */
+  .site-footer { flex-shrink:0; margin:0 16px 16px; border-radius:16px; backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); padding:14px clamp(16px,3vw,36px); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+  .footer-copy { font-size:12px; color:rgba(255,255,255,0.3); }
+  .footer-nav { display:flex; align-items:center; gap:4px; flex-wrap:wrap; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:12px; padding:4px 5px; }
+  .footer-nav a { font-size:12px; font-weight:500; color:rgba(255,255,255,0.38); text-decoration:none; padding:5px 10px; border-radius:18px; border:1px solid rgba(255,255,255,0.07); background:rgba(255,255,255,0.03); transition:0.22s; }
+  .footer-nav a:hover { color:rgba(255,255,255,0.85); background:rgba(255,255,255,0.08); }
+  .footer-nav a.active { color:rgba(255,255,255,0.75); background:rgba(255,255,255,0.06); }
+  .footer-sep { width:1px; height:12px; background:rgba(255,255,255,0.12); margin:0 3px; }
 
-        .empty-state {
-            flex: 1; display: flex; flex-direction: column; align-items: center;
-            justify-content: center; gap: 8px; opacity: 0.4; font-size: 13px; text-align: center;
-        }
-
-        /* ── MAIN WORKSPACE ── */
-        .workspace {
-            flex: 1; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur)); border: 1px solid var(--glass-border);
-            border-radius: 28px; display: flex; flex-direction: column;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2); overflow: hidden; position: relative; min-height: 0;
-        }
-
-        /* Generate View */
-        .gen-view { display: flex; flex-direction: column; flex: 1; min-height: 0; padding: 48px 72px; overflow-y: auto; }
-        .gen-view::-webkit-scrollbar { width: 5px; }
-        .gen-view::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
-        
-        .section-title { font-family: 'Lora', serif; font-size: 32px; font-weight: 700; margin-bottom: 8px; color: #fff; }
-        .section-sub { font-size: 14px; color: var(--text-dim); margin-bottom: 32px; }
-
-        .quiz-title-input {
-            width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.2);
-            color: white; font-size: 24px; font-family: 'Lora', serif; padding: 10px 0; outline: none; margin-bottom: 24px;
-            transition: border-color 0.2s;
-        }
-        .quiz-title-input:focus { border-color: rgba(74,222,128,0.8); }
-        .quiz-title-input::placeholder { color: rgba(255,255,255,0.25); }
-
-        .settings-row {
-            display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap;
-            margin-bottom: 24px;
-        }
-        .setting-field {
-            display: flex; flex-direction: column; gap: 8px;
-            min-width: 220px; max-width: 260px;
-        }
-        .setting-label {
-            font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
-            text-transform: uppercase; color: var(--text-dim);
-        }
-        .setting-input {
-            width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 14px; padding: 12px 14px; color: white; font-size: 15px;
-            font-family: 'DM Sans', sans-serif; outline: none; transition: all 0.2s;
-        }
-        .setting-input:focus { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); }
-        .setting-help { font-size: 12px; color: rgba(255,255,255,0.45); margin-bottom: 4px; }
-
-        .source-textarea {
-            width: 100%; flex: 1; min-height: 250px; background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px; padding: 20px; color: rgba(255,255,255,0.9); font-family: 'DM Sans', sans-serif;
-            font-size: 15px; line-height: 1.6; outline: none; resize: none; transition: all 0.2s; margin-bottom: 24px;
-        }
-        .source-textarea:focus { border-color: rgba(255,255,255,0.3); background: rgba(0,0,0,0.2); }
-        .source-textarea::placeholder { color: rgba(255,255,255,0.2); }
-
-        .btn-generate {
-            background: rgba(74,222,128,0.85); border: none; color: #0a1a0a; align-self: flex-end;
-            padding: 14px 32px; border-radius: 14px; cursor: pointer; font-size: 15px;
-            font-weight: 700; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
-        }
-        .btn-generate:hover { background: #4ade80; box-shadow: 0 4px 20px rgba(74,222,128,0.35); transform: translateY(-2px); }
-        .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        /* Quiz Player View */
-        .player-view { display: none; flex-direction: column; flex: 1; min-height: 0; padding: 32px 40px 28px; }
-        .player-shell {
-            width: 100%; max-width: 680px; margin: 0 auto;
-            display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 20px;
-        }
-        .player-scroll-area {
-            flex: 1; min-height: 0; overflow-y: auto;
-            display: flex; flex-direction: column; gap: 24px; padding-right: 8px;
-        }
-        .player-scroll-area::-webkit-scrollbar { width: 5px; }
-        .player-scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
-        .progress-bar-wrap { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
-        .progress-bar-fill { height: 100%; background: #4ade80; width: 0%; transition: width 0.4s var(--transition-spring); }
-        
-        .question-card {
-            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 24px; padding: 40px; text-align: left;
-        }
-        .question-counter { font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 16px; }
-        .question-text { font-family: 'Lora', serif; font-size: 24px; font-weight: 600; line-height: 1.4; margin-bottom: 32px; }
-        
-        .options-grid { display: flex; flex-direction: column; gap: 12px; }
-        .option-btn {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
-            padding: 16px 20px; border-radius: 14px; color: white; font-size: 15px; font-family: 'DM Sans', sans-serif;
-            text-align: left; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: space-between;
-        }
-        .option-btn:hover:not(.disabled) { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.25); transform: translateX(4px); }
-        .option-btn.selected { background: rgba(255,255,255,0.15); border-color: white; }
-        .option-btn.correct { background: rgba(74,222,128,0.15); border-color: #4ade80; color: #4ade80; }
-        .option-btn.wrong { background: rgba(255,90,90,0.15); border-color: #ff5a5a; color: #ff5a5a; }
-        .option-btn.disabled { cursor: default; opacity: 0.8; }
-
-        /* Explanation panel — extends existing card, matches glass style */
-        .explanation-panel {
-            margin-top: 20px; padding: 16px 20px;
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 14px; font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.75);
-            animation: fadeSlideIn 0.3s var(--transition-spring);
-        }
-        .explanation-label {
-            font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
-            color: rgba(74,222,128,0.8); margin-bottom: 6px;
-        }
-        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-        .player-actions {
-            display: flex; justify-content: flex-end; width: 100%;
-            padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08);
-            background: linear-gradient(180deg, rgba(11,18,32,0), rgba(11,18,32,0.18));
-            flex-shrink: 0;
-        }
-        
-        .btn-secondary {
-            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
-            color: white; padding: 12px 24px; border-radius: 12px; cursor: pointer;
-            font-size: 14px; font-weight: 600; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
-        }
-        .btn-secondary:hover { background: rgba(255,255,255,0.15); }
-
-        /* Results View */
-        .results-view { display: none; flex-direction: column; flex: 1; align-items: center; justify-content: center; padding: 48px; text-align: center; }
-        .score-circle {
-            width: 140px; height: 140px; border-radius: 50%; border: 6px solid #4ade80;
-            display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700;
-            font-family: 'Lora', serif; margin-bottom: 24px; color: #4ade80; box-shadow: 0 0 40px rgba(74,222,128,0.2);
-        }
-        .results-msg { font-size: 20px; font-weight: 500; margin-bottom: 40px; }
-        .results-actions { display: flex; gap: 16px; }
-
-        /* ── OVERLAYS & TOAST ── */
-        .ai-processing-overlay {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(8px); display: flex; flex-direction: column;
-            align-items: center; justify-content: center; gap: 16px;
-            z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-        }
-        .ai-processing-overlay.show { opacity: 1; pointer-events: all; }
-        .ai-processing-overlay p { font-size: 15px; font-weight: 500; opacity: 0.9; }
-        /* Subtle status line below spinner — extends overlay, same style */
-        .overlay-status { font-size: 13px; opacity: 0.5; min-height: 18px; }
-
-        .ai-spinner {
-            width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1);
-            border-top-color: #4ade80; border-radius: 50%; animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .toast {
-            position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px);
-            background: rgba(30,30,30,0.92); backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.12); border-radius: 100px;
-            padding: 10px 20px; font-size: 13px; color: rgba(255,255,255,0.85);
-            opacity: 0; pointer-events: none; transition: all 0.3s var(--transition-spring); z-index: 9999;
-        }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-        /* Question type badge — small pill inside question card */
-        .question-type-badge {
-            display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
-            text-transform: uppercase; color: rgba(255,255,255,0.35);
-            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 100px; padding: 3px 10px; margin-bottom: 12px;
-        }
-
-        @media (max-width: 960px) {
-            nav { padding: 0 20px; }
-            .app-container { flex-direction: column; padding: 16px; }
-            .sidebar { width: 100%; max-height: 240px; }
-            .gen-view, .player-view, .results-view { padding: 28px 24px; }
-            .question-card { padding: 28px 24px; }
-            .section-title { font-size: 28px; }
-            .question-text { font-size: 20px; }
-            .results-actions { width: 100%; max-width: 320px; flex-direction: column; }
-        }
-
-        @media (max-width: 640px) {
-            .nav-links { display: none; }
-            .player-actions { padding-bottom: max(0px, env(safe-area-inset-bottom)); }
-            .btn-generate, .btn-secondary { width: 100%; }
-            .setting-field { min-width: 100%; max-width: none; }
-            .setting-help { margin-bottom: 0; }
-        }
-    </style>
+  /* ── RESPONSIVE ── */
+  @media (max-width: 800px) {
+    .nav-links { display:none; }
+    .nav-burger { display:flex; }
+    .app-container { flex-direction:column; overflow:auto; height:auto; padding:12px; gap:12px; }
+    .sidebar { width:100% !important; max-height:220px; border-radius:18px; }
+    .workspace { min-height:500px; border-radius:18px; }
+    .gen-view { padding:22px 18px; }
+    .setting-field { min-width:100%; max-width:none; }
+    .btn-generate, .btn-secondary { width:100%; text-align:center; align-self:stretch; }
+    .results-actions { flex-direction:column; width:100%; max-width:300px; }
+    .site-footer { flex-direction:column; align-items:flex-start; }
+  }
+  @media (max-width: 480px) {
+    .question-text { font-size:17px; }
+    .option-btn { font-size:13.5px; padding:12px 14px; }
+    .question-card { padding:18px 14px; }
+    .score-circle { width:110px; height:110px; font-size:28px; }
+  }
+</style>
 </head>
 <body>
 
 <nav>
-    <a href="index.html" class="logo">SyllaStudy AI</a>
-    <div class="nav-links">
-        <a href="index.html">Dashboard</a>
-        <a href="chat.html">Study AI</a>
-        <a href="notes.html">SmartNotes</a>
-        <a href="quiz.html" class="active">QuizGen</a>
-        <a href="taskflow.html">TaskFlow</a>
-        <a href="about.html">About</a>
-    </div>
+  <a href="index.html" class="logo">SyllaStudy AI</a>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="chat.html">Study AI</a>
+    <a href="notes.html">SmartNotes</a>
+    <a href="quiz.html" class="active">QuizGen</a>
+    <a href="taskflow.html">TaskFlow</a>
+    <a href="about.html">About</a>
+  </div>
+  <button class="nav-burger" onclick="toggleDrawer()" aria-label="Menu">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
 </nav>
+<div class="mobile-drawer" id="drawer">
+  <a href="index.html">Dashboard</a><a href="chat.html">Study AI</a>
+  <a href="notes.html">SmartNotes</a><a href="quiz.html" class="active">QuizGen</a>
+  <a href="taskflow.html">TaskFlow</a><a href="about.html">About</a>
+</div>
 
 <div class="app-container">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2>Your Quizzes</h2>
-            <button class="new-btn" id="newQuizBtn" title="Create new quiz">+</button>
-        </div>
-        <div class="search-wrap">
-            <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input class="search-input" id="searchInput" type="text" placeholder="Search quizzes…">
-        </div>
-        <div class="quiz-list" id="quizList"></div>
-    </aside>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Your Quizzes</h2>
+      <button class="new-btn" id="newQuizBtn" title="Create new quiz">+</button>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="search-input" id="searchInput" type="text" placeholder="Search quizzes…">
+    </div>
+    <div class="quiz-list" id="quizList"></div>
+  </aside>
 
-    <main class="workspace" id="workspace">
-        <div class="gen-view" id="genView">
-            <h1 class="section-title">Generate a Quiz</h1>
-            <p class="section-sub">Paste your notes, article, or topic below, and AI will create a custom multiple-choice quiz.</p>
-            
-            <input type="text" class="quiz-title-input" id="newQuizTitle" placeholder="Name your quiz (e.g. Chapter 4 Biology)">
-            <div class="settings-row">
-                <div class="setting-field">
-                    <label class="setting-label" for="questionCountInput">Number of questions in custom quiz</label>
-                    <input
-                        type="number"
-                        class="setting-input"
-                        id="questionCountInput"
-                        min="1"
-                        max="50"
-                        step="1"
-                        value="10"
-                        inputmode="numeric"
-                    >
-                </div>
-                <p class="setting-help">Choose between 1 and 50 questions. The AI is instructed and validated against this exact count.</p>
-            </div>
-            <textarea class="source-textarea" id="sourceText" placeholder="Paste the content you want to be tested on here..."></textarea>
-            
-            <button class="btn-generate" id="generateBtn">✨ Generate Quiz</button>
+  <main class="workspace" id="workspace">
+    <div class="gen-view" id="genView">
+      <h1 class="section-title">Generate a Quiz</h1>
+      <p class="section-sub">Paste your notes or topic below — AI will create a custom quiz.</p>
+      <input type="text" class="quiz-title-input" id="newQuizTitle" placeholder="Name your quiz (e.g. Chapter 4 Biology)">
+      <div class="settings-row">
+        <div class="setting-field">
+          <label class="setting-label" for="questionCountInput">Number of questions</label>
+          <input type="number" class="setting-input" id="questionCountInput" min="1" max="50" step="1" value="10" inputmode="numeric">
         </div>
+        <p class="setting-help">1–50 questions. AI is validated against this exact count.</p>
+      </div>
+      <textarea class="source-textarea" id="sourceText" placeholder="Paste the content you want to be tested on here..."></textarea>
+      <button class="btn-generate" id="generateBtn">✨ Generate Quiz</button>
+    </div>
 
-        <div class="player-view" id="playerView">
-            <div class="player-shell">
-                <div class="player-scroll-area" id="playerScrollArea">
-                    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
-                    
-                    <div class="question-card">
-                        <div class="question-counter" id="qCounter">Question 1 of 5</div>
-                        <div id="qTypeBadge"></div>
-                        <div class="question-text" id="qText">Loading question...</div>
-                        <div class="options-grid" id="optionsGrid"></div>
-                        <div id="explanationArea"></div>
-                    </div>
-                </div>
-                
-                <div class="player-actions">
-                    <button class="btn-generate" id="nextBtn" style="display: none;">Next Question ➔</button>
-                </div>
-            </div>
+    <div class="player-view" id="playerView">
+      <div class="player-shell">
+        <div class="player-scroll-area" id="playerScrollArea">
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
+          <div class="question-card">
+            <div class="question-counter" id="qCounter">Question 1 of 5</div>
+            <div id="qTypeBadge"></div>
+            <div class="question-text" id="qText">Loading question...</div>
+            <div class="options-grid" id="optionsGrid"></div>
+            <div id="explanationArea"></div>
+          </div>
         </div>
+        <div class="player-actions">
+          <button class="btn-generate" id="nextBtn" style="display:none;">Next Question ➔</button>
+        </div>
+      </div>
+    </div>
 
-        <div class="results-view" id="resultsView">
-            <h1 class="section-title" id="resultsTitle">Quiz Complete!</h1>
-            <div class="score-circle" id="scoreCircle">0/0</div>
-            <div class="results-msg" id="resultsMsg">Great effort!</div>
-            <div class="results-actions">
-                <button class="btn-secondary" onclick="retakeQuiz()">Retake Quiz</button>
-                <button class="btn-generate" onclick="createNewQuizUI()">Create Another</button>
-            </div>
-        </div>
+    <div class="results-view" id="resultsView">
+      <h1 class="section-title" id="resultsTitle">Quiz Complete!</h1>
+      <div class="score-circle" id="scoreCircle">0/0</div>
+      <div class="results-msg" id="resultsMsg">Great effort!</div>
+      <div class="results-actions">
+        <button class="btn-secondary" onclick="retakeQuiz()">Retake Quiz</button>
+        <button class="btn-generate" onclick="createNewQuizUI()">Create Another</button>
+      </div>
+    </div>
 
-        <div class="ai-processing-overlay" id="aiOverlay">
-            <div class="ai-spinner"></div>
-            <p>Analyzing text &amp; generating questions...</p>
-            <div class="overlay-status" id="overlayStatus"></div>
-        </div>
-    </main>
+    <div class="ai-processing-overlay" id="aiOverlay">
+      <div class="ai-spinner"></div>
+      <p>Analyzing text &amp; generating questions...</p>
+      <div class="overlay-status" id="overlayStatus"></div>
+    </div>
+  </main>
 </div>
+
+<footer class="site-footer">
+  <span class="footer-copy">© 2026 SyllaStudy AI</span>
+  <nav class="footer-nav">
+    <a href="index.html">Home</a><a href="about.html">About</a>
+    <div class="footer-sep"></div>
+    <a href="terms.html">Terms</a><a href="privacy.html">Privacy</a>
+  </nav>
+</footer>
 
 <div class="toast" id="toast"></div>
 
 <script>
 window.SUPABASE_URL = window.SUPABASE_URL || '';
 window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
+function toggleDrawer() { document.getElementById('drawer').classList.toggle('open'); }
+document.addEventListener('click', e => {
+  const d = document.getElementById('drawer');
+  if (!d.contains(e.target) && !e.target.closest('.nav-burger')) d.classList.remove('open');
+});
 </script>
 <script type="module" src="js/pages/quiz-page.js"></script>
 </body>
