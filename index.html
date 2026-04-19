@@ -151,56 +151,52 @@
         }
 
         /* ── Global Footer ───────────────────────────────── */
-                .site-footer {
-            position: relative;
-            z-index: 40;
+                
+        
+        
+        
+        
+        
+        @media (max-width: 768px) {
+            
+        }
 
-            /* Apple-like: very light film, not a solid block */
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-
-            /* Faint seam — separates without announcing itself */
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-
-            /* Subtle inner highlight — just a whisper */
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-
-            padding: 22px 60px;
+    
+        /* ── Footer — transparent, scroll-to, ghost style ── */
+        .site-footer {
+            padding: 40px 60px 36px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 14px;
             flex-shrink: 0;
+            background: transparent;
+            border: none;
         }
         .footer-copy {
-            font-size: 13px;
-            /* Soft muted white — readable but never harsh */
-            color: rgba(255,255,255,0.38);
+            font-size: 12px;
+            color: rgba(255,255,255,0.22);
+            letter-spacing: 0.01em;
         }
         .footer-nav {
             display: flex;
             align-items: center;
-            gap: 26px;
+            gap: 24px;
             flex-wrap: wrap;
         }
         .footer-nav a {
-            font-size: 13px;
-            color: rgba(255,255,255,0.42);
+            font-size: 12px;
+            color: rgba(255,255,255,0.25);
             text-decoration: none;
-            transition: color 0.22s ease;
+            transition: color 0.3s ease;
+            letter-spacing: 0.01em;
         }
-        .footer-nav a:hover { color: rgba(255,255,255,0.82); }
-        .footer-sep {
-            width: 1px;
-            height: 13px;
-            background: rgba(255,255,255,0.1);
-        }
+        .footer-nav a:hover { color: rgba(255,255,255,0.6); }
+        .footer-sep { width: 1px; height: 11px; background: rgba(255,255,255,0.1); }
         @media (max-width: 768px) {
-            .site-footer { padding: 22px 20px; flex-direction: column; align-items: flex-start; }
+            .site-footer { padding: 32px 24px 28px; flex-direction: column; align-items: flex-start; gap: 12px; }
         }
-
     </style>
 </head>
 <body>
@@ -244,7 +240,18 @@
                 <p>Manage your upcoming milestones and track your personal progress efficiently.</p>
             </a>
         </div>
-    </main>
+        <footer class="site-footer">
+        <span class="footer-copy">© 2026 SyllaStudy AI</span>
+        <nav class="footer-nav">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <div class="footer-sep"></div>
+            <a href="terms.html">Terms</a>
+            <a href="privacy.html">Privacy</a>
+        </nav>
+    </footer>
+
+</main>
 
     <script>
         // Set dynamic date
@@ -254,18 +261,6 @@
     </script>
 
  <script type="module" src="js/supabase-client.js"></script>
-
-    <footer class="site-footer">
-        <span class="footer-copy">© 2026 SyllaStudy AI. All rights reserved.</span>
-        <nav class="footer-nav">
-            <a href="index.html">Home</a>
-            <a href="index.html">Dashboard</a>
-            <a href="about.html">About</a>
-            <div class="footer-sep"></div>
-            <a href="terms.html">Terms of Service</a>
-            <a href="privacy.html">Privacy Policy</a>
-        </nav>
-    </footer>
 
 </body>
 </html>
