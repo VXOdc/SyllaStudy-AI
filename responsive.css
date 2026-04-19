@@ -1,1 +1,907 @@
+*,*::before,*::after{box-sizing:border-box}
 
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+
+body{
+  max-width:100vw;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+}
+
+img,video,canvas,svg{
+  max-width:100%;
+  height:auto;
+  display:block;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   GLOBAL NAV — all pages share .nav-links + .logo pattern
+───────────────────────────────────────────────────────────── */
+
+nav{
+  min-height:60px;
+  height:auto;
+  padding-left:clamp(16px,4vw,60px);
+  padding-right:clamp(16px,4vw,60px);
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.nav-links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px 0;
+  align-items:center;
+}
+
+.nav-links a{
+  margin-left:clamp(12px,2.5vw,40px);
+  font-size:clamp(12px,1.4vw,15px);
+  white-space:nowrap;
+}
+
+.logo{
+  font-size:clamp(17px,2.2vw,22px);
+  white-space:nowrap;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   INDEX — DASHBOARD
+───────────────────────────────────────────────────────────── */
+
+/* main padding */
+body > main{
+  padding:clamp(32px,6vw,80px) clamp(16px,5vw,60px);
+  gap:clamp(28px,4vw,50px);
+}
+
+.welcome-section h1{
+  font-size:clamp(28px,6vw,56px);
+  letter-spacing:clamp(-1px,-0.15em,-2px);
+  word-break:break-word;
+}
+
+.welcome-section p{
+  font-size:clamp(15px,2vw,19px);
+}
+
+.module-grid{
+  grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));
+  gap:clamp(14px,2vw,25px);
+}
+
+.glass-card{
+  padding:clamp(28px,4vw,45px) clamp(22px,3.5vw,40px);
+}
+
+.glass-card h2{
+  font-size:clamp(20px,3vw,28px);
+}
+
+.glass-card p{
+  font-size:clamp(14px,1.6vw,15.5px);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CHAT PAGE
+───────────────────────────────────────────────────────────── */
+
+.sidebar{
+  flex-shrink:0;
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1),width 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+
+.main{
+  min-width:0;
+  width:100%;
+}
+
+.empty-state h1{
+  font-size:clamp(26px,6vw,48px);
+}
+
+.msg{
+  max-width:min(70%,640px);
+  font-size:clamp(14px,1.5vw,15px);
+  word-break:break-word;
+  overflow-wrap:anywhere;
+}
+
+.input-row textarea{
+  font-size:16px;
+}
+
+.top-bar{
+  padding:clamp(14px,3vw,24px) clamp(14px,3vw,40px);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   QUIZ PAGE
+───────────────────────────────────────────────────────────── */
+
+.app-container{
+  min-height:0;
+}
+
+.source-textarea{
+  min-height:200px;
+}
+
+.settings-row{
+  gap:12px;
+}
+
+.setting-field{
+  min-width:min(220px,100%);
+  flex:1 1 220px;
+}
+
+.question-text{
+  font-size:clamp(18px,2.5vw,24px);
+}
+
+.section-title{
+  font-size:clamp(24px,4vw,32px);
+}
+
+.option-btn{
+  font-size:clamp(13px,1.5vw,15px);
+  word-break:break-word;
+}
+
+.gen-view{
+  padding:clamp(24px,4vw,48px) clamp(16px,5vw,72px);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TASKFLOW PAGE
+───────────────────────────────────────────────────────────── */
+
+.timer-display{
+  font-size:clamp(44px,8vw,68px);
+}
+
+.ring-wrapper{
+  width:clamp(190px,28vw,260px);
+  height:clamp(190px,28vw,260px);
+}
+
+.task-text{
+  white-space:normal;
+  overflow:visible;
+  text-overflow:unset;
+  word-break:break-word;
+}
+
+.ai-input-wrap{
+  flex-wrap:wrap;
+}
+
+.btn-explode{
+  flex-shrink:0;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ABOUT PAGE
+───────────────────────────────────────────────────────────── */
+
+.glass-card{
+  border-radius:clamp(20px,4vw,40px);
+}
+
+/* about-specific glass-card */
+main > .glass-card{
+  padding:clamp(36px,6vw,72px) clamp(22px,5vw,64px);
+}
+
+h1{
+  font-size:clamp(30px,6vw,54px);
+  word-break:break-word;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   LEGAL / DOC PAGES (privacy, terms)
+───────────────────────────────────────────────────────────── */
+
+.doc-card{
+  padding:clamp(32px,5vw,64px) clamp(20px,6vw,72px);
+  border-radius:clamp(18px,3vw,32px);
+}
+
+.doc-card h1{
+  font-size:clamp(28px,5vw,46px);
+  word-break:break-word;
+}
+
+.service-row{
+  flex-wrap:wrap;
+}
+
+.service-chip{
+  flex:1 1 auto;
+  min-width:140px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   FOOTER — shared .site-footer across pages
+───────────────────────────────────────────────────────────── */
+
+.site-footer{
+  margin:0 clamp(8px,2vw,16px) clamp(8px,2vw,16px);
+  padding:clamp(14px,2vw,18px) clamp(16px,3vw,40px);
+}
+
+.footer-nav{
+  flex-wrap:wrap;
+}
+
+footer{
+  padding:clamp(20px,3vw,34px) clamp(16px,4vw,60px);
+  flex-wrap:wrap;
+  gap:14px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ≤ 960px  TABLET / SMALL LAPTOP
+───────────────────────────────────────────────────────────── */
+
+@media (max-width:960px){
+
+  nav{
+    height:auto;
+    min-height:60px;
+    padding-top:12px;
+    padding-bottom:12px;
+  }
+
+  .nav-links a{
+    margin-left:clamp(10px,2vw,28px);
+  }
+
+  /* quiz sidebar goes stacked */
+  .app-container{
+    flex-direction:column;
+    padding:16px;
+    gap:16px;
+  }
+
+  .app-container .sidebar{
+    width:100% !important;
+    max-height:220px;
+    border-radius:20px;
+    padding:16px;
+    overflow-y:auto;
+  }
+
+  .workspace{
+    min-height:420px;
+    border-radius:20px;
+  }
+
+  /* taskflow stacks */
+  body > main[style*="grid"],
+  main:has(.timer-section){
+    display:flex;
+    flex-direction:column;
+    overflow:auto;
+    height:auto;
+    padding:16px clamp(12px,3vw,28px);
+    gap:16px;
+  }
+
+  .timer-section{
+    min-height:420px;
+    flex-shrink:0;
+  }
+
+  .tasks-panel{
+    min-height:360px;
+    flex-shrink:0;
+  }
+
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ≤ 768px  MOBILE LANDSCAPE / SMALL TABLET
+───────────────────────────────────────────────────────────── */
+
+@media (max-width:768px){
+
+  /* ── Global nav collapse ── */
+  .nav-links{
+    display:none;
+  }
+
+  nav{
+    padding:0 16px;
+    height:56px;
+  }
+
+  /* ── Index dashboard ── */
+  body > main{
+    padding:24px 16px 32px;
+    gap:24px;
+  }
+
+  .welcome-section h1{
+    font-size:clamp(26px,8vw,38px);
+    letter-spacing:-1px;
+  }
+
+  .welcome-section p{
+    font-size:15px;
+  }
+
+  .module-grid{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .glass-card{
+    padding:28px 22px;
+  }
+
+  /* ── Chat page ── */
+  body:has(.sidebar.collapsed) .sidebar,
+  body:has(#sidebar) .sidebar{
+    position:fixed;
+    top:0;
+    left:0;
+    height:100%;
+    z-index:300;
+    transform:translateX(-100%);
+    width:280px !important;
+  }
+
+  body:has(#sidebar) .sidebar.open,
+  body:has(#sidebar) .sidebar:not(.collapsed){
+    transform:translateX(0);
+  }
+
+  .main{
+    width:100% !important;
+  }
+
+  .messages-wrapper{
+    padding:80px 12px 12px;
+  }
+
+  .msg{
+    max-width:90%;
+    font-size:14px;
+    padding:12px 14px;
+  }
+
+  .input-wrapper{
+    padding:10px 12px;
+  }
+
+  .input-box{
+    border-radius:20px;
+    padding:8px;
+  }
+
+  .top-bar{
+    padding:14px 16px;
+  }
+
+  /* ── Quiz page ── */
+  .app-container{
+    padding:12px;
+  }
+
+  .app-container .sidebar{
+    max-height:180px;
+    padding:12px;
+    border-radius:16px;
+  }
+
+  .gen-view{
+    padding:22px 16px;
+    overflow-y:auto;
+  }
+
+  .gen-view .section-title{
+    font-size:24px;
+  }
+
+  .settings-row{
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .setting-field{
+    min-width:100%;
+    max-width:100%;
+  }
+
+  .btn-generate,
+  .btn-secondary{
+    width:100%;
+    text-align:center;
+  }
+
+  .player-view{
+    padding:20px 14px 16px;
+  }
+
+  .question-card{
+    padding:24px 18px;
+  }
+
+  .question-text{
+    font-size:18px;
+  }
+
+  .player-actions{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .results-view{
+    padding:32px 20px;
+  }
+
+  .results-actions{
+    flex-direction:column;
+    width:100%;
+    gap:10px;
+  }
+
+  .score-circle{
+    width:110px;
+    height:110px;
+    font-size:32px;
+  }
+
+  .workspace{
+    border-radius:16px;
+    min-height:360px;
+  }
+
+  /* ── Taskflow page ── */
+  main:has(.timer-section){
+    padding:12px;
+    gap:12px;
+    overflow-y:auto;
+    height:auto;
+    min-height:0;
+  }
+
+  .timer-section{
+    min-height:380px;
+    border-radius:24px;
+  }
+
+  .tasks-panel{
+    border-radius:24px;
+    min-height:320px;
+  }
+
+  .ring-wrapper{
+    width:200px;
+    height:200px;
+  }
+
+  .timer-display{
+    font-size:52px;
+  }
+
+  .timer-controls{
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+
+  .btn-start-timer{
+    padding:13px 32px;
+    min-width:140px;
+  }
+
+  .mode-strip{
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+
+  .mode-strip::-webkit-scrollbar{display:none}
+
+  .mode-pill{
+    min-width:60px;
+    padding:10px 4px;
+  }
+
+  .ai-input-wrap{
+    flex-direction:row;
+    gap:8px;
+  }
+
+  .btn-explode{
+    padding:0 14px;
+    font-size:12px;
+  }
+
+  .task-card{
+    padding:12px 14px;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  .btn-delete-task{
+    opacity:1;
+  }
+
+  /* ── Legal/doc pages ── */
+  .doc-card{
+    padding:28px 18px;
+    border-radius:18px;
+  }
+
+  .doc-card h1{
+    font-size:clamp(26px,7vw,34px);
+  }
+
+  .commitment-card{
+    flex-direction:column;
+    gap:10px;
+    padding:20px 18px;
+  }
+
+  footer{
+    padding:20px 16px;
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  footer .footer-nav{
+    flex-wrap:wrap;
+    gap:4px;
+  }
+
+  /* ── About page ── */
+  main > .glass-card{
+    padding:36px 20px;
+    border-radius:24px;
+    text-align:center;
+  }
+
+  main > .glass-card h1{
+    font-size:clamp(28px,9vw,38px);
+  }
+
+  main > .glass-card p{
+    font-size:15px;
+  }
+
+  .feature-tag-container{
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:8px;
+    margin:28px 0 24px;
+  }
+
+  .tag{
+    font-size:11px;
+    padding:8px 14px;
+  }
+
+  /* ── Shared footer ── */
+  .site-footer{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:10px;
+    padding:14px 16px;
+    margin:0 8px 8px;
+    border-radius:14px;
+  }
+
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ≤ 480px  MOBILE PORTRAIT (iPhone SE–14)
+───────────────────────────────────────────────────────────── */
+
+@media (max-width:480px){
+
+  body > main{
+    padding:18px 12px 24px;
+  }
+
+  .welcome-section h1{
+    font-size:clamp(22px,9vw,32px);
+  }
+
+  .glass-card h2{
+    font-size:19px;
+  }
+
+  .glass-card p{
+    font-size:13.5px;
+  }
+
+  .glass-card{
+    padding:22px 18px;
+  }
+
+  .msg{
+    max-width:95%;
+    font-size:13.5px;
+  }
+
+  .empty-state h1{
+    font-size:22px;
+  }
+
+  .ring-wrapper{
+    width:170px;
+    height:170px;
+  }
+
+  .timer-display{
+    font-size:44px;
+  }
+
+  .timer-section{
+    min-height:340px;
+  }
+
+  .mode-pill-label,
+  .mode-pill-time{
+    font-size:9px;
+  }
+
+  .mode-pill-icon{
+    font-size:12px;
+  }
+
+  .doc-card h1{
+    font-size:clamp(22px,8vw,30px);
+  }
+
+  .doc-card{
+    padding:22px 14px;
+    border-radius:16px;
+  }
+
+  main > .glass-card h1{
+    font-size:26px;
+  }
+
+  .btn-back{
+    padding:13px 24px;
+    font-size:14px;
+  }
+
+  .completion-title{
+    font-size:20px;
+  }
+
+  .completion-actions{
+    flex-direction:column;
+    gap:10px;
+    width:100%;
+  }
+
+  .completion-actions > *{
+    width:100%;
+    text-align:center;
+  }
+
+  .results-view{
+    padding:24px 14px;
+  }
+
+  .section-title{
+    font-size:22px;
+  }
+
+  .source-textarea{
+    min-height:160px;
+    font-size:14px;
+  }
+
+  .quiz-title-input{
+    font-size:18px;
+  }
+
+  .question-text{
+    font-size:16px;
+  }
+
+  .option-btn{
+    font-size:13px;
+    padding:13px 14px;
+  }
+
+  .player-view{
+    padding:16px 12px 12px;
+  }
+
+  .question-card{
+    padding:18px 14px;
+  }
+
+  .tasks-body{
+    padding:14px;
+    gap:10px;
+  }
+
+  .panel-tab{
+    font-size:10px;
+    padding:13px 4px;
+  }
+
+  .ai-input{
+    font-size:13px;
+    padding:12px 14px;
+  }
+
+  .btn-explode{
+    font-size:11px;
+    padding:0 10px;
+  }
+
+  .footer-nav a{
+    font-size:11px;
+    padding:4px 8px;
+  }
+
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ≤ 360px  TINY PHONES (Galaxy A series, older Android)
+───────────────────────────────────────────────────────────── */
+
+@media (max-width:360px){
+
+  nav{
+    padding:0 12px;
+  }
+
+  .logo{
+    font-size:15px;
+  }
+
+  body > main{
+    padding:14px 10px 20px;
+  }
+
+  .welcome-section h1{
+    font-size:22px;
+  }
+
+  .glass-card{
+    padding:18px 14px;
+    border-radius:16px;
+  }
+
+  .glass-card h2{
+    font-size:17px;
+  }
+
+  .doc-card{
+    padding:18px 12px;
+  }
+
+  .doc-card h1{
+    font-size:22px;
+  }
+
+  main > .glass-card{
+    padding:24px 14px;
+  }
+
+  main > .glass-card h1{
+    font-size:22px;
+  }
+
+  .ring-wrapper{
+    width:150px;
+    height:150px;
+  }
+
+  .timer-display{
+    font-size:38px;
+  }
+
+  .btn-start-timer{
+    padding:12px 20px;
+    min-width:120px;
+    font-size:13px;
+  }
+
+  .btn-ghost{
+    padding:12px 14px;
+    font-size:12px;
+  }
+
+  .site-footer{
+    margin:0 6px 6px;
+    border-radius:12px;
+  }
+
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ≥ 1440px  LARGE DESKTOP / 4K
+───────────────────────────────────────────────────────────── */
+
+@media (min-width:1440px){
+
+  nav{
+    padding-left:clamp(60px,5vw,120px);
+    padding-right:clamp(60px,5vw,120px);
+  }
+
+  body > main{
+    padding:100px clamp(60px,7vw,120px);
+  }
+
+  .module-grid{
+    max-width:1400px;
+  }
+
+  .welcome-section{
+    max-width:1400px;
+  }
+
+  .messages{
+    max-width:980px;
+  }
+
+  .input-box{
+    max-width:980px;
+  }
+
+  .doc-card{
+    max-width:880px;
+  }
+
+  .gen-view{
+    padding:56px 100px;
+  }
+
+}
+
+/* ─────────────────────────────────────────────────────────────
+   OVERFLOW PROTECTION — last-resort global guards
+───────────────────────────────────────────────────────────── */
+
+html,
+body{
+  overflow-x:hidden;
+}
+
+.sidebar,
+.main,
+.workspace,
+.tasks-panel,
+.timer-section,
+nav,
+footer,
+.site-footer,
+.doc-card,
+.glass-card,
+main{
+  max-width:100%;
+  word-break:break-word;
+}
+
+textarea,
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="search"]{
+  max-width:100%;
+  min-width:0;
+}
+
+/* Prevent any deeply nested element from blowing out width */
+.messages-wrapper *,
+.tasks-body *,
+.gen-view *,
+.player-view *,
+.results-view *{
+  max-width:100%;
+  min-width:0;
+}
