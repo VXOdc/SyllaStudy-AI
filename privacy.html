@@ -4,502 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy • SyllaStudy AI</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
-
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.07);
-            --glass-border: rgba(255, 255, 255, 0.16);
-            --glass-blur: 50px;
-            --text-main: #ffffff;
-            --text-dim: rgba(255, 255, 255, 0.62);
-            --accent-glow: rgba(255, 255, 255, 0.35);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        body {
-            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
-            background:
-                linear-gradient(rgba(0,0,0,0.62), rgba(0,0,0,0.92)),
-                url("https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* depth / separation layer */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.45);
-            backdrop-filter: saturate(0.6) blur(3px);
-            -webkit-backdrop-filter: saturate(0.6) blur(3px);
-            z-index: 0;
-            animation: overlayFadeIn 0.5s ease forwards;
-        }
-
-        @keyframes overlayFadeIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
-
-        /* ── Nav ─────────────────────────────────────────── */
-        nav {
-            position: relative;
-            z-index: 100;
-            height: 80px;
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            background: rgba(255, 255, 255, 0.05);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.11);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 60px;
-            flex-shrink: 0;
-        }
-
-        .logo {
-            font-family: 'Lora', serif;
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            opacity: 0.95;
-            text-decoration: none;
-            color: white;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin-left: 36px;
-            font-size: 14px;
-            font-weight: 500;
-            opacity: 0.6;
-            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        .nav-links a:hover,
-        .nav-links a.active {
-            opacity: 1;
-            text-shadow: 0 0 16px var(--accent-glow);
-        }
-
-        /* ── Main ────────────────────────────────────────── */
-        main {
-            flex: 1;
-            position: relative;
-            z-index: 1;
-            display: flex;
-            justify-content: center;
-            padding: 60px 24px 80px;
-        }
-
-        /* ── Glass doc card ──────────────────────────────── */
-        .doc-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid var(--glass-border);
-            border-radius: 32px;
-            padding: 64px 72px;
-            max-width: 800px;
-            width: 100%;
-            box-shadow:
-                0 40px 90px rgba(0, 0, 0, 0.5),
-                inset 0 0 0 1px rgba(255,255,255,0.04);
-            animation: cardSlideIn 0.65s cubic-bezier(0.23, 1, 0.32, 1) both;
-        }
-
-        @keyframes cardSlideIn {
-            from { opacity: 0; transform: translateY(30px) scale(0.982); }
-            to   { opacity: 1; transform: translateY(0)   scale(1);     }
-        }
-
-        /* ── Header ──────────────────────────────────────── */
-        .doc-label {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.35);
-            margin-bottom: 18px;
-        }
-
-        .doc-card h1 {
-            font-family: 'Lora', serif;
-            font-size: 46px;
-            font-weight: 700;
-            letter-spacing: -1.3px;
-            line-height: 1.08;
-            margin-bottom: 14px;
-        }
-
-        .doc-meta {
-            display: flex;
-            align-items: center;
-            font-size: 13px;
-            color: rgba(255,255,255,0.33);
-            margin-bottom: 50px;
-        }
-
-        .doc-meta-sep {
-            margin: 0 14px;
-            opacity: 0.4;
-        }
-
-        hr {
-            border: none;
-            height: 1px;
-            background: rgba(255,255,255,0.1);
-            margin: 42px 0;
-        }
-
-        /* ── Sections ────────────────────────────────────── */
-        .section {
-            margin-bottom: 42px;
-        }
-
-        .section:last-of-type { margin-bottom: 0; }
-
-        .section h2 {
-            font-family: 'Lora', serif;
-            font-size: 18.5px;
-            font-weight: 600;
-            letter-spacing: -0.25px;
-            margin-bottom: 13px;
-            color: rgba(255,255,255,0.95);
-        }
-
-        .section p {
-            font-size: 15.5px;
-            line-height: 1.82;
-            color: var(--text-dim);
-            margin-bottom: 11px;
-        }
-
-        .section p:last-child { margin-bottom: 0; }
-
-        .section a {
-            color: rgba(255,255,255,0.8);
-            text-underline-offset: 3px;
-            transition: color 0.2s;
-        }
-
-        .section a:hover { color: white; }
-
-        .section ul {
-            list-style: none;
-            padding: 0;
-            margin-top: 4px;
-        }
-
-        .section ul li {
-            font-size: 15.5px;
-            line-height: 1.8;
-            color: var(--text-dim);
-            padding: 5px 0 5px 22px;
-            position: relative;
-        }
-
-        .section ul li::before {
-            content: '';
-            position: absolute;
-            left: 2px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-        }
-
-        /* Third-party service chips */
-        .service-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 16px;
-        }
-
-        .service-chip {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.11);
-            border-radius: 12px;
-            padding: 12px 18px;
-            transition: background 0.25s ease, border-color 0.25s ease;
-        }
-
-        .service-chip:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.2);
-        }
-
-        .chip-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.12);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
-
-        .chip-text strong {
-            display: block;
-            font-size: 13.5px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.88);
-            line-height: 1.3;
-        }
-
-        .chip-text span {
-            font-size: 12px;
-            color: rgba(255,255,255,0.4);
-        }
-
-        /* Privacy commitment card */
-        .commitment-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.11);
-            border-radius: 20px;
-            padding: 28px 30px;
-            margin-top: 14px;
-            display: flex;
-            gap: 18px;
-        }
-
-        .commitment-icon {
-            font-size: 22px;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .commitment-card p {
-            margin: 0;
-            font-size: 15px;
-            line-height: 1.8;
-            color: rgba(255,255,255,0.52);
-        }
-
-        /* Footer note */
-        .doc-footer-note {
-            font-size: 13px;
-            color: rgba(255,255,255,0.28);
-            line-height: 1.7;
-            margin-top: 48px;
-            padding-top: 32px;
-            border-top: 1px solid rgba(255,255,255,0.08);
-        }
-
-        /* ── Global footer ───────────────────────────────── */
-        footer {
-            position: relative;
-            z-index: 1;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255,255,255,0.08);
-            padding: 34px 60px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 18px;
-        }
-
-        .footer-copy {
-            font-size: 13px;
-            color: rgba(255,255,255,0.32);
-        }
-
-        .footer-nav {
-            display: flex;
-            align-items: center;
-            gap: 28px;
-            flex-wrap: wrap;
-        }
-
-        .footer-nav a {
-            font-size: 13px;
-            color: rgba(255,255,255,0.42);
-            text-decoration: none;
-            transition: color 0.22s ease;
-        }
-
-        .footer-nav a:hover { color: rgba(255,255,255,0.9); }
-        .footer-nav a.active { color: rgba(255,255,255,0.75); }
-
-        .footer-sep {
-            width: 1px;
-            height: 14px;
-            background: rgba(255,255,255,0.14);
-        }
-
-        /* ── Mobile ──────────────────────────────────────── */
-        @media (max-width: 768px) {
-            nav { padding: 0 24px; }
-            .nav-links { display: none; }
-            .doc-card { padding: 40px 28px; border-radius: 24px; }
-            .doc-card h1 { font-size: 34px; }
-            footer { padding: 28px 24px; flex-direction: column; align-items: flex-start; }
-            .commitment-card { flex-direction: column; gap: 10px; }
-        }
-    </style>
+    <link rel="stylesheet" href="components/legal-page.css">
+    <link rel="stylesheet" href="components/site-footer.css">
+    <script src="components/site-footer.js" defer></script>
 </head>
-<body>
-
-    <nav>
-        <a href="index.html" class="logo">SyllaStudy AI</a>
-        <div class="nav-links">
-            <a href="index.html">Dashboard</a>
-            <a href="chat.html">Study AI</a>
-            <a href="notes.html">SmartNotes</a>
-            <a href="quiz.html">QuizGen</a>
-            <a href="taskflow.html">TaskFlow</a>
-            <a href="about.html">About</a>
+<body class="legal-page">
+    <nav class="legal-nav">
+        <a class="legal-logo" href="/index.html">SyllaStudy AI</a>
+        <div class="legal-nav-links">
+            <a href="/index.html">Dashboard</a>
+            <a href="/chat.html">Study AI</a>
+            <a href="/notes.html">SmartNotes</a>
+            <a href="/quiz.html">QuizGen</a>
+            <a href="/taskflow.html">TaskFlow</a>
+            <a href="/about.html">About</a>
         </div>
     </nav>
 
-    <main>
-        <div class="doc-card">
-
-            <p class="doc-label">Legal</p>
-            <h1>Privacy Policy</h1>
-            <div class="doc-meta">
-                <span>SyllaStudy AI</span>
-                <span class="doc-meta-sep">·</span>
-                <span>Effective January 1, 2026</span>
-            </div>
-
-            <hr>
-
-            <div class="section">
-                <h2>The Short Version</h2>
-                <p>We collect the minimum data needed to make SyllaStudy AI work. We don't sell it. We don't use it for ads. Here's the full picture.</p>
-            </div>
-
-            <div class="section">
-                <h2>What We Collect</h2>
-                <p>Depending on how you use the app, we may collect:</p>
-                <ul>
-                    <li><strong style="color: rgba(255,255,255,0.8); font-weight: 500;">Account data</strong> — your email address and basic profile information if you create an account or sign in</li>
-                    <li><strong style="color: rgba(255,255,255,0.8); font-weight: 500;">Content you create</strong> — notes, quiz responses, and chat messages you write within the app, stored so you can access them later</li>
-                    <li><strong style="color: rgba(255,255,255,0.8); font-weight: 500;">Usage analytics</strong> — basic, anonymized logs (pages visited, features used, error reports) to help us improve the app</li>
-                </ul>
-                <p>We do not collect payment information, location data, or anything unrelated to the core app experience.</p>
-            </div>
-
-            <div class="section">
-                <h2>How We Use Your Data</h2>
-                <p>Data we collect is used solely to operate and improve SyllaStudy AI. Specifically:</p>
-                <ul>
-                    <li>To store and retrieve your notes, quizzes, and tasks across sessions</li>
-                    <li>To authenticate your identity when you sign in</li>
-                    <li>To pass your messages to AI providers so they can generate responses</li>
-                    <li>To diagnose errors and improve the stability and quality of the app</li>
-                </ul>
-
-                <div class="commitment-card">
-                    <div class="commitment-icon">🔒</div>
-                    <p>We do not sell your data to third parties. We do not use your content to train AI models. We do not build advertising profiles or share your information with marketers — ever.</p>
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>Third-Party Services</h2>
-                <p>SyllaStudy AI relies on the following trusted services to function. Each operates under its own privacy policy.</p>
-
-                <div class="service-row">
-                    <div class="service-chip">
-                        <div class="chip-icon">🗄️</div>
-                        <div class="chip-text">
-                            <strong>Supabase</strong>
-                            <span>Database &amp; authentication</span>
+    <main class="legal-main">
+        <div class="legal-shell">
+            <div class="legal-overlay visible">
+                <article class="legal-card">
+                    <header class="legal-hero">
+                        <div class="legal-chip-row">
+                            <span class="legal-chip">Privacy Policy</span>
+                            <div class="legal-switcher" aria-label="Legal pages">
+                                <a href="/terms.html">Terms</a>
+                                <a class="active" href="/privacy.html">Privacy</a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="service-chip">
-                        <div class="chip-icon">▲</div>
-                        <div class="chip-text">
-                            <strong>Vercel</strong>
-                            <span>Hosting &amp; edge delivery</span>
+                        <h1>What SyllaStudy AI collects and why.</h1>
+                        <p class="legal-intro">
+                            We try to keep privacy simple: collect the minimum needed to run the app, never sell your data,
+                            and be honest about the third-party services that help the product work.
+                        </p>
+                        <div class="legal-meta">
+                            <span>Last updated April 19, 2026</span>
+                            <span>Transparent summary of current app behavior</span>
                         </div>
+                    </header>
+
+                    <div class="legal-content">
+                        <section class="legal-block">
+                            <h2>Data we may collect</h2>
+                            <ul>
+                                <li>Basic account data, if account or authentication features are enabled.</li>
+                                <li>Chats, prompts, notes, quiz content, tasks, or other workspace content that you create or save.</li>
+                                <li>Basic usage and diagnostic logs used to keep the app available and troubleshoot problems.</li>
+                                <li>Some feature data stored locally in your browser for faster app functionality.</li>
+                            </ul>
+                        </section>
+
+                        <section class="legal-block">
+                            <h2>How that data is used</h2>
+                            <p>
+                                We use data to run the product, respond to your actions, save the work you expect to keep,
+                                and maintain basic reliability and abuse protection.
+                            </p>
+                            <p>
+                                We do not sell your personal data. We use it only for product functionality, service
+                                operations, and limited support or debugging needs.
+                            </p>
+                        </section>
+
+                        <section class="legal-block">
+                            <h2>Third-party services used by the app</h2>
+                            <ul>
+                                <li><strong>Supabase</strong> may be used for database storage and authentication support.</li>
+                                <li><strong>Vercel</strong> hosts and serves the web application.</li>
+                                <li><strong>AI providers</strong> process prompts and responses. The current setup uses Mistral with a Gemini fallback path when needed.</li>
+                            </ul>
+                            <p>
+                                Those providers may process data as part of delivering their part of the service. Their
+                                handling practices are governed by their own policies.
+                            </p>
+                        </section>
+
+                        <section class="legal-block">
+                            <h2>Storage approach</h2>
+                            <p>
+                                We keep storage practical, not excessive. Some data may live in browser storage, and some
+                                may live in supporting infrastructure only when needed to power app features or preserve
+                                saved content.
+                            </p>
+                        </section>
+
+                        <section class="legal-block">
+                            <h2>Security</h2>
+                            <p>
+                                We use reasonable protection measures for a modern web app, but we do not claim perfect
+                                security or enterprise-grade compliance on this page. No internet service can promise zero
+                                risk.
+                            </p>
+                        </section>
+
+                        <section class="legal-block">
+                            <h2>Changes to this policy</h2>
+                            <p>
+                                If our data practices change, we may update this page at any time. The latest posted version
+                                is the version that applies to your ongoing use of the app.
+                            </p>
+                            <p class="legal-footnote">
+                                If you use SyllaStudy AI through an organization or private deployment, that environment may
+                                have additional rules layered on top of this summary.
+                            </p>
+                        </section>
                     </div>
-                    <div class="service-chip">
-                        <div class="chip-icon">🤖</div>
-                        <div class="chip-text">
-                            <strong>Mistral AI</strong>
-                            <span>Primary AI model</span>
-                        </div>
-                    </div>
-                    <div class="service-chip">
-                        <div class="chip-icon">✦</div>
-                        <div class="chip-text">
-                            <strong>Google Gemini</strong>
-                            <span>Fallback AI model</span>
-                        </div>
-                    </div>
-                </div>
-
-                <p style="margin-top: 18px;">When you use AI features, your messages are sent to these providers to generate a response. Messages are not stored by these providers beyond what's needed for the request itself.</p>
+                </article>
             </div>
 
-            <div class="section">
-                <h2>Data Retention</h2>
-                <p>We retain your account data and content for as long as your account is active. If you'd like your data deleted, contact us through the About page and we'll remove it promptly.</p>
-                <p>Anonymous usage logs are retained for up to 90 days for diagnostic purposes, then purged automatically.</p>
-            </div>
-
-            <div class="section">
-                <h2>Security</h2>
-                <p>We take reasonable measures to protect your data — encrypted storage via Supabase, HTTPS-only connections, and standard access controls. That said, no system is perfectly secure. We don't promise enterprise-grade compliance, but we handle your data carefully and take breaches seriously.</p>
-            </div>
-
-            <div class="section">
-                <h2>Your Rights</h2>
-                <p>You can request access to, correction of, or deletion of your personal data at any time. Just reach out through the About page. We'll respond within a reasonable timeframe.</p>
-            </div>
-
-            <div class="section">
-                <h2>Changes to This Policy</h2>
-                <p>We may update this Privacy Policy as the app evolves. When we do, the effective date at the top will reflect the change. For significant updates, we may notify you within the app.</p>
-            </div>
-
-            <p class="doc-footer-note">
-                Questions about your data? We're accessible through the <a href="about.html" style="color: rgba(255,255,255,0.5); text-decoration: underline; text-underline-offset: 3px;">About page</a>. Privacy concerns are taken seriously and responded to personally.
-            </p>
-
+            <div class="site-footer-shell" data-footer-host></div>
         </div>
     </main>
-
-    <footer>
-        <span class="footer-copy">© 2026 SyllaStudy AI. All rights reserved.</span>
-        <nav class="footer-nav">
-            <a href="index.html">Home</a>
-            <a href="index.html">Dashboard</a>
-            <a href="about.html">About</a>
-            <div class="footer-sep"></div>
-            <a href="terms.html">Terms of Service</a>
-            <a href="privacy.html" class="active">Privacy Policy</a>
-        </nav>
-    </footer>
-
 </body>
 </html>
-
