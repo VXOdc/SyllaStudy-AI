@@ -90,9 +90,9 @@
     padding: 18px 22px;
     border-radius: calc(var(--radius, 14px) + 8px);
     border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
-    background: linear-gradient(180deg, rgba(10, 16, 25, 0.46), rgba(10, 16, 25, 0.3));
-    backdrop-filter: blur(calc(var(--glass-blur, 32px) * 0.4)) saturate(1.04);
-    -webkit-backdrop-filter: blur(calc(var(--glass-blur, 32px) * 0.4)) saturate(1.04);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.04));
+    backdrop-filter: blur(28px) saturate(1.08);
+    -webkit-backdrop-filter: blur(28px) saturate(1.08);
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
     display: flex;
     align-items: flex-start;
