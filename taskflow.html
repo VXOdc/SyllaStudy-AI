@@ -51,7 +51,7 @@
             flex-shrink: 0;
             z-index: 200;
         }
-        .logo { font-family: 'Lora', serif; font-size: 19px; font-weight: 700; letter-spacing: -0.3px; }
+        .logo { font-family: 'Lora', serif; font-size: 19px; font-weight: 700; letter-spacing: -0.3px; text-decoration: none; color: white; }
         .nav-links a {
             color: white; text-decoration: none; margin-left: 36px;
             font-size: 13px; font-weight: 400; letter-spacing: 0.04em;
@@ -59,6 +59,27 @@
         }
         .nav-links a:hover { opacity: 0.85; }
         .nav-links a.active { opacity: 1; }
+
+        /* ── GLOBAL FOOTER ── */
+        .site-footer {
+            background: rgba(0, 0, 0, 0.38);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 18px 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+        .footer-copy { font-size: 12px; color: rgba(255,255,255,0.28); }
+        .footer-nav { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+        .footer-nav a { font-size: 12px; color: rgba(255,255,255,0.38); text-decoration: none; transition: color 0.22s; }
+        .footer-nav a:hover { color: rgba(255,255,255,0.85); }
+        .footer-sep { width: 1px; height: 12px; background: rgba(255,255,255,0.12); }
+        @media (max-width: 900px) { .site-footer { display: none; } }
 
         /* ── MAIN LAYOUT ── */
         main {
@@ -387,13 +408,14 @@
 
 <!-- ── NAV ── -->
 <nav>
-    <div class="logo">SyllaStudy AI</div>
+    <a href="index.html" class="logo">SyllaStudy AI</a>
     <div class="nav-links">
         <a href="index.html">Dashboard</a>
         <a href="chat.html">Study AI</a>
         <a href="notes.html">SmartNotes</a>
         <a href="quiz.html">QuizGen</a>
         <a href="taskflow.html" class="active">TaskFlow</a>
+        <a href="about.html">About</a>
     </div>
 </nav>
 
@@ -552,5 +574,17 @@ window.SUPABASE_URL = window.SUPABASE_URL || '';
 window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
 </script>
 <script type="module" src="js/pages/taskflow-page.js"></script>
+
+<footer class="site-footer">
+    <span class="footer-copy">© 2026 SyllaStudy AI. All rights reserved.</span>
+    <nav class="footer-nav">
+        <a href="index.html">Home</a>
+        <a href="index.html">Dashboard</a>
+        <a href="about.html">About</a>
+        <div class="footer-sep"></div>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+    </nav>
+</footer>
 </body>
 </html>
