@@ -154,10 +154,18 @@
                 .site-footer {
             position: relative;
             z-index: 40;
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(28px) saturate(1.1);
-            -webkit-backdrop-filter: blur(28px) saturate(1.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.12);
+
+            /* Apple-like: very light film, not a solid block */
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+
+            /* Faint seam — separates without announcing itself */
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+            /* Subtle inner highlight — just a whisper */
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
             padding: 22px 60px;
             display: flex;
             align-items: center;
@@ -165,11 +173,11 @@
             flex-wrap: wrap;
             gap: 16px;
             flex-shrink: 0;
-            box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.06);
         }
         .footer-copy {
             font-size: 13px;
-            color: rgba(255,255,255,0.3);
+            /* Soft muted white — readable but never harsh */
+            color: rgba(255,255,255,0.38);
         }
         .footer-nav {
             display: flex;
@@ -179,15 +187,15 @@
         }
         .footer-nav a {
             font-size: 13px;
-            color: rgba(255,255,255,0.4);
+            color: rgba(255,255,255,0.42);
             text-decoration: none;
             transition: color 0.22s ease;
         }
-        .footer-nav a:hover { color: rgba(255,255,255,0.88); }
+        .footer-nav a:hover { color: rgba(255,255,255,0.82); }
         .footer-sep {
             width: 1px;
             height: 13px;
-            background: rgba(255,255,255,0.13);
+            background: rgba(255,255,255,0.1);
         }
         @media (max-width: 768px) {
             .site-footer { padding: 22px 20px; flex-direction: column; align-items: flex-start; }
