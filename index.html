@@ -1,302 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
- <script>
+<script>
   window.SUPABASE_URL = "https://qyqvuukigsbjuhjygrxp.supabase.co";
   window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF5cXZ1dWtpZ3NianVoanlncnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNjEzMjAsImV4cCI6MjA5MTkzNzMyMH0.5ivvnQC5f-6Yp62ptBt7jZpK_4c-WIwfPnNkbfh9_4s";
 </script>
-    
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard • SyllaStudy AI</title>
-    <style>
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.12);
-            --glass-border: rgba(255, 255, 255, 0.22);
-            --glass-blur: 40px;
-            --accent-glow: rgba(255, 255, 255, 0.35);
-            --text-main: #ffffff;
-            --text-dim: rgba(255, 255, 255, 0.6);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard • SyllaStudy AI</title>
+<style>
+  :root {
+    --glass-bg: rgba(255,255,255,0.12);
+    --glass-border: rgba(255,255,255,0.22);
+    --glass-blur: 40px;
+    --text-main: #fff;
+    --text-dim: rgba(255,255,255,0.6);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  html { overflow-x: hidden; }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-font-smoothing: antialiased;
-        }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.5)),
+                url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+  }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.45)), 
-                        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            min-height: 100vh;
-            color: var(--text-main);
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-        
+  /* ── NAV ── */
+  nav {
+    height: 72px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255,255,255,0.05);
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 clamp(20px,5vw,60px);
+    z-index: 200;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+  }
+  .logo { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; opacity: 0.9; white-space: nowrap; }
+  .nav-links { display: flex; align-items: center; gap: 2px; }
+  .nav-links a {
+    color: #fff; text-decoration: none;
+    padding: 7px 14px; font-size: 14px; font-weight: 500;
+    opacity: 0.65; border-radius: 22px; white-space: nowrap; transition: all 0.25s;
+  }
+  .nav-links a:hover, .nav-links a.active { opacity: 1; background: rgba(255,255,255,0.1); }
 
-        /* Top Navigation */
-        nav {
-            height: 80px;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.05);
-            border-bottom: 1px solid var(--glass-border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 60px;
-            z-index: 100;
-        }
+  .nav-burger {
+    display: none;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; width: 40px; height: 40px; border-radius: 11px;
+    align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+  }
+  .nav-burger svg { width:18px;height:18px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round; }
 
-        .logo {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            opacity: 0.9;
-        }
+  .mobile-drawer {
+    display: none; flex-direction: column;
+    position: fixed; top: 72px; left: 0; right: 0;
+    background: rgba(8,8,16,0.97);
+    backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    z-index: 199; padding: 10px 16px 18px; gap: 3px;
+    animation: drawerDown 0.2s ease;
+  }
+  @keyframes drawerDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:none} }
+  .mobile-drawer.open { display: flex; }
+  .mobile-drawer a {
+    color: rgba(255,255,255,0.75); text-decoration: none;
+    font-size: 15px; font-weight: 500; padding: 13px 16px; border-radius: 12px; transition: 0.2s;
+  }
+  .mobile-drawer a.active, .mobile-drawer a:hover { background: rgba(255,255,255,0.09); color: #fff; }
 
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin-left: 40px;
-            font-size: 15px;
-            font-weight: 500;
-            opacity: 0.7;
-            transition: 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-        }
+  /* ── MAIN ── */
+  main {
+    flex: 1;
+    padding: clamp(36px,6vw,80px) clamp(20px,5vw,60px) 32px;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(32px,4vw,50px);
+  }
 
-        .nav-links a:hover, .nav-links a.active { 
-            opacity: 1; 
-            text-shadow: 0 0 15px var(--accent-glow);
-        }
+  .welcome-section h1 {
+    font-size: clamp(30px,6vw,56px);
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: clamp(-1px,-0.03em,-2px);
+    line-height: 1.05;
+  }
+  .welcome-section p { font-size: clamp(15px,1.8vw,19px); color: var(--text-dim); }
 
-        /* Main Content Layout */
-        main {
-            flex: 1;
-            padding: 80px 60px;
-            display: flex;
-            flex-direction: column;
-            gap: 50px;
-            min-height: 0;
-        }
+  /* ── GRID ── */
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(260px,100%), 1fr));
+    gap: clamp(12px,2vw,24px);
+    max-width: 1200px;
+  }
 
-        .welcome-section {
-            max-width: 1200px;
-        }
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    padding: clamp(28px,3.5vw,45px) clamp(24px,3vw,40px);
+    text-decoration: none;
+    color: #fff;
+    transition: all 0.45s cubic-bezier(0.23,1,0.32,1);
+  }
+  .card-ai    { border-radius: 40px 15px 50px 20px; }
+  .card-notes { border-radius: 20px 45px 15px 55px; }
+  .card-quiz  { border-radius: 35px 35px 60px 20px; }
+  .card-tasks { border-radius: 50px 20px 45px 15px; }
 
-        .welcome-section h1 {
-            font-size: 56px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            letter-spacing: -2px;
-        }
+  .glass-card:hover {
+    transform: translateY(-8px);
+    background: rgba(255,255,255,0.18);
+    border-color: rgba(255,255,255,0.45);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  }
+  .glass-card h2 { font-size: clamp(20px,2.5vw,28px); margin-bottom: 12px; font-weight: 600; }
+  .glass-card p  { font-size: clamp(13.5px,1.4vw,15.5px); line-height: 1.7; color: var(--text-dim); }
 
-        .welcome-section p {
-            font-size: 19px;
-            color: var(--text-dim);
-            font-weight: 400;
-        }
+  /* ── FOOTER ── */
+  .site-footer {
+    flex-shrink: 0; margin: 0 16px 16px; border-radius: 18px;
+    backdrop-filter: blur(28px) saturate(1.4); -webkit-backdrop-filter: blur(28px) saturate(1.4);
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+    padding: 16px clamp(16px,3vw,36px);
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  }
+  .footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); letter-spacing: 0.02em; }
+  .footer-nav {
+    display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 12px; padding: 4px 5px;
+  }
+  .footer-nav a {
+    font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.38);
+    text-decoration: none; padding: 5px 10px; border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.03); transition: 0.22s;
+  }
+  .footer-nav a:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.08); }
+  .footer-nav a.active { color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.06); }
+  .footer-sep { width:1px; height:12px; background:rgba(255,255,255,0.12); margin:0 3px; }
 
-        /* Module Grid */
-        .module-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            max-width: 1200px;
-        }
-
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid var(--glass-border);
-            padding: 45px 40px;
-            text-decoration: none;
-            color: white;
-            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        /* Organic Border Radii - Consistent with your existing style */
-        .card-ai { border-radius: 40px 15px 50px 20px; }
-        .card-notes { border-radius: 20px 45px 15px 55px; }
-        .card-quiz { border-radius: 35px 35px 60px 20px; } /* New QuizGen radius */
-        .card-tasks { border-radius: 50px 20px 45px 15px; }
-
-        .glass-card:hover {
-            transform: translateY(-12px);
-            background: rgba(255, 255, 255, 0.18);
-            border-color: rgba(255, 255, 255, 0.45);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
-        }
-
-        .glass-card h2 {
-            font-size: 28px;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        .glass-card p {
-            font-size: 15.5px;
-            line-height: 1.7;
-            color: var(--text-dim);
-        }
-
-        /* ── Global Footer ───────────────────────────────── */
-                
-        
-        
-        
-        
-        
-        @media (max-width: 768px) {
-            
-        }
-
-    
-        /* ── Apple Glassmorphic Footer ───────────────────── */
-        .site-footer {
-            flex-shrink: 0;
-            position: relative;
-            z-index: 10;
-            margin: 0 16px 16px;
-            border-radius: 20px;
-            backdrop-filter: blur(28px) saturate(1.4);
-            -webkit-backdrop-filter: blur(28px) saturate(1.4);
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.13);
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.12),
-                0 8px 32px rgba(0, 0, 0, 0.22);
-            padding: 18px 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .footer-copy {
-            font-size: 12px;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.32);
-            letter-spacing: 0.02em;
-        }
-        .footer-nav {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 14px;
-            padding: 4px 6px;
-        }
-        .footer-nav a {
-            font-size: 12px;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.38);
-            text-decoration: none;
-            padding: 5px 10px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(255, 255, 255, 0.04);
-            transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
-            letter-spacing: 0.01em;
-        }
-        .footer-nav a:hover {
-            color: rgba(255, 255, 255, 0.85);
-            background: rgba(255, 255, 255, 0.08);
-        }
-        .footer-nav a.active {
-            color: rgba(255, 255, 255, 0.75);
-            background: rgba(255, 255, 255, 0.06);
-        }
-        .footer-sep {
-            width: 1px;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.12);
-            margin: 0 4px;
-        }
-        @media (max-width: 768px) {
-            .site-footer {
-                padding: 18px 24px;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-        }
-    </style>
+  /* ── MOBILE ── */
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .nav-burger { display: flex; }
+    .site-footer { flex-direction: column; align-items: flex-start; }
+    .glass-card:hover { transform: none; }
+  }
+  @media (max-width: 480px) {
+    .module-grid { grid-template-columns: 1fr; }
+  }
+</style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo">SyllaStudy AI</div>
-        <div class="nav-links">
-            <a href="index.html" class="active">Dashboard</a>
-            <a href="chat.html">Study AI</a>
-            <a href="notes.html">SmartNotes</a>
-            <a href="quiz.html">QuizGen</a>
-            <a href="taskflow.html">TaskFlow</a>
-            <a href="about.html">About</a>
-        </div>
-    </nav>
+<nav>
+  <div class="logo">SyllaStudy AI</div>
+  <div class="nav-links">
+    <a href="index.html" class="active">Dashboard</a>
+    <a href="chat.html">Study AI</a>
+    <a href="notes.html">SmartNotes</a>
+    <a href="quiz.html">QuizGen</a>
+    <a href="taskflow.html">TaskFlow</a>
+    <a href="about.html">About</a>
+  </div>
+  <button class="nav-burger" onclick="toggleDrawer()" aria-label="Menu">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+</nav>
 
-    <main>
-        <div class="welcome-section">
-            <h1 id="current-date">Today</h1>
-            <p>Welcome back. What should we achieve today?</p>
-        </div>
+<div class="mobile-drawer" id="drawer">
+  <a href="index.html" class="active">Dashboard</a>
+  <a href="chat.html">Study AI</a>
+  <a href="notes.html">SmartNotes</a>
+  <a href="quiz.html">QuizGen</a>
+  <a href="taskflow.html">TaskFlow</a>
+  <a href="about.html">About</a>
+</div>
 
-        <div class="module-grid">
-            <a href="chat.html" class="glass-card card-ai">
-                <h2>Study AI</h2>
-                <p>Engage with your intelligent tutor to solve complex problems or brainstorm new ideas.</p>
-            </a>
+<main>
+  <div class="welcome-section">
+    <h1 id="current-date">Today</h1>
+    <p>Welcome back. What should we achieve today?</p>
+  </div>
 
-            <a href="notes.html" class="glass-card card-notes">
-                <h2>SmartNotes</h2>
-                <p>A distraction-free writing environment for organizing your projects and drafts.</p>
-            </a>
-
-            <a href="quiz.html" class="glass-card card-quiz">
-                <h2>QuizGen</h2>
-                <p>Transform your notes into interactive quizzes powered by AI to test your knowledge.</p>
-            </a>
-
-            <a href="taskflow.html" class="glass-card card-tasks">
-                <h2>TaskFlow</h2>
-                <p>Manage your upcoming milestones and track your personal progress efficiently.</p>
-            </a>
-        </div>
-
+  <div class="module-grid">
+    <a href="chat.html" class="glass-card card-ai">
+      <h2>Study AI</h2>
+      <p>Engage with your intelligent tutor to solve complex problems or brainstorm new ideas.</p>
+    </a>
+    <a href="notes.html" class="glass-card card-notes">
+      <h2>SmartNotes</h2>
+      <p>A distraction-free writing environment for organizing your projects and drafts.</p>
+    </a>
+    <a href="quiz.html" class="glass-card card-quiz">
+      <h2>QuizGen</h2>
+      <p>Transform your notes into interactive quizzes powered by AI to test your knowledge.</p>
+    </a>
+    <a href="taskflow.html" class="glass-card card-tasks">
+      <h2>TaskFlow</h2>
+      <p>Manage your upcoming milestones and track your personal progress efficiently.</p>
+    </a>
+  </div>
 </main>
 
-    <footer class="site-footer">
-        <span class="footer-copy">© 2026 SyllaStudy AI</span>
-        <nav class="footer-nav">
-            <a href="index.html" class="active">Home</a>
-            <a href="about.html">About</a>
-            <div class="footer-sep"></div>
-            <a href="terms.html">Terms</a>
-            <a href="privacy.html">Privacy</a>
-        </nav>
-    </footer>
+<footer class="site-footer">
+  <span class="footer-copy">© 2026 SyllaStudy AI</span>
+  <nav class="footer-nav">
+    <a href="index.html" class="active">Home</a>
+    <a href="about.html">About</a>
+    <div class="footer-sep"></div>
+    <a href="terms.html">Terms</a>
+    <a href="privacy.html">Privacy</a>
+  </nav>
+</footer>
 
-    <script>
-        // Set dynamic date
-        const options = { weekday: 'long', month: 'long', day: 'numeric' };
-        const today  = new Date();
-        document.getElementById('current-date').innerText = today.toLocaleDateString("en-US", options);
-    </script>
-
- <script type="module" src="js/supabase-client.js"></script>
-
+<script>
+  const opts = { weekday:'long', month:'long', day:'numeric' };
+  document.getElementById('current-date').innerText = new Date().toLocaleDateString("en-US", opts);
+  function toggleDrawer() {
+    document.getElementById('drawer').classList.toggle('open');
+  }
+  document.addEventListener('click', e => {
+    const drawer = document.getElementById('drawer');
+    if (!drawer.contains(e.target) && !e.target.closest('.nav-burger')) drawer.classList.remove('open');
+  });
+</script>
+<script type="module" src="js/supabase-client.js"></script>
 </body>
 </html>
