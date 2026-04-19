@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy • SyllaStudy AI</title>
+    <title>Terms of Service • SyllaStudy AI</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
 
@@ -37,7 +37,7 @@
             flex-direction: column;
         }
 
-        /* depth / separation layer */
+        /* depth layer — blurs & desaturates background content slightly */
         body::before {
             content: '';
             position: fixed;
@@ -96,7 +96,7 @@
             text-shadow: 0 0 16px var(--accent-glow);
         }
 
-        /* ── Main ────────────────────────────────────────── */
+        /* ── Page body ───────────────────────────────────── */
         main {
             flex: 1;
             position: relative;
@@ -106,7 +106,7 @@
             padding: 60px 24px 80px;
         }
 
-        /* ── Glass doc card ──────────────────────────────── */
+        /* ── Glass document card ─────────────────────────── */
         .doc-card {
             background: var(--glass-bg);
             backdrop-filter: blur(var(--glass-blur));
@@ -127,7 +127,7 @@
             to   { opacity: 1; transform: translateY(0)   scale(1);     }
         }
 
-        /* ── Header ──────────────────────────────────────── */
+        /* ── Doc header ──────────────────────────────────── */
         .doc-label {
             font-size: 11px;
             font-weight: 600;
@@ -149,6 +149,7 @@
         .doc-meta {
             display: flex;
             align-items: center;
+            gap: 0;
             font-size: 13px;
             color: rgba(255,255,255,0.33);
             margin-bottom: 50px;
@@ -159,6 +160,7 @@
             opacity: 0.4;
         }
 
+        /* ── Divider ─────────────────────────────────────── */
         hr {
             border: none;
             height: 1px;
@@ -171,7 +173,9 @@
             margin-bottom: 42px;
         }
 
-        .section:last-of-type { margin-bottom: 0; }
+        .section:last-of-type {
+            margin-bottom: 0;
+        }
 
         .section h2 {
             font-family: 'Lora', serif;
@@ -194,10 +198,10 @@
         .section a {
             color: rgba(255,255,255,0.8);
             text-underline-offset: 3px;
-            transition: color 0.2s;
+            transition: opacity 0.2s;
         }
 
-        .section a:hover { color: white; }
+        .section a:hover { opacity: 1; color: white; }
 
         .section ul {
             list-style: none;
@@ -225,80 +229,36 @@
             background: rgba(255,255,255,0.3);
         }
 
-        /* Third-party service chips */
-        .service-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 16px;
-        }
-
-        .service-chip {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.11);
-            border-radius: 12px;
-            padding: 12px 18px;
-            transition: background 0.25s ease, border-color 0.25s ease;
-        }
-
-        .service-chip:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.2);
-        }
-
-        .chip-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.12);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
-
-        .chip-text strong {
-            display: block;
-            font-size: 13.5px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.88);
-            line-height: 1.3;
-        }
-
-        .chip-text span {
-            font-size: 12px;
-            color: rgba(255,255,255,0.4);
-        }
-
-        /* Privacy commitment card */
-        .commitment-card {
+        /* Callout box — for AI disclaimer */
+        .callout {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.11);
-            border-radius: 20px;
-            padding: 28px 30px;
+            border-radius: 16px;
+            padding: 22px 26px;
             margin-top: 14px;
-            display: flex;
-            gap: 18px;
         }
 
-        .commitment-icon {
-            font-size: 22px;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .commitment-card p {
+        .callout p {
             margin: 0;
-            font-size: 15px;
-            line-height: 1.8;
-            color: rgba(255,255,255,0.52);
+            font-size: 14.5px;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.78;
         }
 
-        /* Footer note */
+        /* Inline code-style tag */
+        .tag-inline {
+            display: inline-block;
+            background: rgba(255,255,255,0.09);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 6px;
+            padding: 0 8px;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.75);
+            vertical-align: middle;
+        }
+
+        /* Footer note at bottom of card */
         .doc-footer-note {
             font-size: 13px;
             color: rgba(255,255,255,0.28);
@@ -332,6 +292,7 @@
         
 
         
+
         .footer-nav a.active { color: rgba(255,255,255,0.65); }
 
         
@@ -343,7 +304,6 @@
             .doc-card { padding: 40px 28px; border-radius: 24px; }
             .doc-card h1 { font-size: 34px; }
             footer { padding: 28px 24px; flex-direction: column; align-items: flex-start; }
-            .commitment-card { flex-direction: column; gap: 10px; }
         }
     
         /* ── Footer — transparent, scroll-to, ghost style ── */
@@ -401,7 +361,7 @@
         <div class="doc-card">
 
             <p class="doc-label">Legal</p>
-            <h1>Privacy Policy</h1>
+            <h1>Terms of Service</h1>
             <div class="doc-meta">
                 <span>SyllaStudy AI</span>
                 <span class="doc-meta-sep">·</span>
@@ -411,98 +371,56 @@
             <hr>
 
             <div class="section">
-                <h2>The Short Version</h2>
-                <p>We collect the minimum data needed to make SyllaStudy AI work. We don't sell it. We don't use it for ads. Here's the full picture.</p>
+                <h2>Acceptance of Terms</h2>
+                <p>By accessing or using SyllaStudy AI, you agree to be bound by these Terms of Service. If you don't agree, please don't use the app — no hard feelings.</p>
+                <p>We may update these terms at any time. Continued use after an update means you accept the revised terms. We'll always update the effective date above when we make changes.</p>
             </div>
 
             <div class="section">
-                <h2>What We Collect</h2>
-                <p>Depending on how you use the app, we may collect:</p>
+                <h2>How You May Use the App</h2>
+                <p>SyllaStudy AI exists to help students study smarter — through AI conversation, quiz generation, smart note-taking, and task management. Please use it for those purposes.</p>
+                <p>You agree not to:</p>
                 <ul>
-                    <li><strong style="color: rgba(255,255,255,0.8); font-weight: 500;">Account data</strong> — your email address and basic profile information if you create an account or sign in</li>
-                    <li><strong style="color: rgba(255,255,255,0.8); font-weight: 500;">Content you create</strong> — notes, quiz responses, and chat messages you write within the app, stored so you can access them later</li>
-                    <li><strong style="color: rgba(255,255,255,0.8); font-weight: 500;">Usage analytics</strong> — basic, anonymized logs (pages visited, features used, error reports) to help us improve the app</li>
+                    <li>Abuse, overload, or attempt to destabilize the app or its infrastructure</li>
+                    <li>Scrape, harvest, or extract data from the app by automated means</li>
+                    <li>Reverse engineer, decompile, or attempt to extract the source code</li>
+                    <li>Use the app to generate, store, or distribute harmful or illegal content</li>
+                    <li>Impersonate other users or attempt to access accounts that are not yours</li>
                 </ul>
-                <p>We do not collect payment information, location data, or anything unrelated to the core app experience.</p>
             </div>
 
             <div class="section">
-                <h2>How We Use Your Data</h2>
-                <p>Data we collect is used solely to operate and improve SyllaStudy AI. Specifically:</p>
-                <ul>
-                    <li>To store and retrieve your notes, quizzes, and tasks across sessions</li>
-                    <li>To authenticate your identity when you sign in</li>
-                    <li>To pass your messages to AI providers so they can generate responses</li>
-                    <li>To diagnose errors and improve the stability and quality of the app</li>
-                </ul>
-
-                <div class="commitment-card">
-                    <div class="commitment-icon">🔒</div>
-                    <p>We do not sell your data to third parties. We do not use your content to train AI models. We do not build advertising profiles or share your information with marketers — ever.</p>
+                <h2>AI-Generated Content Disclaimer</h2>
+                <p>SyllaStudy AI uses third-party AI models to power its features. AI is genuinely useful — but it's not infallible.</p>
+                <div class="callout">
+                    <p>Responses generated by AI may be inaccurate, incomplete, or outdated. Nothing produced by the AI constitutes legal, medical, financial, or academic advice. You should always verify important information with trusted, authoritative sources. AI is a tool to assist your thinking — not replace it.</p>
                 </div>
             </div>
 
             <div class="section">
-                <h2>Third-Party Services</h2>
-                <p>SyllaStudy AI relies on the following trusted services to function. Each operates under its own privacy policy.</p>
-
-                <div class="service-row">
-                    <div class="service-chip">
-                        <div class="chip-icon">🗄️</div>
-                        <div class="chip-text">
-                            <strong>Supabase</strong>
-                            <span>Database &amp; authentication</span>
-                        </div>
-                    </div>
-                    <div class="service-chip">
-                        <div class="chip-icon">▲</div>
-                        <div class="chip-text">
-                            <strong>Vercel</strong>
-                            <span>Hosting &amp; edge delivery</span>
-                        </div>
-                    </div>
-                    <div class="service-chip">
-                        <div class="chip-icon">🤖</div>
-                        <div class="chip-text">
-                            <strong>Mistral AI</strong>
-                            <span>Primary AI model</span>
-                        </div>
-                    </div>
-                    <div class="service-chip">
-                        <div class="chip-icon">✦</div>
-                        <div class="chip-text">
-                            <strong>Google Gemini</strong>
-                            <span>Fallback AI model</span>
-                        </div>
-                    </div>
-                </div>
-
-                <p style="margin-top: 18px;">When you use AI features, your messages are sent to these providers to generate a response. Messages are not stored by these providers beyond what's needed for the request itself.</p>
+                <h2>Your Data</h2>
+                <p>We collect only what's necessary to operate the app: your account information (if you sign in), content you create such as notes and quizzes, and basic usage logs for maintenance and improvement.</p>
+                <p>We do not sell your data. We do not use your content to build advertising profiles. Your content belongs to you. For full details, see our <a href="privacy.html">Privacy Policy</a>.</p>
             </div>
 
             <div class="section">
-                <h2>Data Retention</h2>
-                <p>We retain your account data and content for as long as your account is active. If you'd like your data deleted, contact us through the About page and we'll remove it promptly.</p>
-                <p>Anonymous usage logs are retained for up to 90 days for diagnostic purposes, then purged automatically.</p>
+                <h2>Intellectual Property</h2>
+                <p>The SyllaStudy AI name, logo, UI design, and original codebase are owned by the developer and may not be reproduced or redistributed without permission.</p>
+                <p>Content you create — notes, quizzes, tasks — remains yours. You grant us only the minimal permissions needed to display and store that content on your behalf.</p>
             </div>
 
             <div class="section">
-                <h2>Security</h2>
-                <p>We take reasonable measures to protect your data — encrypted storage via Supabase, HTTPS-only connections, and standard access controls. That said, no system is perfectly secure. We don't promise enterprise-grade compliance, but we handle your data carefully and take breaches seriously.</p>
+                <h2>Limitations of Liability</h2>
+                <p>SyllaStudy AI is provided <span class="tag-inline">as-is</span> without warranties of uptime, completeness, or fitness for a particular purpose. We are not liable for data loss, missed deadlines, academic outcomes, or any damages arising from your use of the app.</p>
             </div>
 
             <div class="section">
-                <h2>Your Rights</h2>
-                <p>You can request access to, correction of, or deletion of your personal data at any time. Just reach out through the About page. We'll respond within a reasonable timeframe.</p>
-            </div>
-
-            <div class="section">
-                <h2>Changes to This Policy</h2>
-                <p>We may update this Privacy Policy as the app evolves. When we do, the effective date at the top will reflect the change. For significant updates, we may notify you within the app.</p>
+                <h2>Changes to These Terms</h2>
+                <p>We reserve the right to update these Terms at any time. The effective date above will always reflect the latest revision. For material changes, we may notify you within the app itself.</p>
             </div>
 
             <p class="doc-footer-note">
-                Questions about your data? We're accessible through the <a href="about.html" style="color: rgba(255,255,255,0.5); text-decoration: underline; text-underline-offset: 3px;">About page</a>. Privacy concerns are taken seriously and responded to personally.
+                Questions? Reach us through the <a href="about.html" style="color: rgba(255,255,255,0.5); text-decoration: underline; text-underline-offset: 3px;">About page</a>. We're a small team and we read every message.
             </p>
 
         </div>
@@ -515,8 +433,8 @@
             <a href="index.html">Dashboard</a>
             <a href="about.html">About</a>
             <div class="footer-sep"></div>
-            <a href="terms.html">Terms of Service</a>
-            <a href="privacy.html" class="active">Privacy Policy</a>
+            <a href="terms.html" class="active">Terms of Service</a>
+            <a href="privacy.html">Privacy Policy</a>
         </nav>
     </footer>
 
