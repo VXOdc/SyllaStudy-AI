@@ -325,33 +325,16 @@
             gap: 18px;
         }
 
-        .footer-copy {
-            font-size: 13px;
-            color: rgba(255,255,255,0.38);
-        }
+        
 
-        .footer-nav {
-            display: flex;
-            align-items: center;
-            gap: 28px;
-            flex-wrap: wrap;
-        }
+        
 
-        .footer-nav a {
-            font-size: 13px;
-            color: rgba(255,255,255,0.42);
-            text-decoration: none;
-            transition: color 0.22s ease;
-        }
+        
 
-        .footer-nav a:hover { color: rgba(255,255,255,0.82); }
+        
         .footer-nav a.active { color: rgba(255,255,255,0.65); }
 
-        .footer-sep {
-            width: 1px;
-            height: 14px;
-            background: rgba(255,255,255,0.1);
-        }
+        
 
         /* ── Mobile ──────────────────────────────────────── */
         @media (max-width: 768px) {
@@ -361,6 +344,42 @@
             .doc-card h1 { font-size: 34px; }
             footer { padding: 28px 24px; flex-direction: column; align-items: flex-start; }
             .commitment-card { flex-direction: column; gap: 10px; }
+        }
+    
+        /* ── Footer — transparent, scroll-to, ghost style ── */
+        .site-footer {
+            padding: 40px 60px 36px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            flex-shrink: 0;
+            background: transparent;
+            border: none;
+        }
+        .footer-copy {
+            font-size: 12px;
+            color: rgba(255,255,255,0.22);
+            letter-spacing: 0.01em;
+        }
+        .footer-nav {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .footer-nav a {
+            font-size: 12px;
+            color: rgba(255,255,255,0.25);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            letter-spacing: 0.01em;
+        }
+        .footer-nav a:hover { color: rgba(255,255,255,0.6); }
+        .footer-sep { width: 1px; height: 11px; background: rgba(255,255,255,0.1); }
+        @media (max-width: 768px) {
+            .site-footer { padding: 32px 24px 28px; flex-direction: column; align-items: flex-start; gap: 12px; }
         }
     </style>
 </head>
@@ -498,6 +517,17 @@
             <div class="footer-sep"></div>
             <a href="terms.html">Terms of Service</a>
             <a href="privacy.html" class="active">Privacy Policy</a>
+        </nav>
+    </footer>
+
+    <footer class="site-footer">
+        <span class="footer-copy">© 2026 SyllaStudy AI</span>
+        <nav class="footer-nav">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <div class="footer-sep"></div>
+            <a href="terms.html">Terms</a>
+            <a href="privacy.html">Privacy</a>
         </nav>
     </footer>
 
