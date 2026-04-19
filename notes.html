@@ -1,488 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy • SyllaStudy AI</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartNotes • SyllaStudy AI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700&family=DM+Sans:wght@300;400;500;600&display=swap');
+  :root {
+    --glass-bg: rgba(255,255,255,0.08);
+    --glass-border: rgba(255,255,255,0.18);
+    --glass-blur: 40px;
+    --text-main: #fff;
+    --text-dim: rgba(255,255,255,0.6);
+    --spring: cubic-bezier(0.4,0,0.2,1);
+  }
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; -webkit-font-smoothing:antialiased; }
+  html { overflow-x:hidden; }
+  body { font-family:'DM Sans',sans-serif; background:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.8)),url("https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80"); background-size:cover; background-position:center; background-attachment:fixed; color:var(--text-main); min-height:100dvh; display:flex; flex-direction:column; overflow-x:hidden; }
 
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.07);
-            --glass-border: rgba(255, 255, 255, 0.16);
-            --glass-blur: 50px;
-            --text-main: #ffffff;
-            --text-dim: rgba(255, 255, 255, 0.62);
-            --accent-glow: rgba(255, 255, 255, 0.35);
-        }
+  /* ── NAV ── */
+  nav { height:64px; backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); background:rgba(255,255,255,0.05); border-bottom:1px solid var(--glass-border); display:flex; align-items:center; justify-content:space-between; padding:0 clamp(20px,4vw,48px); z-index:200; flex-shrink:0; position:sticky; top:0; }
+  .logo { font-family:'Lora',serif; font-size:18px; font-weight:700; letter-spacing:-0.3px; text-decoration:none; color:#fff; white-space:nowrap; }
+  .nav-links { display:flex; align-items:center; gap:2px; }
+  .nav-links a { color:#fff; text-decoration:none; padding:7px 13px; font-size:13.5px; font-weight:500; opacity:0.65; border-radius:20px; white-space:nowrap; transition:0.25s; }
+  .nav-links a:hover, .nav-links a.active { opacity:1; background:rgba(255,255,255,0.1); }
+  .nav-burger { display:none; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; width:38px; height:38px; border-radius:10px; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+  .nav-burger svg { width:17px;height:17px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round; }
+  .mobile-drawer { display:none; flex-direction:column; position:fixed; top:64px; left:0; right:0; background:rgba(8,8,16,0.97); backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px); border-bottom:1px solid rgba(255,255,255,0.1); z-index:199; padding:10px 16px 18px; gap:3px; }
+  .mobile-drawer.open { display:flex; }
+  .mobile-drawer a { color:rgba(255,255,255,0.75); text-decoration:none; font-size:15px; font-weight:500; padding:13px 16px; border-radius:12px; transition:0.2s; }
+  .mobile-drawer a.active, .mobile-drawer a:hover { background:rgba(255,255,255,0.09); color:#fff; }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-font-smoothing: antialiased;
-        }
+  /* ── LAYOUT ── */
+  .app-container {
+    display: flex; flex: 1;
+    padding: clamp(14px,2vw,24px); gap: clamp(12px,1.5vw,20px);
+    min-height: 0; overflow: hidden;
+  }
 
-        body {
-            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
-            background:
-                linear-gradient(rgba(0,0,0,0.62), rgba(0,0,0,0.92)),
-                url("https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=2000&q=80");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+  /* ── SIDEBAR (notes list) ── */
+  .notes-sidebar {
+    width: clamp(220px,22vw,280px); background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border); border-radius: 24px;
+    display: flex; flex-direction: column; padding: 18px 12px; gap: 12px;
+    flex-shrink: 0; min-height: 0; overflow: hidden;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.2);
+  }
+  .sidebar-header { display:flex; align-items:center; justify-content:space-between; padding:0 4px; }
+  .sidebar-header h2 { font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; opacity:0.45; }
+  .new-note-btn { background:rgba(255,255,255,0.9); color:#111; border:none; width:30px; height:30px; border-radius:50%; font-size:20px; font-weight:300; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.25s var(--spring); flex-shrink:0; }
+  .new-note-btn:hover { transform:scale(1.1) rotate(90deg); background:#fff; }
 
-        /* depth / separation layer */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.45);
-            backdrop-filter: saturate(0.6) blur(3px);
-            -webkit-backdrop-filter: saturate(0.6) blur(3px);
-            z-index: 0;
-            animation: overlayFadeIn 0.5s ease forwards;
-        }
+  .notes-search { position:relative; }
+  .notes-search input { width:100%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:11px; padding:8px 12px 8px 32px; color:#fff; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; transition:0.2s; }
+  .notes-search input::placeholder { color:rgba(255,255,255,0.35); }
+  .notes-search input:focus { border-color:rgba(255,255,255,0.3); background:rgba(255,255,255,0.1); }
+  .notes-search svg { position:absolute; left:10px; top:50%; transform:translateY(-50%); opacity:0.4; pointer-events:none; }
 
-        @keyframes overlayFadeIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
+  .notes-list { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:3px; scrollbar-width:none; }
+  .notes-list::-webkit-scrollbar { display:none; }
 
-        /* ── Nav ─────────────────────────────────────────── */
-        nav {
-            position: relative;
-            z-index: 100;
-            height: 80px;
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            background: rgba(255, 255, 255, 0.05);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.11);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 60px;
-            flex-shrink: 0;
-        }
+  .note-item { padding:11px 12px; border-radius:12px; cursor:pointer; transition:0.18s; border:1px solid transparent; }
+  .note-item:hover { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.1); }
+  .note-item.active { background:rgba(255,255,255,0.14); border-color:var(--glass-border); }
+  .note-item-title { font-size:13.5px; font-weight:600; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .note-item-preview { font-size:11.5px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .note-item-date { font-size:10.5px; color:rgba(255,255,255,0.3); margin-top:4px; }
 
-        .logo {
-            font-family: 'Lora', serif;
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            opacity: 0.95;
-            text-decoration: none;
-            color: white;
-        }
+  .sidebar-empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0.4; font-size:13px; text-align:center; gap:8px; padding:20px; }
 
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin-left: 36px;
-            font-size: 14px;
-            font-weight: 500;
-            opacity: 0.6;
-            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-        }
+  /* ── EDITOR ── */
+  .editor-workspace {
+    flex: 1; background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border); border-radius: 24px;
+    display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.2); min-height: 0; min-width: 0;
+  }
 
-        .nav-links a:hover,
-        .nav-links a.active {
-            opacity: 1;
-            text-shadow: 0 0 16px var(--accent-glow);
-        }
+  .editor-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; gap: 12px; flex-wrap: wrap;
+  }
+  .toolbar-left { display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
+  .toolbar-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .note-title-input { background:transparent; border:none; color:#fff; font-family:'Lora',serif; font-size:clamp(16px,2vw,20px); font-weight:600; outline:none; flex:1; min-width:0; }
+  .note-title-input::placeholder { color:rgba(255,255,255,0.25); }
 
-        /* ── Main ────────────────────────────────────────── */
-        main {
-            flex: 1;
-            position: relative;
-            z-index: 1;
-            display: flex;
-            justify-content: center;
-            padding: 60px 24px 80px;
-        }
+  .toolbar-btn { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.7); padding:7px 14px; border-radius:10px; font-size:13px; font-weight:500; font-family:'DM Sans',sans-serif; cursor:pointer; transition:0.2s; white-space:nowrap; display:flex; align-items:center; gap:6px; }
+  .toolbar-btn:hover { background:rgba(255,255,255,0.14); color:#fff; }
+  .toolbar-btn.primary { background:rgba(255,255,255,0.9); color:#000; border-color:transparent; }
+  .toolbar-btn.primary:hover { background:#fff; }
+  .toolbar-btn.danger:hover { background:rgba(255,90,90,0.15); color:#ff5a5a; border-color:rgba(255,90,90,0.25); }
+  .toolbar-btn svg { width:14px; height:14px; stroke:currentColor; stroke-width:2; fill:none; }
 
-        /* ── Glass doc card ──────────────────────────────── */
-        .doc-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid var(--glass-border);
-            border-radius: 32px;
-            padding: 64px 72px;
-            max-width: 800px;
-            width: 100%;
-            box-shadow:
-                0 40px 90px rgba(0, 0, 0, 0.5),
-                inset 0 0 0 1px rgba(255,255,255,0.04);
-            animation: cardSlideIn 0.65s cubic-bezier(0.23, 1, 0.32, 1) both;
-        }
+  .editor-area {
+    flex: 1; padding: clamp(20px,3vw,40px) clamp(20px,4vw,56px);
+    overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent;
+  }
+  .editor-area::-webkit-scrollbar { width:5px; }
+  .editor-area::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15); border-radius:10px; }
 
-        @keyframes cardSlideIn {
-            from { opacity: 0; transform: translateY(30px) scale(0.982); }
-            to   { opacity: 1; transform: translateY(0)   scale(1);     }
-        }
+  #noteEditor {
+    width:100%; min-height:100%; background:transparent; border:none;
+    color:rgba(255,255,255,0.88); font-family:'DM Sans',sans-serif;
+    font-size:clamp(14px,1.6vw,16px); line-height:1.8; outline:none; resize:none;
+  }
+  #noteEditor::placeholder { color:rgba(255,255,255,0.2); }
 
-        /* ── Header ──────────────────────────────────────── */
-        .doc-label {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.35);
-            margin-bottom: 18px;
-        }
+  .editor-empty-state { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0.5; padding:40px 20px; }
+  .editor-empty-state h2 { font-family:'Lora',serif; font-size:clamp(20px,3vw,26px); font-weight:600; margin-bottom:10px; }
+  .editor-empty-state p { font-size:14px; color:var(--text-dim); }
 
-        .doc-card h1 {
-            font-family: 'Lora', serif;
-            font-size: 46px;
-            font-weight: 700;
-            letter-spacing: -1.3px;
-            line-height: 1.08;
-            margin-bottom: 14px;
-        }
+  .editor-status { padding:10px 20px; border-top:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:space-between; font-size:11.5px; color:rgba(255,255,255,0.28); flex-shrink:0; flex-wrap:wrap; gap:6px; }
 
-        .doc-meta {
-            display: flex;
-            align-items: center;
-            font-size: 13px;
-            color: rgba(255,255,255,0.33);
-            margin-bottom: 50px;
-        }
+  /* ── FOOTER ── */
+  .site-footer { flex-shrink:0; margin:0 16px 16px; border-radius:16px; backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); padding:14px clamp(16px,3vw,36px); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+  .footer-copy { font-size:12px; color:rgba(255,255,255,0.3); }
+  .footer-nav { display:flex; align-items:center; gap:4px; flex-wrap:wrap; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:12px; padding:4px 5px; }
+  .footer-nav a { font-size:12px; font-weight:500; color:rgba(255,255,255,0.38); text-decoration:none; padding:5px 10px; border-radius:18px; border:1px solid rgba(255,255,255,0.07); background:rgba(255,255,255,0.03); transition:0.22s; }
+  .footer-nav a:hover { color:rgba(255,255,255,0.85); background:rgba(255,255,255,0.08); }
+  .footer-nav a.active { color:rgba(255,255,255,0.75); background:rgba(255,255,255,0.06); }
+  .footer-sep { width:1px; height:12px; background:rgba(255,255,255,0.12); margin:0 3px; }
 
-        .doc-meta-sep {
-            margin: 0 14px;
-            opacity: 0.4;
-        }
-
-        hr {
-            border: none;
-            height: 1px;
-            background: rgba(255,255,255,0.1);
-            margin: 42px 0;
-        }
-
-        /* ── Sections ────────────────────────────────────── */
-        .section {
-            margin-bottom: 42px;
-        }
-
-        .section:last-of-type { margin-bottom: 0; }
-
-        .section h2 {
-            font-family: 'Lora', serif;
-            font-size: 18.5px;
-            font-weight: 600;
-            letter-spacing: -0.25px;
-            margin-bottom: 13px;
-            color: rgba(255,255,255,0.95);
-        }
-
-        .section p {
-            font-size: 15.5px;
-            line-height: 1.82;
-            color: var(--text-dim);
-            margin-bottom: 11px;
-        }
-
-        .section p:last-child { margin-bottom: 0; }
-
-        .section a {
-            color: rgba(255,255,255,0.8);
-            text-underline-offset: 3px;
-            transition: color 0.2s;
-        }
-
-        .section a:hover { color: white; }
-
-        .section ul {
-            list-style: none;
-            padding: 0;
-            margin-top: 4px;
-        }
-
-        .section ul li {
-            font-size: 15.5px;
-            line-height: 1.8;
-            color: var(--text-dim);
-            padding: 5px 0 5px 22px;
-            position: relative;
-        }
-
-        .section ul li::before {
-            content: '';
-            position: absolute;
-            left: 2px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-        }
-
-        /* Third-party service chips */
-        .service-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 16px;
-        }
-
-        .service-chip {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.11);
-            border-radius: 12px;
-            padding: 12px 18px;
-            transition: background 0.25s ease, border-color 0.25s ease;
-        }
-
-        .service-chip:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.2);
-        }
-
-        .chip-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.12);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
-
-        .chip-text strong {
-            display: block;
-            font-size: 13.5px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.88);
-            line-height: 1.3;
-        }
-
-        .chip-text span {
-            font-size: 12px;
-            color: rgba(255,255,255,0.4);
-        }
-
-        /* Privacy commitment card */
-        .commitment-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.11);
-            border-radius: 20px;
-            padding: 28px 30px;
-            margin-top: 14px;
-            display: flex;
-            gap: 18px;
-        }
-
-        .commitment-icon {
-            font-size: 22px;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .commitment-card p {
-            margin: 0;
-            font-size: 15px;
-            line-height: 1.8;
-            color: rgba(255,255,255,0.52);
-        }
-
-        /* Footer note */
-        .doc-footer-note {
-            font-size: 13px;
-            color: rgba(255,255,255,0.28);
-            line-height: 1.7;
-            margin-top: 48px;
-            padding-top: 32px;
-            border-top: 1px solid rgba(255,255,255,0.08);
-        }
-
-        /* ── Global footer ───────────────────────────────── */
-        footer {
-            position: relative;
-            z-index: 1;
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-top: 1px solid rgba(255,255,255,0.08);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-            padding: 34px 60px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 18px;
-        }
-
-        
-
-        
-
-        
-
-        
-        .footer-nav a.active { color: rgba(255,255,255,0.65); }
-
-        
-
-        /* ── Mobile ──────────────────────────────────────── */
-        @media (max-width: 768px) {
-            nav { padding: 0 24px; }
-            .nav-links { display: none; }
-            .doc-card { padding: 40px 28px; border-radius: 24px; }
-            .doc-card h1 { font-size: 34px; }
-            footer { padding: 28px 24px; flex-direction: column; align-items: flex-start; }
-            .commitment-card { flex-direction: column; gap: 10px; }
-        }
-    </style>
+  /* ── RESPONSIVE ── */
+  @media (max-width:800px) {
+    .nav-links { display:none; }
+    .nav-burger { display:flex; }
+    .app-container { flex-direction:column; overflow:auto; height:auto; padding:12px; gap:12px; }
+    .notes-sidebar { width:100%; max-height:200px; border-radius:18px; padding:14px 12px; }
+    .editor-workspace { min-height:480px; border-radius:18px; }
+    .editor-toolbar { padding:10px 14px; }
+    .editor-area { padding:16px; }
+    .site-footer { flex-direction:column; align-items:flex-start; }
+  }
+  @media (max-width:480px) {
+    .toolbar-right .toolbar-btn span { display:none; }
+    .toolbar-btn { padding:7px 10px; }
+    .editor-status { font-size:10.5px; }
+  }
+</style>
 </head>
 <body>
 
-    <nav>
-        <a href="index.html" class="logo">SyllaStudy AI</a>
-        <div class="nav-links">
-            <a href="index.html">Dashboard</a>
-            <a href="chat.html">Study AI</a>
-            <a href="notes.html">SmartNotes</a>
-            <a href="quiz.html">QuizGen</a>
-            <a href="taskflow.html">TaskFlow</a>
-            <a href="about.html">About</a>
+<nav>
+  <a href="index.html" class="logo">SyllaStudy AI</a>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a><a href="chat.html">Study AI</a>
+    <a href="notes.html" class="active">SmartNotes</a><a href="quiz.html">QuizGen</a>
+    <a href="taskflow.html">TaskFlow</a><a href="about.html">About</a>
+  </div>
+  <button class="nav-burger" onclick="toggleDrawer()" aria-label="Menu">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+</nav>
+<div class="mobile-drawer" id="drawer">
+  <a href="index.html">Dashboard</a><a href="chat.html">Study AI</a>
+  <a href="notes.html" class="active">SmartNotes</a><a href="quiz.html">QuizGen</a>
+  <a href="taskflow.html">TaskFlow</a><a href="about.html">About</a>
+</div>
+
+<div class="app-container">
+  <!-- Notes List Sidebar -->
+  <aside class="notes-sidebar">
+    <div class="sidebar-header">
+      <h2>My Notes</h2>
+      <button class="new-note-btn" id="newNoteBtn" title="New note">+</button>
+    </div>
+    <div class="notes-search">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="notesSearchInput" placeholder="Search notes…">
+    </div>
+    <div class="notes-list" id="notesList">
+      <div class="sidebar-empty">
+        <span style="font-size:28px;">📝</span>
+        <span>No notes yet.<br>Hit + to create one.</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Editor -->
+  <main class="editor-workspace">
+    <div class="editor-empty-state" id="editorEmptyState">
+      <h2>Your notes live here</h2>
+      <p>Select a note from the list, or create a new one to get started.</p>
+    </div>
+
+    <div id="editorPanel" style="display:none; flex:1; flex-direction:column; min-height:0; overflow:hidden; display:none;">
+      <div class="editor-toolbar">
+        <div class="toolbar-left">
+          <input type="text" class="note-title-input" id="noteTitleInput" placeholder="Untitled Note">
         </div>
-    </nav>
-
-    <main>
-        <div class="doc-card">
-
-            <p class="doc-label">Legal</p>
-            <h1>Privacy Policy</h1>
-            <div class="doc-meta">
-                <span>SyllaStudy AI</span>
-                <span class="doc-meta-sep">·</span>
-                <span>Effective January 1, 2026</span>
-            </div>
-
-            <hr>
-
-            <div class="section">
-                <h2>The Short Version</h2>
-                <p>We collect the minimum data needed to make SyllaStudy AI work. We don't sell it. We don't use it for ads. Here's the full picture.</p>
-            </div>
-
-            <div class="section">
-                <h2>What We Collect</h2>
-                <p>Depending on how you use the app, we may collect:</p>
-                <ul>
-                    <li><strong style="color: rgba(255,255,255,0.8); font-weight: 500;">Account data</strong> — your email address and basic profile information if you create an account or sign in</li>
-                    <li><strong style="color: rgba(255,255,255,0.8); font-weight: 500;">Content you create</strong> — notes, quiz responses, and chat messages you write within the app, stored so you can access them later</li>
-                    <li><strong style="color: rgba(255,255,255,0.8); font-weight: 500;">Usage analytics</strong> — basic, anonymized logs (pages visited, features used, error reports) to help us improve the app</li>
-                </ul>
-                <p>We do not collect payment information, location data, or anything unrelated to the core app experience.</p>
-            </div>
-
-            <div class="section">
-                <h2>How We Use Your Data</h2>
-                <p>Data we collect is used solely to operate and improve SyllaStudy AI. Specifically:</p>
-                <ul>
-                    <li>To store and retrieve your notes, quizzes, and tasks across sessions</li>
-                    <li>To authenticate your identity when you sign in</li>
-                    <li>To pass your messages to AI providers so they can generate responses</li>
-                    <li>To diagnose errors and improve the stability and quality of the app</li>
-                </ul>
-
-                <div class="commitment-card">
-                    <div class="commitment-icon">🔒</div>
-                    <p>We do not sell your data to third parties. We do not use your content to train AI models. We do not build advertising profiles or share your information with marketers — ever.</p>
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>Third-Party Services</h2>
-                <p>SyllaStudy AI relies on the following trusted services to function. Each operates under its own privacy policy.</p>
-
-                <div class="service-row">
-                    <div class="service-chip">
-                        <div class="chip-icon">🗄️</div>
-                        <div class="chip-text">
-                            <strong>Supabase</strong>
-                            <span>Database &amp; authentication</span>
-                        </div>
-                    </div>
-                    <div class="service-chip">
-                        <div class="chip-icon">▲</div>
-                        <div class="chip-text">
-                            <strong>Vercel</strong>
-                            <span>Hosting &amp; edge delivery</span>
-                        </div>
-                    </div>
-                    <div class="service-chip">
-                        <div class="chip-icon">🤖</div>
-                        <div class="chip-text">
-                            <strong>Mistral AI</strong>
-                            <span>Primary AI model</span>
-                        </div>
-                    </div>
-                    <div class="service-chip">
-                        <div class="chip-icon">✦</div>
-                        <div class="chip-text">
-                            <strong>Google Gemini</strong>
-                            <span>Fallback AI model</span>
-                        </div>
-                    </div>
-                </div>
-
-                <p style="margin-top: 18px;">When you use AI features, your messages are sent to these providers to generate a response. Messages are not stored by these providers beyond what's needed for the request itself.</p>
-            </div>
-
-            <div class="section">
-                <h2>Data Retention</h2>
-                <p>We retain your account data and content for as long as your account is active. If you'd like your data deleted, contact us through the About page and we'll remove it promptly.</p>
-                <p>Anonymous usage logs are retained for up to 90 days for diagnostic purposes, then purged automatically.</p>
-            </div>
-
-            <div class="section">
-                <h2>Security</h2>
-                <p>We take reasonable measures to protect your data — encrypted storage via Supabase, HTTPS-only connections, and standard access controls. That said, no system is perfectly secure. We don't promise enterprise-grade compliance, but we handle your data carefully and take breaches seriously.</p>
-            </div>
-
-            <div class="section">
-                <h2>Your Rights</h2>
-                <p>You can request access to, correction of, or deletion of your personal data at any time. Just reach out through the About page. We'll respond within a reasonable timeframe.</p>
-            </div>
-
-            <div class="section">
-                <h2>Changes to This Policy</h2>
-                <p>We may update this Privacy Policy as the app evolves. When we do, the effective date at the top will reflect the change. For significant updates, we may notify you within the app.</p>
-            </div>
-
-            <p class="doc-footer-note">
-                Questions about your data? We're accessible through the <a href="about.html" style="color: rgba(255,255,255,0.5); text-decoration: underline; text-underline-offset: 3px;">About page</a>. Privacy concerns are taken seriously and responded to personally.
-            </p>
-
+        <div class="toolbar-right">
+          <button class="toolbar-btn" id="aiEnhanceBtn">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span>AI Enhance</span>
+          </button>
+          <button class="toolbar-btn primary" id="saveNoteBtn">
+            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span>Save</span>
+          </button>
+          <button class="toolbar-btn danger" id="deleteNoteBtn" title="Delete note">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
         </div>
-    </main>
+      </div>
+      <div class="editor-area">
+        <textarea id="noteEditor" placeholder="Start writing your note here…"></textarea>
+      </div>
+      <div class="editor-status">
+        <span id="editorWordCount">0 words</span>
+        <span id="editorSaveStatus">All changes saved</span>
+      </div>
+    </div>
+  </main>
+</div>
 
-    <footer>
-        <span class="footer-copy">© 2026 SyllaStudy AI. All rights reserved.</span>
-        <nav class="footer-nav">
-            <a href="index.html">Home</a>
-            <a href="index.html">Dashboard</a>
-            <a href="about.html">About</a>
-            <div class="footer-sep"></div>
-            <a href="terms.html">Terms of Service</a>
-            <a href="privacy.html" class="active">Privacy Policy</a>
-        </nav>
-    </footer>
+<footer class="site-footer">
+  <span class="footer-copy">© 2026 SyllaStudy AI</span>
+  <nav class="footer-nav">
+    <a href="index.html">Home</a><a href="about.html">About</a>
+    <div class="footer-sep"></div>
+    <a href="terms.html">Terms</a><a href="privacy.html">Privacy</a>
+  </nav>
+</footer>
 
+<script>
+window.SUPABASE_URL = window.SUPABASE_URL || '';
+window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
+function toggleDrawer() { document.getElementById('drawer').classList.toggle('open'); }
+document.addEventListener('click', e => {
+  const d = document.getElementById('drawer');
+  if (!d.contains(e.target) && !e.target.closest('.nav-burger')) d.classList.remove('open');
+});
+</script>
+<script type="module" src="js/pages/notes-page.js"></script>
 </body>
 </html>
