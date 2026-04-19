@@ -1,199 +1,47 @@
-:root {
-    --glass-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-    --overlay-bg: rgba(6, 10, 15, 0.45);
-    --radius: 14px;
-    --transition-fast: 180ms;
-}
-
-.legal-overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--overlay-bg, rgba(6, 10, 15, 0.45));
-    backdrop-filter: blur(8px) saturate(0.9);
-    -webkit-backdrop-filter: blur(8px) saturate(0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1200;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--transition-fast, 180ms) ease;
-}
-
-.legal-overlay.visible {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.legal-card {
-    width: min(980px, 94%);
-    max-height: 86vh;
-    overflow: auto;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.02));
-    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
-    box-shadow: var(--glass-shadow, 0 8px 30px rgba(0, 0, 0, 0.25));
-    border-radius: var(--radius, 14px);
-    padding: 28px;
-    color: var(--text-primary, var(--text-main, #e9eef8));
-    transition: transform 220ms ease, opacity 220ms ease;
-    transform: translateY(6px);
-    opacity: 0;
-}
-
-.legal-overlay.visible .legal-card {
-    transform: translateY(0);
-    opacity: 1;
-}
-
-.legal-card h1,
-.legal-card h2 {
-    color: var(--text-primary, var(--text-main, #e9eef8));
-    margin-top: 0;
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-
-.legal-card p {
-    color: var(--muted, var(--text-dim, #9aa6b2));
-    line-height: 1.6;
-    font-size: 15px;
-    margin-bottom: 12px;
-}
-
-.site-footer {
-    position: relative;
-    z-index: 40;
-    width: 100%;
-    padding: 0;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 260ms ease, transform 260ms ease;
-}
-
-.site-footer.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.site-footer-shell {
-    width: 100%;
-    min-height: clamp(160px, 22vh, 220px);
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    padding: 0 24px max(20px, env(safe-area-inset-bottom));
-}
-
-.site-footer__inner {
-    width: min(100%, 1120px);
-    margin: 0 auto;
-    padding: 18px 22px;
-    border-radius: calc(var(--radius, 14px) + 8px);
-    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
-    background: linear-gradient(180deg, rgba(10, 16, 25, 0.46), rgba(10, 16, 25, 0.3));
-    backdrop-filter: blur(calc(var(--glass-blur, 32px) * 0.4)) saturate(1.04);
-    -webkit-backdrop-filter: blur(calc(var(--glass-blur, 32px) * 0.4)) saturate(1.04);
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 18px 32px;
-    flex-wrap: wrap;
-}
-
-.site-footer__meta {
-    max-width: 340px;
-    font-size: 13px;
-    line-height: 1.7;
-    color: var(--muted, var(--text-dim, rgba(255, 255, 255, 0.68)));
-}
-
-.site-footer__nav {
-    display: flex;
-    gap: 18px 28px;
-    align-items: flex-start;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-}
-
-.site-footer__group {
-    min-width: 180px;
-}
-
-.site-footer__label {
-    display: block;
-    margin-bottom: 10px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.42);
-}
-
-.site-footer .footer-links,
-.site-footer__links {
-    display: flex;
-    gap: 12px 18px;
-    flex-wrap: wrap;
-}
-
-.site-footer .footer-links a,
-.site-footer__links a {
-    color: var(--muted, var(--text-dim, #9aa6b2));
-    text-decoration: none;
-    font-size: 13px;
-    line-height: 1.6;
-    transition:
-        color var(--transition-fast, 180ms) ease,
-        transform var(--transition-fast, 180ms) ease,
-        text-shadow var(--transition-fast, 180ms) ease;
-}
-
-.site-footer .footer-links a:hover,
-.site-footer .footer-links a:focus-visible,
-.site-footer__links a:hover,
-.site-footer__links a:focus-visible {
-    color: var(--text-primary, var(--text-main, #e9eef8));
-    transform: translateY(-2px);
-    text-shadow: 0 0 18px rgba(255, 255, 255, 0.16);
-}
-
-.site-footer .footer-links a:focus-visible,
-.site-footer__links a:focus-visible {
-    outline: none;
-}
-
-@media (max-width: 840px) {
-    .site-footer-shell {
-        min-height: 132px;
-        padding: 0 16px max(18px, env(safe-area-inset-bottom));
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.querySelector("[data-site-footer]")) {
+        return;
     }
 
-    .site-footer__inner {
-        padding: 16px 18px;
-        gap: 18px;
+    const host = document.querySelector("[data-footer-host]");
+    if (!host) {
+        return;
     }
 
-    .site-footer__nav {
-        width: 100%;
-        gap: 18px 24px;
-        justify-content: flex-start;
-    }
+    const footer = document.createElement("footer");
+    footer.className = "site-footer";
+    footer.setAttribute("data-site-footer", "");
+    footer.innerHTML = `
+        <div class="site-footer__inner">
+            <div class="site-footer__meta">© 2026 SyllaStudy AI. All rights reserved.</div>
+            <div class="site-footer__nav" aria-label="Footer navigation">
+                <div class="site-footer__group">
+                    <span class="site-footer__label">Navigation</span>
+                    <div class="site-footer__links footer-links">
+                        <a href="/index.html">Home</a>
+                        <a href="/index.html">Dashboard</a>
+                        <a href="/index.html#features">Features</a>
+                        <a href="/about.html#contact">Contact</a>
+                        <a href="/about.html">About</a>
+                    </div>
+                </div>
+                <div class="site-footer__group">
+                    <span class="site-footer__label">Legal</span>
+                    <div class="site-footer__links footer-links">
+                        <a href="/terms.html">Terms of Service</a>
+                        <a href="/privacy.html">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 
-    .site-footer__group {
-        min-width: min(100%, 220px);
-    }
-}
+    host.appendChild(footer);
 
-@media (max-width: 640px) {
-    .legal-card {
-        padding: 18px;
-        border-radius: 12px;
-        max-height: 92vh;
-    }
+    const findScrollRoot = () => {
+        let node = host.parentElement;
 
-    .legal-card p {
-        font-size: 15px;
-        line-height: 1.5;
-    }
-}
+        while (node && node !== document.body) {
+            const style = window.getComputedStyle(node);
+            const overflowY = style.overflowY || style.overflow;
+
