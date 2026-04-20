@@ -367,6 +367,32 @@ async function explodeTask() {
 
 document.getElementById('scheduleBtn').addEventListener('click', generateSchedule);
 
+// ─── Helpers for real-time schedule building ──────────────────────────────────
+
+/** Format a Date object as "2:15 PM" */
+function formatTimeAmPm(date) {
+  return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+}
+
+/**
+ * Given a start Date and an array of task durations (minutes),
+ * returns an array of "HH:MM AM – HH:MM AM" strings with 5-min breaks between.
+ * Tasks come back from the AI with an `estimatedMinutes` field;
+ * we cascade from the real current time.
+ */
+function buildTimeBlocks(startDate, taskMinutesList, breakMinutes = 5) {
+  const blocks = [];
+  let cursor = new Date(startDate);
+  taskMinutesList.forEach((mins) => {
+    const from = new Date(cursor);
+    cursor = new Date(cursor.getTime() + mins * 60_000);
+    const to = new Date(cursor);
+    blocks.push(`${formatTimeAmPm(from)} – ${formatTimeAmPm(to)}`);
+    cursor = new Date(cursor.getTime() + breakMinutes * 60_000); // break
+  });
+  return blocks;
+}
+
 async function generateSchedule() {
   const pending = tasks.filter((t) => !t.completed);
   if (pending.length === 0) return showToast('Add some tasks first!');
@@ -375,8 +401,11 @@ async function generateSchedule() {
   btn.disabled = true;
   btn.innerHTML = `<div class="spinner w" style="display:inline-block;vertical-align:middle;margin-right:8px;"></div> Scheduling…`;
 
+  // Capture the real current time BEFORE the async call so blocks are accurate
+  const sessionStart = new Date();
+
   const taskStr = pending.map((t) => `- ${t.text} (Est: ${t.time}m, Priority: ${t.energy})`).join('\n');
-  const prompt  = `You are a strict productivity scheduler. Here are the tasks:\n${taskStr}\n\nSelect the top 3 most important tasks for today and assign realistic time blocks (e.g. "9:00 AM - 9:45 AM").\n\nReturn ONLY a JSON array, no markdown: [{"time": "9:00 AM - 9:45 AM", "text": "Task description"}]`;
+  const prompt  = `You are a strict productivity scheduler. The current time is ${formatTimeAmPm(sessionStart)}.\n\nHere are the tasks:\n${taskStr}\n\nSelect the top 3 most important tasks for today. For each task, return ONLY its name and its estimated duration in minutes (use the Est value provided, do not invent new durations).\n\nReturn ONLY a JSON array, no markdown, no extra text:\n[{"text": "Task description", "estimatedMinutes": 25}]`;
 
   try {
     const res = await fetch('/api/chat', {
@@ -385,16 +414,20 @@ async function generateSchedule() {
       body:    JSON.stringify({ type: 'chat', message: prompt }),
     });
     if (!res.ok) throw new Error('API error');
-    const data     = await res.json();
-    const clean    = data.reply.replace(/```json/g, '').replace(/```/g, '').trim();
-    const schedule = JSON.parse(clean);
+    const data  = await res.json();
+    const clean = data.reply.replace(/```json/g, '').replace(/```/g, '').trim();
+    const aiTasks = JSON.parse(clean);
+
+    // Build accurate time blocks starting from the real current time
+    const durations  = aiTasks.map((t) => Number(t.estimatedMinutes) || 25);
+    const timeBlocks = buildTimeBlocks(sessionStart, durations, 5);
 
     const list = document.getElementById('scheduleList');
     list.innerHTML = '';
-    schedule.forEach((item) => {
+    aiTasks.forEach((item, i) => {
       const el = document.createElement('div');
       el.className = 'time-block';
-      el.innerHTML = `<div class="time-label-block">${item.time}</div><div class="time-task-text">${escHtml(item.text)}</div>`;
+      el.innerHTML = `<div class="time-label-block">${timeBlocks[i]}</div><div class="time-task-text">${escHtml(item.text)}</div>`;
       list.appendChild(el);
     });
     showToast('✨ Schedule ready!');
