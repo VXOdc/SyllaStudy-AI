@@ -32,45 +32,21 @@
   .mobile-drawer a.active, .mobile-drawer a:hover { background:rgba(255,255,255,0.09); color:#fff; }
 
   /* ── LAYOUT ── */
-  .app-container {
-    display: flex; flex: 1;
-    padding: clamp(14px,2vw,24px); gap: clamp(12px,1.5vw,20px);
-    min-height: 0; overflow: hidden;
-  }
+  .app-container { display:flex; flex:1; padding:clamp(14px,2vw,24px); gap:clamp(12px,1.5vw,20px); min-height:0; overflow:hidden; }
 
-  /* ── SIDEBAR (notes list) ── */
-  .notes-sidebar {
-    width: clamp(220px,22vw,280px); background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border); border-radius: 24px;
-    display: flex; flex-direction: column; padding: 18px 12px; gap: 12px;
-    flex-shrink: 0; min-height: 0; overflow: hidden;
-    box-shadow: 0 14px 40px rgba(0,0,0,0.2);
-  }
+  /* ── SIDEBAR ── */
+  .notes-sidebar { width:clamp(220px,22vw,280px); background:var(--glass-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur)); border:1px solid var(--glass-border); border-radius:24px; display:flex; flex-direction:column; padding:18px 12px; gap:12px; flex-shrink:0; min-height:0; overflow:hidden; box-shadow:0 14px 40px rgba(0,0,0,0.2); }
   .sidebar-header { display:flex; align-items:center; justify-content:space-between; padding:0 4px; }
   .sidebar-header h2 { font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; opacity:0.45; }
   .new-note-btn { background:rgba(255,255,255,0.9); color:#111; border:none; width:30px; height:30px; border-radius:50%; font-size:20px; font-weight:300; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.25s var(--spring); flex-shrink:0; }
   .new-note-btn:hover { transform:scale(1.1) rotate(90deg); background:#fff; }
-
   .notes-search { position:relative; }
   .notes-search input { width:100%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:11px; padding:8px 12px 8px 32px; color:#fff; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; transition:0.2s; }
   .notes-search input::placeholder { color:rgba(255,255,255,0.35); }
   .notes-search input:focus { border-color:rgba(255,255,255,0.3); background:rgba(255,255,255,0.1); }
   .notes-search svg { position:absolute; left:10px; top:50%; transform:translateY(-50%); opacity:0.4; pointer-events:none; }
 
-  .notes-list { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:3px; scrollbar-width:none; }
-  .notes-list::-webkit-scrollbar { display:none; }
-
-  .note-item { padding:11px 12px; border-radius:12px; cursor:pointer; transition:0.18s; border:1px solid transparent; }
-  .note-item:hover { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.1); }
-  .note-item.active { background:rgba(255,255,255,0.14); border-color:var(--glass-border); }
-  .note-item-title { font-size:13.5px; font-weight:600; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .note-item-preview { font-size:11.5px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .note-item-date { font-size:10.5px; color:rgba(255,255,255,0.3); margin-top:4px; }
-
-  .sidebar-empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0.4; font-size:13px; text-align:center; gap:8px; padding:20px; }
-
-  /* ── QUOTA INDICATOR ── */
+  /* ── QUOTA ── */
   .quota-bar-wrap { padding:0 4px; display:flex; flex-direction:column; gap:5px; flex-shrink:0; }
   .quota-row { display:flex; align-items:center; justify-content:space-between; }
   .quota-label { font-size:10.5px; color:rgba(255,255,255,0.38); letter-spacing:0.04em; }
@@ -82,50 +58,79 @@
   .quota-fill.warn { background:rgba(251,191,36,0.7); }
   .quota-fill.full { background:rgba(255,90,90,0.8); }
 
-  /* ── EDITOR ── */
-  .editor-workspace {
-    flex: 1; background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border); border-radius: 24px;
-    display: flex; flex-direction: column; overflow: hidden;
-    box-shadow: 0 14px 40px rgba(0,0,0,0.2); min-height: 0; min-width: 0;
-  }
+  /* ── NOTES LIST ── */
+  .notes-list { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:3px; scrollbar-width:none; }
+  .notes-list::-webkit-scrollbar { display:none; }
+  .note-item { padding:11px 12px; border-radius:12px; cursor:pointer; transition:0.18s; border:1px solid transparent; display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+  .note-item:hover { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.1); }
+  .note-item.active { background:rgba(255,255,255,0.14); border-color:var(--glass-border); }
+  .note-item-content { flex:1; min-width:0; }
+  .note-title-preview { font-size:13.5px; font-weight:600; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .note-snippet { font-size:11.5px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .note-date { font-size:10.5px; color:rgba(255,255,255,0.3); margin-top:4px; }
+  .delete-btn { background:none; border:none; color:rgba(255,255,255,0.3); cursor:pointer; font-size:16px; padding:2px 4px; border-radius:6px; transition:0.2s; flex-shrink:0; opacity:0; line-height:1; }
+  .note-item:hover .delete-btn { opacity:1; }
+  .delete-btn:hover { color:rgba(255,90,90,0.85); background:rgba(255,90,90,0.12); }
+  .empty-state { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0.4; font-size:13px; text-align:center; gap:8px; padding:20px; }
 
-  .editor-toolbar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; gap: 12px; flex-wrap: wrap;
-  }
-  .toolbar-left { display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
-  .toolbar-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
-  .note-title-input { background:transparent; border:none; color:#fff; font-family:'Lora',serif; font-size:clamp(16px,2vw,20px); font-weight:600; outline:none; flex:1; min-width:0; }
-  .note-title-input::placeholder { color:rgba(255,255,255,0.25); }
+  /* ── EDITOR WORKSPACE ── */
+  .editor-workspace { flex:1; background:var(--glass-bg); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur)); border:1px solid var(--glass-border); border-radius:24px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 14px 40px rgba(0,0,0,0.2); min-height:0; min-width:0; }
+  #editorContainer { flex:1; display:flex; flex-direction:column; min-height:0; overflow:hidden; }
 
-  .toolbar-btn { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.7); padding:7px 14px; border-radius:10px; font-size:13px; font-weight:500; font-family:'DM Sans',sans-serif; cursor:pointer; transition:0.2s; white-space:nowrap; display:flex; align-items:center; gap:6px; }
-  .toolbar-btn:hover { background:rgba(255,255,255,0.14); color:#fff; }
-  .toolbar-btn.primary { background:rgba(255,255,255,0.9); color:#000; border-color:transparent; }
-  .toolbar-btn.primary:hover { background:#fff; }
-  .toolbar-btn.danger:hover { background:rgba(255,90,90,0.15); color:#ff5a5a; border-color:rgba(255,90,90,0.25); }
-  .toolbar-btn svg { width:14px; height:14px; stroke:currentColor; stroke-width:2; fill:none; }
+  /* ── DYNAMIC EDITOR (injected by JS) ── */
+  .no-note-placeholder { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0.5; gap:14px; padding:40px 20px; }
+  .no-note-placeholder p { font-size:14px; color:var(--text-dim); }
+  .toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:3px; padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.08); flex-shrink:0; }
+  .tool-btn { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.75); padding:5px 9px; border-radius:7px; font-size:12px; font-family:'DM Sans',sans-serif; cursor:pointer; transition:0.15s; white-space:nowrap; }
+  .tool-btn:hover { background:rgba(255,255,255,0.14); color:#fff; }
+  .tool-sep { width:1px; height:18px; background:rgba(255,255,255,0.12); margin:0 3px; flex-shrink:0; }
+  .autosave-indicator { margin-left:auto; font-size:11px; color:rgba(255,255,255,0.4); display:flex; align-items:center; gap:5px; opacity:0; transition:opacity 0.3s; }
+  .autosave-indicator.show { opacity:1; }
+  .autosave-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,200,80,0.8); animation:blink 1s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .editor-wrapper { flex:1; display:flex; flex-direction:column; position:relative; min-height:0; overflow:hidden; }
+  .editor-body { flex:1; display:flex; flex-direction:column; overflow-y:auto; padding:clamp(20px,3vw,40px) clamp(20px,4vw,56px); scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.15) transparent; }
+  .editor-body::-webkit-scrollbar { width:5px; }
+  .editor-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15); border-radius:10px; }
+  .document-title { background:transparent; border:none; color:#fff; font-family:'Lora',serif; font-size:clamp(20px,2.5vw,28px); font-weight:600; outline:none; width:100%; margin-bottom:18px; }
+  .document-title::placeholder { color:rgba(255,255,255,0.2); }
+  .rich-text { flex:1; min-height:200px; color:rgba(255,255,255,0.88); font-family:'DM Sans',sans-serif; font-size:clamp(14px,1.6vw,15.5px); line-height:1.8; outline:none; }
+  .rich-text:empty::before { content:attr(placeholder); color:rgba(255,255,255,0.2); pointer-events:none; }
+  .rich-text h1 { font-family:'Lora',serif; font-size:1.6em; margin-bottom:0.5em; }
+  .rich-text h2 { font-family:'Lora',serif; font-size:1.3em; margin-bottom:0.4em; }
+  .rich-text p { margin-bottom:0.8em; }
+  .rich-text ul, .rich-text ol { padding-left:1.5em; margin-bottom:0.8em; }
+  .ai-processing-overlay { display:none; position:absolute; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); flex-direction:column; align-items:center; justify-content:center; gap:14px; z-index:10; border-radius:0 0 24px 24px; }
+  .ai-processing-overlay.show { display:flex; }
+  .ai-spinner { width:32px; height:32px; border:3px solid rgba(255,255,255,0.15); border-top-color:#fff; border-radius:50%; animation:spin 0.8s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .ai-processing-overlay p { font-size:14px; color:rgba(255,255,255,0.8); }
+  .editor-footer { padding:9px 18px; border-top:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px; font-size:11.5px; color:rgba(255,255,255,0.28); flex-shrink:0; }
 
-  .editor-area {
-    flex: 1; padding: clamp(20px,3vw,40px) clamp(20px,4vw,56px);
-    overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent;
-  }
-  .editor-area::-webkit-scrollbar { width:5px; }
-  .editor-area::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15); border-radius:10px; }
+  /* ── TRANSFORM MODAL ── */
+  .transform-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:500; align-items:center; justify-content:center; padding:20px; }
+  .transform-modal.show { display:flex; }
+  .modal-card { background:rgba(18,18,24,0.95); border:1px solid rgba(255,255,255,0.15); border-radius:20px; padding:24px; width:100%; max-width:380px; display:flex; flex-direction:column; gap:16px; animation:fadeUp 0.25s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .modal-header { display:flex; align-items:center; justify-content:space-between; }
+  .modal-title-text { font-size:15px; font-weight:600; }
+  .modal-close-x { background:none; border:none; color:rgba(255,255,255,0.45); font-size:20px; cursor:pointer; padding:2px 6px; border-radius:6px; line-height:1; transition:0.2s; }
+  .modal-close-x:hover { color:#fff; background:rgba(255,255,255,0.1); }
+  .modal-options { display:flex; flex-direction:column; gap:6px; }
+  .modal-option { padding:10px 14px; border-radius:11px; cursor:pointer; font-size:13.5px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.04); transition:0.18s; }
+  .modal-option:hover { background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.18); }
+  .modal-option.selected { background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.35); color:#fff; }
+  .modal-actions { display:flex; gap:8px; }
+  .modal-cancel-btn { flex:1; padding:11px; background:transparent; border:1px solid rgba(255,255,255,0.14); border-radius:11px; color:rgba(255,255,255,0.6); font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; transition:0.2s; }
+  .modal-cancel-btn:hover { background:rgba(255,255,255,0.07); color:#fff; }
+  .modal-apply-btn { flex:2; padding:11px; background:rgba(255,255,255,0.9); border:none; border-radius:11px; color:#000; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:0.2s; }
+  .modal-apply-btn:hover:not(:disabled) { background:#fff; }
+  .modal-apply-btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .modal-apply-btn.loading { opacity:0.6; cursor:wait; }
 
-  #noteEditor {
-    width:100%; min-height:100%; background:transparent; border:none;
-    color:rgba(255,255,255,0.88); font-family:'DM Sans',sans-serif;
-    font-size:clamp(14px,1.6vw,16px); line-height:1.8; outline:none; resize:none;
-  }
-  #noteEditor::placeholder { color:rgba(255,255,255,0.2); }
-
-  .editor-empty-state { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0.5; padding:40px 20px; }
-  .editor-empty-state h2 { font-family:'Lora',serif; font-size:clamp(20px,3vw,26px); font-weight:600; margin-bottom:10px; }
-  .editor-empty-state p { font-size:14px; color:var(--text-dim); }
-
-  .editor-status { padding:10px 20px; border-top:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:space-between; font-size:11.5px; color:rgba(255,255,255,0.28); flex-shrink:0; flex-wrap:wrap; gap:6px; }
+  /* ── TOAST ── */
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(14px); background:rgba(20,20,25,0.92); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.12); border-radius:100px; padding:10px 20px; font-size:13px; font-weight:500; color:#fff; opacity:0; pointer-events:none; transition:0.3s; z-index:9999; white-space:nowrap; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
   /* ── FOOTER ── */
   .site-footer { flex-shrink:0; margin:0 16px 16px; border-radius:16px; backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); padding:14px clamp(16px,3vw,36px); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
@@ -133,7 +138,6 @@
   .footer-nav { display:flex; align-items:center; gap:4px; flex-wrap:wrap; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:12px; padding:4px 5px; }
   .footer-nav a { font-size:12px; font-weight:500; color:rgba(255,255,255,0.38); text-decoration:none; padding:5px 10px; border-radius:18px; border:1px solid rgba(255,255,255,0.07); background:rgba(255,255,255,0.03); transition:0.22s; }
   .footer-nav a:hover { color:rgba(255,255,255,0.85); background:rgba(255,255,255,0.08); }
-  .footer-nav a.active { color:rgba(255,255,255,0.75); background:rgba(255,255,255,0.06); }
   .footer-sep { width:1px; height:12px; background:rgba(255,255,255,0.12); margin:0 3px; }
 
   /* ── RESPONSIVE ── */
@@ -141,16 +145,16 @@
     .nav-links { display:none; }
     .nav-burger { display:flex; }
     .app-container { flex-direction:column; overflow:auto; height:auto; padding:12px; gap:12px; }
-    .notes-sidebar { width:100%; max-height:200px; border-radius:18px; padding:14px 12px; }
+    .notes-sidebar { width:100%; max-height:220px; border-radius:18px; padding:14px 12px; }
     .editor-workspace { min-height:480px; border-radius:18px; }
-    .editor-toolbar { padding:10px 14px; }
-    .editor-area { padding:16px; }
+    .toolbar { padding:8px 10px; gap:2px; }
+    .tool-btn { font-size:11px; padding:5px 7px; }
+    .editor-body { padding:16px; }
     .site-footer { flex-direction:column; align-items:flex-start; }
   }
   @media (max-width:480px) {
-    .toolbar-right .toolbar-btn span { display:none; }
-    .toolbar-btn { padding:7px 10px; }
-    .editor-status { font-size:10.5px; }
+    .tool-sep { display:none; }
+    .document-title { font-size:18px; }
   }
 </style>
 </head>
@@ -174,7 +178,7 @@
 </div>
 
 <div class="app-container">
-  <!-- Notes List Sidebar -->
+  <!-- Sidebar -->
   <aside class="notes-sidebar">
     <div class="sidebar-header">
       <h2>My Notes</h2>
@@ -182,58 +186,37 @@
     </div>
     <div class="notes-search">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="notesSearchInput" placeholder="Search notes…">
+      <input type="text" id="searchInput" placeholder="Search notes…">
     </div>
-    <div class="quota-bar-wrap" id="notesQuota">
+    <div class="quota-bar-wrap">
       <div class="quota-row">
         <span class="quota-label">Saved notes</span>
         <span class="quota-count" id="notesQuotaCount">0 / 25</span>
       </div>
       <div class="quota-track"><div class="quota-fill" id="notesQuotaFill" style="width:0%"></div></div>
     </div>
-    <div class="notes-list" id="notesList">
-      <div class="sidebar-empty">
-        <span style="font-size:28px;">📝</span>
-        <span>No notes yet.<br>Hit + to create one.</span>
-      </div>
-    </div>
+    <div class="notes-list" id="noteList"></div>
   </aside>
 
   <!-- Editor -->
   <main class="editor-workspace">
-    <div class="editor-empty-state" id="editorEmptyState">
-      <h2>Your notes live here</h2>
-      <p>Select a note from the list, or create a new one to get started.</p>
-    </div>
-
-    <div id="editorPanel" style="display:none; flex:1; flex-direction:column; min-height:0; overflow:hidden; display:none;">
-      <div class="editor-toolbar">
-        <div class="toolbar-left">
-          <input type="text" class="note-title-input" id="noteTitleInput" placeholder="Untitled Note">
-        </div>
-        <div class="toolbar-right">
-          <button class="toolbar-btn" id="aiEnhanceBtn">
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <span>AI Enhance</span>
-          </button>
-          <button class="toolbar-btn primary" id="saveNoteBtn">
-            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            <span>Save</span>
-          </button>
-          <button class="toolbar-btn danger" id="deleteNoteBtn" title="Delete note">
-            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="editor-area">
-        <textarea id="noteEditor" placeholder="Start writing your note here…"></textarea>
-      </div>
-      <div class="editor-status">
-        <span id="editorWordCount">0 words</span>
-        <span id="editorSaveStatus">All changes saved</span>
-      </div>
-    </div>
+    <div id="editorContainer"></div>
   </main>
+</div>
+
+<!-- Transform Modal -->
+<div class="transform-modal" id="transformModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span class="modal-title-text" id="modalTitle">Transform</span>
+      <button class="modal-close-x" id="modalCloseBtn">×</button>
+    </div>
+    <div class="modal-options" id="modalOptions"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel-btn" id="modalCancelBtn">Cancel</button>
+      <button class="modal-apply-btn" id="applyBtn">Apply</button>
+    </div>
+  </div>
 </div>
 
 <footer class="site-footer">
@@ -244,6 +227,8 @@
     <a href="terms.html">Terms</a><a href="privacy.html">Privacy</a>
   </nav>
 </footer>
+
+<div class="toast" id="toast"></div>
 
 <script>
 window.SUPABASE_URL = window.SUPABASE_URL || '';
