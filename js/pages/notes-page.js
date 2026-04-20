@@ -24,6 +24,7 @@ async function bootstrap() {
 }
 
 const ACTIVE_KEY = 'syllastudy_active_note';
+const NOTE_LIMIT = 25;
 
 let notes         = [];
 let activeId      = null;
@@ -96,6 +97,10 @@ function showToast(msg, duration = 2400) {
 }
 
 async function createNote() {
+  if (notes.length >= NOTE_LIMIT) {
+    showToast(`📚 Limit reached — delete a note to make room (${NOTE_LIMIT} max)`);
+    return;
+  }
   const note = await notesService.create({ title: '', content: '' });
   notes    = await notesService.getAll();
   activeId = note.id;
@@ -178,6 +183,23 @@ function showAutosave(saving) {
   }
 }
 
+function renderQuota() {
+  const countEl = document.getElementById('notesQuotaCount');
+  const fillEl  = document.getElementById('notesQuotaFill');
+  if (!countEl || !fillEl) return;
+  const n    = notes.length;
+  const pct  = Math.min(100, (n / NOTE_LIMIT) * 100);
+  const warn = n >= NOTE_LIMIT * 0.8;   // amber at 20+
+  const full = n >= NOTE_LIMIT;          // red at 25
+  countEl.textContent = `${n} / ${NOTE_LIMIT}`;
+  countEl.className   = 'quota-count' + (full ? ' full' : warn ? ' warn' : '');
+  fillEl.style.width  = `${pct}%`;
+  fillEl.className    = 'quota-fill'  + (full ? ' full' : warn ? ' warn' : '');
+  // dim the + button when full
+  const btn = document.getElementById('newNoteBtn');
+  if (btn) { btn.style.opacity = full ? '0.35' : ''; btn.title = full ? `Limit reached (${NOTE_LIMIT} notes max)` : 'New note'; }
+}
+
 function renderSidebar() {
   const list = document.getElementById('noteList');
   const q    = searchQuery.toLowerCase();
@@ -194,6 +216,7 @@ function renderSidebar() {
       <p>${q ? 'No results' : 'No notes yet'}</p>
       ${!q ? '<p style="font-size:12px;opacity:.6">Click + to create one</p>' : ''}
     </div>`;
+    renderQuota();
     return;
   }
 
@@ -206,6 +229,7 @@ function renderSidebar() {
       </div>
       <button class="delete-btn" title="Delete" onclick="event.stopPropagation(); window.__notesConfirmDelete('${n.id}')">×</button>
     </div>`).join('');
+  renderQuota();
 }
 
 function confirmDelete(id) {
