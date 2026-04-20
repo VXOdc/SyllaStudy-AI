@@ -78,7 +78,7 @@
   .timer-section.running::before { opacity:1; animation:ambientPulse 4s ease-in-out infinite; }
   @keyframes ambientPulse { 0%,100%{transform:scale(0.9);opacity:0.4} 50%{transform:scale(1.1);opacity:0.9} }
 
-  .active-task-banner { position:absolute; top:20px; left:50%; transform:translateX(-50%); background:rgba(74,222,128,0.12); border:1px solid rgba(74,222,128,0.3); border-radius:100px; padding:5px 16px; font-size:12px; color:rgba(74,222,128,0.9); letter-spacing:0.05em; white-space:nowrap; max-width:80%; overflow:hidden; text-overflow:ellipsis; opacity:0; pointer-events:none; transition:opacity 0.35s; }
+  .active-task-banner { position:absolute; top:14px; left:50%; transform:translateX(-50%); background:rgba(74,222,128,0.12); border:1px solid rgba(74,222,128,0.3); border-radius:100px; padding:5px 16px; font-size:12px; color:rgba(74,222,128,0.9); letter-spacing:0.05em; white-space:nowrap; max-width:80%; overflow:hidden; text-overflow:ellipsis; opacity:0; pointer-events:none; transition:opacity 0.35s; }
   .active-task-banner.visible { opacity:1; }
 
   .status-badge { display:inline-flex; align-items:center; gap:7px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:18px; padding:6px 15px; border:1px solid var(--glass-border); border-radius:100px; backdrop-filter:blur(10px); background:rgba(255,255,255,0.05); transition:all 0.4s; }
@@ -204,30 +204,88 @@
   @media (max-width: 860px) {
     .nav-links { display:none; }
     .nav-burger { display:flex; }
-    /* Stack layout, allow scrolling on mobile */
     main {
-      display:flex; flex-direction:column;
-      height:auto; overflow:visible;
-      padding:14px 14px 0;
+      display: flex; flex-direction: column;
+      height: auto; overflow: visible;
+      padding: 12px 12px 0;
+      gap: 12px;
     }
-    .timer-section { min-height:420px; border-radius:22px; }
-    .tasks-panel { min-height:400px; border-radius:22px; }
-    .site-footer { flex-direction:column; align-items:flex-start; }
+    .timer-section { border-radius: 22px; }
+    .tasks-panel  { border-radius: 22px; min-height: 460px; }
+    .site-footer  { flex-direction: column; align-items: flex-start; }
   }
-  @media (max-width: 480px) {
-    .timer-display { font-size:46px; }
-    .ring-wrapper { width:190px; height:190px; }
-    .btn-start-timer { padding:12px 28px; min-width:130px; font-size:13px; }
-    .btn-ghost { padding:12px 16px; font-size:12px; }
-    .mode-strip { overflow-x:auto; scrollbar-width:none; }
-    .mode-strip::-webkit-scrollbar { display:none; }
-    .mode-pill { min-width:58px; }
-    .ai-input-wrap { flex-wrap:wrap; }
-    .btn-explode { width:100%; justify-content:center; height:44px; }
-    .task-text { white-space:normal; }
-    .btn-delete-task { opacity:1; }
-    .completion-actions { flex-direction:column; gap:10px; }
-    .completion-actions > * { width:100%; text-align:center; }
+
+  @media (max-width: 600px) {
+    /* ── Timer: compact but breathable ── */
+    .timer-section {
+      min-height: 0;
+      padding-bottom: 56px; /* room for mode-strip */
+    }
+    .status-badge  { margin-bottom: 10px; font-size: 10px; padding: 5px 12px; }
+    .ring-wrapper  { width: 160px; height: 160px; margin-bottom: 14px; }
+    .timer-display { font-size: 42px; letter-spacing: -1.5px; }
+    .timer-session-label { font-size: 10px; margin-top: 4px; }
+    .timer-controls { gap: 8px; margin-top: 2px; }
+    .btn-start-timer { padding: 11px 26px; min-width: 118px; font-size: 13px; }
+    .btn-ghost       { padding: 11px 15px; font-size: 12px; }
+
+    /* ── Mode strip: scrollable pills, taller tap targets ── */
+    .mode-strip {
+      overflow-x: auto; scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .mode-strip::-webkit-scrollbar { display: none; }
+    .mode-pill {
+      min-width: 64px; padding: 10px 6px;
+      gap: 3px;
+    }
+    .mode-pill-icon  { font-size: 15px; }
+    .mode-pill-label { font-size: 9px; }
+    .mode-pill-time  { font-size: 10px; }
+
+    /* ── Task input: stacked, full-width, roomy ── */
+    .tasks-body { padding: 14px; gap: 12px; }
+    .ai-input-wrap {
+      flex-direction: column;
+      gap: 8px;
+    }
+    .ai-input {
+      width: 100%;
+      font-size: 15px;
+      padding: 14px 16px;
+      border-radius: 14px;
+    }
+    .btn-explode {
+      width: 100%;
+      height: 48px;
+      justify-content: center;
+      font-size: 14px;
+      border-radius: 14px;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Task cards: larger tap targets ── */
+    .task-card    { padding: 13px 13px; }
+    .task-text    { white-space: normal; font-size: 13px; }
+    .btn-delete-task { opacity: 1; }
+    .btn-focus-task  { font-size: 11px; padding: 6px 10px; }
+
+    /* ── Completion overlay ── */
+    .completion-actions { flex-direction: column; gap: 10px; }
+    .completion-actions > * { width: 100%; text-align: center; }
+
+    /* ── Panel tabs ── */
+    .panel-tab { font-size: 11px; padding: 13px 6px; }
+
+    /* ── Section labels ── */
+    .section-label { font-size: 10px; }
+  }
+
+  @media (max-width: 380px) {
+    main { padding: 10px 10px 0; }
+    .ring-wrapper { width: 144px; height: 144px; }
+    .timer-display { font-size: 38px; }
+    .mode-pill { min-width: 56px; }
   }
 </style>
 </head>
