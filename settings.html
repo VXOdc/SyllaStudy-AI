@@ -1,1 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings • SyllaStudy AI</title>
+<meta name="description" content="Manage your SyllaStudy AI preferences and local data.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700&family=DM+Sans:wght@300;400;500;600&display=swap');
 
+  :root {
+    --glass-bg: rgba(255,255,255,0.07);
+    --glass-border: rgba(255,255,255,0.16);
+    --glass-blur: 50px;
+    --text-main: #fff;
+    --text-dim: rgba(255,255,255,0.62);
+    --text-muted: rgba(255,255,255,0.35);
+    --danger: rgba(255, 80, 80, 0.85);
+    --danger-border: rgba(255, 80, 80, 0.25);
+    --danger-bg: rgba(255, 80, 80, 0.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  html { overflow-x: hidden; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background:
+      linear-gradient(rgba(0,0,0,0.62), rgba(0,0,0,0.92)),
+      url("https://images.unsplash.com/photo-1771992457539-a65d4a32ae37?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: var(--text-main);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: saturate(0.6) blur(3px);
+    -webkit-backdrop-filter: saturate(0.6) blur(3px);
+    z-index: 0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    height: 64px;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    background: rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 clamp(20px, 5vw, 60px);
+    flex-shrink: 0;
+  }
+  .logo {
+    font-family: 'Lora', serif;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.5px;
+    opacity: 0.95; text-decoration: none; color: #fff; white-space: nowrap;
+  }
+  .nav-links { display: flex; align-items: center; gap: 2px; }
+  .nav-links a {
+    color: #fff; text-decoration: none;
+    padding: 7px 13px; font-size: 14px; font-weight: 500;
+    opacity: 0.6; border-radius: 22px; white-space: nowrap;
+    transition: opacity 0.25s, background 0.25s;
+  }
+  .nav-links a:hover, .nav-links a.active { opacity: 1; background: rgba(255,255,255,0.1); }
+  .nav-burger {
+    display: none;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; width: 38px; height: 38px; border-radius: 10px;
+    align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+  }
+  .nav-burger svg { width:17px; height:17px; stroke:#fff; stroke-width:2; fill:none; stroke-linecap:round; }
+  .mobile-drawer {
+    display: none; flex-direction: column;
+    position: fixed; top: 64px; left: 0; right: 0;
+    background: rgba(8,8,16,0.97);
+    backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    z-index: 199; padding: 10px 16px 18px; gap: 3px;
+  }
+  .mobile-drawer.open { display: flex; }
+  .mobile-drawer a {
+    color: rgba(255,255,255,0.75); text-decoration: none;
+    font-size: 15px; font-weight: 500; padding: 13px 16px; border-radius: 12px;
+    transition: background 0.2s, color 0.2s;
+  }
+  .mobile-drawer a.active, .mobile-drawer a:hover { background: rgba(255,255,255,0.09); color: #fff; }
+
+  /* ── MAIN ── */
+  main {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    padding: clamp(28px,4vw,60px) clamp(16px,4vw,24px) clamp(32px,4vw,80px);
+  }
+
+  .settings-shell {
+    max-width: 680px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    margin-bottom: 8px;
+  }
+  .page-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px;
+  }
+  .page-header h1 {
+    font-family: 'Lora', serif;
+    font-size: clamp(26px,5vw,40px); font-weight: 700;
+    letter-spacing: -0.8px; line-height: 1.1; margin-bottom: 8px;
+  }
+  .page-header p {
+    font-size: 15px; color: var(--text-dim); line-height: 1.6;
+  }
+
+  /* ── SETTINGS CARD ── */
+  .settings-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    overflow: hidden;
+    animation: cardIn 0.5s cubic-bezier(0.23,1,0.32,1) both;
+  }
+  .settings-card:nth-child(2) { animation-delay: 0.05s; }
+  .settings-card:nth-child(3) { animation-delay: 0.10s; }
+  .settings-card:nth-child(4) { animation-delay: 0.15s; }
+  @keyframes cardIn {
+    from { opacity:0; transform:translateY(20px); }
+    to   { opacity:1; transform:none; }
+  }
+
+  .card-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .card-header h2 {
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* ── SETTING ROW ── */
+  .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 18px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    transition: background 0.2s;
+  }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-row:hover { background: rgba(255,255,255,0.03); }
+
+  .setting-info { flex: 1; min-width: 0; }
+  .setting-label {
+    font-size: 14px; font-weight: 500;
+    color: rgba(255,255,255,0.9); margin-bottom: 2px;
+  }
+  .setting-desc {
+    font-size: 12.5px; color: var(--text-muted); line-height: 1.5;
+  }
+
+  /* ── TOGGLE ── */
+  .toggle-wrap { flex-shrink: 0; }
+  .toggle {
+    position: relative;
+    width: 44px; height: 26px;
+    cursor: pointer;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-track {
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 999px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .toggle input:checked ~ .toggle-track {
+    background: rgba(255,255,255,0.85);
+    border-color: rgba(255,255,255,0.85);
+  }
+  .toggle-thumb {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 50%;
+    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  .toggle input:checked ~ .toggle-track .toggle-thumb {
+    transform: translateX(18px);
+    background: #0a0a14;
+  }
+
+  /* ── STORAGE BAR ── */
+  .storage-detail {
+    padding: 16px 24px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .storage-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .storage-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .storage-item-name {
+    font-size: 13px; color: var(--text-dim);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .storage-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.25); flex-shrink: 0;
+  }
+  .storage-item-size {
+    font-size: 12px; color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── DANGER ZONE ── */
+  .settings-card.danger {
+    border-color: var(--danger-border);
+    background: var(--danger-bg);
+  }
+  .settings-card.danger .card-header {
+    border-bottom-color: var(--danger-border);
+  }
+  .settings-card.danger .card-header h2 {
+    color: rgba(255, 100, 100, 0.7);
+  }
+  .settings-card.danger .setting-row:hover {
+    background: rgba(255, 80, 80, 0.05);
+  }
+  .settings-card.danger .setting-row {
+    border-bottom-color: var(--danger-border);
+  }
+
+  /* ── DANGER BUTTON ── */
+  .btn-danger {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif;
+    color: rgba(255, 110, 110, 0.9);
+    background: rgba(255, 80, 80, 0.1);
+    border: 1px solid rgba(255, 80, 80, 0.25);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    white-space: nowrap;
+  }
+  .btn-danger:hover {
+    background: rgba(255, 80, 80, 0.18);
+    border-color: rgba(255, 80, 80, 0.45);
+    color: rgba(255, 130, 130, 1);
+  }
+  .btn-danger:active { transform: scale(0.98); }
+  .btn-danger:disabled {
+    opacity: 0.4; cursor: not-allowed; transform: none;
+  }
+
+  /* ── CONFIRM DIALOG ── */
+  .confirm-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+    padding: 16px;
+  }
+  .confirm-overlay.open { display: flex; }
+
+  .confirm-box {
+    background: rgba(14,14,26,0.96);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 20px;
+    padding: 32px;
+    max-width: 400px;
+    width: 100%;
+    animation: confirmIn 0.2s cubic-bezier(0.23,1,0.32,1);
+  }
+  @keyframes confirmIn {
+    from { opacity:0; transform: scale(0.95); }
+    to   { opacity:1; transform: none; }
+  }
+  .confirm-box h3 {
+    font-family: 'Lora', serif;
+    font-size: 20px; font-weight: 600; margin-bottom: 10px;
+  }
+  .confirm-box p {
+    font-size: 14px; line-height: 1.7; color: var(--text-dim); margin-bottom: 24px;
+  }
+  .confirm-actions {
+    display: flex; gap: 10px; justify-content: flex-end;
+  }
+  .btn-cancel {
+    padding: 9px 18px;
+    font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif;
+    color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px; cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .btn-cancel:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.9); }
+  .btn-confirm-delete {
+    padding: 9px 18px;
+    font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif;
+    color: rgba(255,110,110,0.95);
+    background: rgba(255,80,80,0.12);
+    border: 1px solid rgba(255,80,80,0.3);
+    border-radius: 10px; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .btn-confirm-delete:hover {
+    background: rgba(255,80,80,0.22);
+    border-color: rgba(255,80,80,0.55);
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+    z-index: 600;
+    background: rgba(20,20,36,0.95);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.88);
+    backdrop-filter: blur(20px);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(-4px); }
+
+  /* ── SITE FOOTER ── */
+  .site-footer {
+    flex-shrink: 0; position: relative; z-index: 1;
+    margin: 0 16px 16px; border-radius: 18px;
+    backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+    padding: 16px clamp(16px,3vw,36px);
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  }
+  .footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
+  .footer-nav {
+    display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 12px; padding: 4px 5px;
+  }
+  .footer-nav a {
+    font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.38);
+    text-decoration: none; padding: 5px 10px; border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.03);
+    transition: color 0.22s, background 0.22s;
+  }
+  .footer-nav a:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.08); }
+  .footer-nav a.active { color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.06); }
+  .footer-sep { width: 1px; height: 12px; background: rgba(255,255,255,0.12); margin: 0 3px; }
+
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .nav-burger { display: flex; }
+    .site-footer { flex-direction: column; align-items: flex-start; }
+    .confirm-box { padding: 24px; }
+    .confirm-actions { flex-direction: column-reverse; }
+    .btn-cancel, .btn-confirm-delete { width: 100%; text-align: center; padding: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">SyllaStudy AI</a>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a><a href="chat.html">Study AI</a>
+    <a href="notes.html">SmartNotes</a><a href="quiz.html">QuizGen</a>
+    <a href="taskflow.html">TaskFlow</a><a href="about.html">About</a>
+  </div>
+  <button class="nav-burger" onclick="toggleDrawer()" aria-label="Menu">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+</nav>
+<div class="mobile-drawer" id="drawer">
+  <a href="index.html">Dashboard</a><a href="chat.html">Study AI</a>
+  <a href="notes.html">SmartNotes</a><a href="quiz.html">QuizGen</a>
+  <a href="taskflow.html">TaskFlow</a><a href="about.html">About</a>
+</div>
+
+<main>
+  <div class="settings-shell">
+
+    <div class="page-header">
+      <p class="page-label">App</p>
+      <h1>Settings</h1>
+      <p>Manage your local preferences and stored data.</p>
+    </div>
+
+    <!-- CHAT HISTORY -->
+    <div class="settings-card">
+      <div class="card-header"><h2>Study AI</h2></div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-label">Conversation history</div>
+          <div class="setting-desc">Chat threads and project data stored in your browser</div>
+        </div>
+        <button class="btn-danger" onclick="openConfirm('chat')">Clear history</button>
+      </div>
+    </div>
+
+    <!-- LOCAL DATA -->
+    <div class="settings-card">
+      <div class="card-header"><h2>Local Storage</h2></div>
+      <div class="storage-detail">
+        <div class="storage-items" id="storage-summary">
+          <div class="storage-item">
+            <span class="storage-item-name"><span class="storage-dot"></span>Chat history</span>
+            <span class="storage-item-size" id="size-chat">—</span>
+          </div>
+          <div class="storage-item">
+            <span class="storage-item-name"><span class="storage-dot"></span>Active note preference</span>
+            <span class="storage-item-size" id="size-notes">—</span>
+          </div>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-label">Clear all local data</div>
+          <div class="setting-desc">Removes all browser-stored data for this app. Your account data on the server is not affected.</div>
+        </div>
+        <button class="btn-danger" onclick="openConfirm('all')">Clear all</button>
+      </div>
+    </div>
+
+    <!-- DANGER ZONE -->
+    <div class="settings-card danger">
+      <div class="card-header"><h2>Danger Zone</h2></div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-label">Reset app state</div>
+          <div class="setting-desc">Clears all local data and reloads the app. Use this if something is broken or stuck.</div>
+        </div>
+        <button class="btn-danger" onclick="openConfirm('reset')">Reset &amp; reload</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <span class="footer-copy">© 2026 SyllaStudy AI</span>
+  <nav class="footer-nav">
+    <a href="index.html">Home</a><a href="about.html">About</a>
+    <div class="footer-sep"></div>
+    <a href="terms.html">Terms</a><a href="privacy.html">Privacy</a>
+  </nav>
+</footer>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-overlay" id="confirm-overlay" onclick="handleOverlayClick(event)">
+  <div class="confirm-box">
+    <h3 id="confirm-title">Are you sure?</h3>
+    <p id="confirm-desc">This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-confirm-delete" id="confirm-btn" onclick="executeAction()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Storage keys used by the app ──
+  const KEYS = {
+    chat: ['syllastudy_chat_meta_v1', 'syllastudy_projects_v1'],
+    notes: ['syllastudy_active_note'],
+  };
+
+  let pendingAction = null;
+
+  // ── Measure local storage usage ──
+  function byteSize(val) {
+    if (!val) return 0;
+    return new Blob([val]).size;
+  }
+  function formatBytes(bytes) {
+    if (bytes === 0) return 'empty';
+    if (bytes < 1024) return bytes + ' B';
+    return (bytes / 1024).toFixed(1) + ' KB';
+  }
+
+  function updateStorageDisplay() {
+    try {
+      const chatBytes = KEYS.chat.reduce((acc, k) => acc + byteSize(localStorage.getItem(k)), 0);
+      const noteBytes = KEYS.notes.reduce((acc, k) => acc + byteSize(localStorage.getItem(k)), 0);
+      document.getElementById('size-chat').textContent = formatBytes(chatBytes);
+      document.getElementById('size-notes').textContent = formatBytes(noteBytes);
+    } catch (_) {}
+  }
+
+  // ── Confirm dialog ──
+  const CONFIRM_COPY = {
+    chat: {
+      title: 'Clear chat history?',
+      desc: 'All conversation threads and project data stored in this browser will be removed. This cannot be undone.',
+      btn: 'Clear history',
+    },
+    all: {
+      title: 'Clear all local data?',
+      desc: 'All browser-stored data for SyllaStudy AI will be removed. Your account and server data are not affected.',
+      btn: 'Clear all',
+    },
+    reset: {
+      title: 'Reset and reload?',
+      desc: 'All local data will be cleared and the app will reload. Use this only if something is broken.',
+      btn: 'Reset app',
+    },
+  };
+
+  function openConfirm(action) {
+    pendingAction = action;
+    const copy = CONFIRM_COPY[action];
+    document.getElementById('confirm-title').textContent = copy.title;
+    document.getElementById('confirm-desc').textContent = copy.desc;
+    document.getElementById('confirm-btn').textContent = copy.btn;
+    document.getElementById('confirm-overlay').classList.add('open');
+  }
+
+  function closeConfirm() {
+    document.getElementById('confirm-overlay').classList.remove('open');
+    pendingAction = null;
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('confirm-overlay')) closeConfirm();
+  }
+
+  function executeAction() {
+    closeConfirm();
+    try {
+      if (pendingAction === 'chat') {
+        KEYS.chat.forEach(k => localStorage.removeItem(k));
+        showToast('Chat history cleared');
+      } else if (pendingAction === 'all') {
+        [...KEYS.chat, ...KEYS.notes].forEach(k => localStorage.removeItem(k));
+        showToast('Local data cleared');
+      } else if (pendingAction === 'reset') {
+        [...KEYS.chat, ...KEYS.notes].forEach(k => localStorage.removeItem(k));
+        showToast('Resetting…');
+        setTimeout(() => location.href = 'index.html', 900);
+      }
+      updateStorageDisplay();
+    } catch (err) {
+      showToast('Something went wrong');
+    }
+    pendingAction = null;
+  }
+
+  // ── Toast ──
+  let toastTimer;
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+  }
+
+  // ── Nav drawer ──
+  function toggleDrawer() { document.getElementById('drawer').classList.toggle('open'); }
+  document.addEventListener('click', e => {
+    const d = document.getElementById('drawer');
+    if (!d.contains(e.target) && !e.target.closest('.nav-burger')) d.classList.remove('open');
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeConfirm();
+  });
+
+  // ── Init ──
+  updateStorageDisplay();
+</script>
+</body>
+</html>
