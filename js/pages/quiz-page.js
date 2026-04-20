@@ -26,6 +26,7 @@ const MIN_QUESTION_COUNT  = 1;
 const MAX_QUESTION_COUNT  = 50;
 const DEFAULT_QUESTION_COUNT = 10;
 const MAX_INPUT_CHARS     = 8000;
+const QUIZ_LIMIT          = 25;
 
 let quizzes      = [];
 let activeQuizId = null;
@@ -84,6 +85,7 @@ function renderSidebar() {
       </svg>
       <p>${q ? 'No results' : 'No quizzes yet'}</p>
     </div>`;
+    renderQuota();
     return;
   }
 
@@ -95,6 +97,23 @@ function renderSidebar() {
       </div>
       <button class="delete-btn" title="Delete" onclick="event.stopPropagation(); window.__qzDelete('${quiz.id}')">×</button>
     </div>`).join('');
+  renderQuota();
+}
+
+function renderQuota() {
+  const countEl = document.getElementById('quizQuotaCount');
+  const fillEl  = document.getElementById('quizQuotaFill');
+  if (!countEl || !fillEl) return;
+  const n    = quizzes.length;
+  const pct  = Math.min(100, (n / QUIZ_LIMIT) * 100);
+  const warn = n >= QUIZ_LIMIT * 0.8;
+  const full = n >= QUIZ_LIMIT;
+  countEl.textContent = `${n} / ${QUIZ_LIMIT}`;
+  countEl.className   = 'quota-count' + (full ? ' full' : warn ? ' warn' : '');
+  fillEl.style.width  = `${pct}%`;
+  fillEl.className    = 'quota-fill'  + (full ? ' full' : warn ? ' warn' : '');
+  const btn = document.getElementById('newQuizBtn');
+  if (btn) { btn.style.opacity = full ? '0.35' : ''; btn.title = full ? `Limit reached (${QUIZ_LIMIT} quizzes max)` : 'Create new quiz'; }
 }
 
 async function deleteQuiz(id) {
@@ -330,6 +349,7 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
   if (!text) { showToast('✍️ Please paste some text to generate a quiz'); return; }
   if (text.length < 50) { showToast('⚠️ Text is too short. Add more content for better questions.'); return; }
   if (text.length > MAX_INPUT_CHARS) { showToast(`⚠️ Text is too long. Please limit to ${MAX_INPUT_CHARS} characters.`); return; }
+  if (quizzes.length >= QUIZ_LIMIT) { showToast(`📚 Limit reached — delete a quiz to make room (${QUIZ_LIMIT} max)`); return; }
 
   overlay.classList.add('show');
   genBtn.disabled = true;
