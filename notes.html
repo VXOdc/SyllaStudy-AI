@@ -70,6 +70,18 @@
 
   .sidebar-empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0.4; font-size:13px; text-align:center; gap:8px; padding:20px; }
 
+  /* ── QUOTA INDICATOR ── */
+  .quota-bar-wrap { padding:0 4px; display:flex; flex-direction:column; gap:5px; flex-shrink:0; }
+  .quota-row { display:flex; align-items:center; justify-content:space-between; }
+  .quota-label { font-size:10.5px; color:rgba(255,255,255,0.38); letter-spacing:0.04em; }
+  .quota-count { font-size:10.5px; font-weight:600; color:rgba(255,255,255,0.55); font-variant-numeric:tabular-nums; transition:color 0.3s; }
+  .quota-count.warn { color:rgba(251,191,36,0.85); }
+  .quota-count.full { color:rgba(255,90,90,0.9); }
+  .quota-track { height:3px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; }
+  .quota-fill { height:100%; border-radius:99px; background:rgba(255,255,255,0.3); transition:width 0.4s cubic-bezier(0.4,0,0.2,1),background 0.3s; }
+  .quota-fill.warn { background:rgba(251,191,36,0.7); }
+  .quota-fill.full { background:rgba(255,90,90,0.8); }
+
   /* ── EDITOR ── */
   .editor-workspace {
     flex: 1; background: var(--glass-bg);
@@ -171,6 +183,13 @@
     <div class="notes-search">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="notesSearchInput" placeholder="Search notes…">
+    </div>
+    <div class="quota-bar-wrap" id="notesQuota">
+      <div class="quota-row">
+        <span class="quota-label">Saved notes</span>
+        <span class="quota-count" id="notesQuotaCount">0 / 25</span>
+      </div>
+      <div class="quota-track"><div class="quota-fill" id="notesQuotaFill" style="width:0%"></div></div>
     </div>
     <div class="notes-list" id="notesList">
       <div class="sidebar-empty">
