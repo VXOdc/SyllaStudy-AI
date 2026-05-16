@@ -316,7 +316,7 @@
   <section class="timer-section" id="timerSection">
     <div class="active-task-banner" id="activeTaskBanner">Focusing on: —</div>
     <div class="completion-overlay" id="completionOverlay">
-      <div class="completion-emoji">🎯</div>
+      <div class="completion-emoji"></div>
       <div class="completion-title">Session Complete</div>
       <div class="completion-sub" id="completionSub">You focused for 25 minutes</div>
       <div class="completion-actions">
@@ -353,8 +353,8 @@
     </div>
     <div class="mode-strip">
       <div class="mode-pill active" data-mode="focus" data-minutes="25"><span class="mode-pill-icon">🔴</span><span class="mode-pill-label">Focus</span><span class="mode-pill-time">25 min</span></div>
-      <div class="mode-pill" data-mode="deep" data-minutes="45"><span class="mode-pill-icon">🧠</span><span class="mode-pill-label">Deep Work</span><span class="mode-pill-time">45 min</span></div>
-      <div class="mode-pill" data-mode="review" data-minutes="15"><span class="mode-pill-icon">⚡</span><span class="mode-pill-label">Sprint</span><span class="mode-pill-time">15 min</span></div>
+      <div class="mode-pill" data-mode="deep" data-minutes="45"><span class="mode-pill-label">Deep Work</span><span class="mode-pill-time">45 min</span></div>
+      <div class="mode-pill" data-mode="review" data-minutes="15"><span class="mode-pill-label">Sprint</span><span class="mode-pill-time">15 min</span></div>
       <div class="mode-pill" data-mode="break" data-minutes="5"><span class="mode-pill-icon">🌊</span><span class="mode-pill-label">Break</span><span class="mode-pill-time">5 min</span></div>
       <div class="mode-pill" data-mode="custom" data-minutes="0"><span class="mode-pill-icon">✏️</span><span class="mode-pill-label">Custom</span><span class="mode-pill-time" id="customPillTime">— min</span></div>
     </div>
@@ -369,7 +369,7 @@
     <div class="tasks-body" id="tabTasks">
       <div class="ai-input-wrap">
         <input type="text" id="goalInput" class="ai-input" placeholder="Type a big goal… AI breaks it down">
-        <button class="btn-explode" id="explodeBtn">⚡AI Break Down</button>
+        <button class="btn-explode" id="explodeBtn">AI Break Down</button>
       </div>
       <div class="section-label"><span>To Do</span><span id="taskCount" style="font-size:11px;color:var(--text-dim);">0 tasks</span></div>
       <div id="todoList"><div class="empty-state">Enter a goal above and let AI break it into micro-tasks 🌊</div></div>
@@ -390,11 +390,14 @@
 </main>
 
 <footer class="site-footer">
-  <span class="footer-copy">© 2026 SyllaStudy AI</span>
+  <span class="footer-copy">© 2026 SyllaStudy AI. All rights reserved.</span>
   <nav class="footer-nav">
     <a href="index.html">Home</a><a href="about.html">About</a><a href="settings.html">Settings</a>
     <div class="footer-sep"></div>
     <a href="terms.html">Terms</a><a href="privacy.html">Privacy</a>
+    <div class="footer-sep"></div>
+    <a href="https://www.instagram.com/syllastudyai/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">Instagram</a>
+    <a href="mailto:syllastudyai@gmail.com" aria-label="Email">Contact</a>
   </nav>
 </footer>
 
