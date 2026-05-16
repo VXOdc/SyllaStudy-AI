@@ -431,9 +431,9 @@
       <div class="setting-row">
         <div class="setting-info">
           <div class="setting-label">Conversation history</div>
-          <div class="setting-desc">Chat threads and project data stored in your browser</div>
+          <div class="setting-desc">Chat threads, project folders, and conversation metadata stored in your browser</div>
         </div>
-        <button class="btn-danger" onclick="openConfirm('chat')">Clear history</button>
+        <button class="btn-danger" type="button" onclick="openConfirm('chat')">Clear history</button>
       </div>
     </div>
 
@@ -447,8 +447,20 @@
             <span class="storage-item-size" id="size-chat">—</span>
           </div>
           <div class="storage-item">
-            <span class="storage-item-name"><span class="storage-dot"></span>Active note preference</span>
+            <span class="storage-item-name"><span class="storage-dot"></span>SmartNotes</span>
             <span class="storage-item-size" id="size-notes">—</span>
+          </div>
+          <div class="storage-item">
+            <span class="storage-item-name"><span class="storage-dot"></span>QuizGen</span>
+            <span class="storage-item-size" id="size-quizzes">—</span>
+          </div>
+          <div class="storage-item">
+            <span class="storage-item-name"><span class="storage-dot"></span>TaskFlow</span>
+            <span class="storage-item-size" id="size-tasks">—</span>
+          </div>
+          <div class="storage-item">
+            <span class="storage-item-name"><span class="storage-dot"></span>App profile</span>
+            <span class="storage-item-size" id="size-profile">—</span>
           </div>
         </div>
       </div>
@@ -457,7 +469,7 @@
           <div class="setting-label">Clear all local data</div>
           <div class="setting-desc">Removes all browser-stored data for this app. Your account data on the server is not affected.</div>
         </div>
-        <button class="btn-danger" onclick="openConfirm('all')">Clear all</button>
+        <button class="btn-danger" type="button" onclick="openConfirm('all')">Clear all</button>
       </div>
     </div>
 
@@ -469,7 +481,7 @@
           <div class="setting-label">Reset app state</div>
           <div class="setting-desc">Clears all local data and reloads the app. Use this if something is broken or stuck.</div>
         </div>
-        <button class="btn-danger" onclick="openConfirm('reset')">Reset &amp; reload</button>
+        <button class="btn-danger" type="button" onclick="openConfirm('reset')">Reset &amp; reload</button>
       </div>
     </div>
 
@@ -479,33 +491,63 @@
 <footer class="site-footer">
   <span class="footer-copy">© 2026 SyllaStudy AI</span>
   <nav class="footer-nav">
-    <a href="index.html">Home</a><a href="about.html">About</a>
+    <a href="index.html">Home</a><a href="about.html">About</a><a href="settings.html" class="active">Settings</a>
     <div class="footer-sep"></div>
     <a href="terms.html">Terms</a><a href="privacy.html">Privacy</a>
   </nav>
 </footer>
 
 <!-- CONFIRM DIALOG -->
-<div class="confirm-overlay" id="confirm-overlay" onclick="handleOverlayClick(event)">
+<div class="confirm-overlay" id="confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-desc" onclick="handleOverlayClick(event)">
   <div class="confirm-box">
     <h3 id="confirm-title">Are you sure?</h3>
     <p id="confirm-desc">This action cannot be undone.</p>
     <div class="confirm-actions">
-      <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
-      <button class="btn-confirm-delete" id="confirm-btn" onclick="executeAction()">Confirm</button>
+      <button class="btn-cancel" type="button" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-confirm-delete" id="confirm-btn" type="button" onclick="executeAction()">Confirm</button>
     </div>
   </div>
 </div>
 
 <!-- TOAST -->
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" aria-live="polite"></div>
 
 <script>
   // ── Storage keys used by the app ──
-  const KEYS = {
-    chat: ['syllastudy_chat_meta_v1', 'syllastudy_projects_v1'],
-    notes: ['syllastudy_active_note'],
+  const STORAGE_KEYS = {
+    chat: [
+      'syllastudy_chats_cache_v1',
+      'syllastudy_chat_meta_v1',
+      'syllastudy_projects_v1',
+      'vxoChats',
+      'vxoCurrentChat',
+      'chats',
+      'currentChat',
+    ],
+    notes: [
+      'syllastudy_notes_cache_v1',
+      'syllastudy_notes',
+      'syllastudy_active_note',
+    ],
+    quizzes: [
+      'syllastudy_quizzes_cache_v1',
+      'syllastudy_quizzes',
+    ],
+    tasks: [
+      'syllastudy_tasks_cache_v1',
+      'syllastudy_tasks_v2',
+    ],
+    profile: [
+      'syllastudy_local_user_id',
+    ],
   };
+
+  const LEGACY_APP_KEYS = new Set([
+    'vxoChats',
+    'vxoCurrentChat',
+    'chats',
+    'currentChat',
+  ]);
 
   let pendingAction = null;
 
@@ -519,13 +561,36 @@
     if (bytes < 1024) return bytes + ' B';
     return (bytes / 1024).toFixed(1) + ' KB';
   }
+  function groupSize(keys) {
+    return keys.reduce((acc, k) => acc + byteSize(localStorage.getItem(k)), 0);
+  }
+  function setSize(id, bytes) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = formatBytes(bytes);
+  }
+  function allKnownStorageKeys() {
+    const keys = new Set(Object.values(STORAGE_KEYS).flat());
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('syllastudy_') || LEGACY_APP_KEYS.has(key))) {
+          keys.add(key);
+        }
+      }
+    } catch (_) {}
+    return [...keys];
+  }
+  function removeKeys(keys) {
+    keys.forEach(k => localStorage.removeItem(k));
+  }
 
   function updateStorageDisplay() {
     try {
-      const chatBytes = KEYS.chat.reduce((acc, k) => acc + byteSize(localStorage.getItem(k)), 0);
-      const noteBytes = KEYS.notes.reduce((acc, k) => acc + byteSize(localStorage.getItem(k)), 0);
-      document.getElementById('size-chat').textContent = formatBytes(chatBytes);
-      document.getElementById('size-notes').textContent = formatBytes(noteBytes);
+      setSize('size-chat', groupSize(STORAGE_KEYS.chat));
+      setSize('size-notes', groupSize(STORAGE_KEYS.notes));
+      setSize('size-quizzes', groupSize(STORAGE_KEYS.quizzes));
+      setSize('size-tasks', groupSize(STORAGE_KEYS.tasks));
+      setSize('size-profile', groupSize(STORAGE_KEYS.profile));
     } catch (_) {}
   }
 
@@ -549,12 +614,15 @@
   };
 
   function openConfirm(action) {
-    pendingAction = action;
     const copy = CONFIRM_COPY[action];
+    if (!copy) return;
+    pendingAction = action;
     document.getElementById('confirm-title').textContent = copy.title;
     document.getElementById('confirm-desc').textContent = copy.desc;
-    document.getElementById('confirm-btn').textContent = copy.btn;
+    const confirmBtn = document.getElementById('confirm-btn');
+    confirmBtn.textContent = copy.btn;
     document.getElementById('confirm-overlay').classList.add('open');
+    setTimeout(() => confirmBtn.focus?.(), 0);
   }
 
   function closeConfirm() {
@@ -567,16 +635,19 @@
   }
 
   function executeAction() {
+    const action = pendingAction;
     closeConfirm();
+    if (!action) return;
+
     try {
-      if (pendingAction === 'chat') {
-        KEYS.chat.forEach(k => localStorage.removeItem(k));
+      if (action === 'chat') {
+        removeKeys(STORAGE_KEYS.chat);
         showToast('Chat history cleared');
-      } else if (pendingAction === 'all') {
-        [...KEYS.chat, ...KEYS.notes].forEach(k => localStorage.removeItem(k));
+      } else if (action === 'all') {
+        removeKeys(allKnownStorageKeys());
         showToast('Local data cleared');
-      } else if (pendingAction === 'reset') {
-        [...KEYS.chat, ...KEYS.notes].forEach(k => localStorage.removeItem(k));
+      } else if (action === 'reset') {
+        removeKeys(allKnownStorageKeys());
         showToast('Resetting…');
         setTimeout(() => location.href = 'index.html', 900);
       }
