@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <a href="/index.html#features">Features</a>
                         <a href="/about.html#contact">Contact</a>
                         <a href="/about.html">About</a>
+                        <a href="/settings.html">Settings</a>
                     </div>
                 </div>
                 <div class="site-footer__group">
